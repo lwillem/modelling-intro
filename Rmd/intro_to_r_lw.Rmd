@@ -150,15 +150,15 @@ For example, can you install the packages `deSolve` and 'curl'? We will use this
 Once installed you then have to load the package at the start of the R file. This is done using 
 
 ```{r results = "hide"}
-library(curl) # load in the curl library of function (to import data)
-library(deSolve) # load in the deSolve library of functions (to solve ODE's)
+library(curl) # load the curl library of function (to import data)
+library(deSolve) # load the deSolve library of functions (to solve ODE's)
 ```
 
 ## Reading in data
 
 In order to read in data, the first thing to do is to check that you are pointing R at the right folder by setting the appropriate working directory. To do this make sure you `setwd(where_the_data_is)`, to point R to wherever you have decided to store your files.
 
-For this practical, you will first need to download the required data from (in [CSV format](https://en.wikipedia.org/wiki/Comma-separated_values)) from [here](https://github.com/lwillem/modelling-intro/raw/master/data/data.csv). Save it in the correct folder and make this your current working directory. 
+For this tutorial, you will first need to download the required data from (in [CSV format](https://en.wikipedia.org/wiki/Comma-separated_values)) from [here](https://github.com/lwillem/modelling-intro/raw/master/data/data.csv). Save it in the correct folder and make this your current working directory. 
 
 You can do it automatically via R using the 'curl' package. The following command will download the data and store it in your current directory under 'data.csv'
 ```{r echo = TRUE,eval = FALSE}

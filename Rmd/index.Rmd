@@ -16,8 +16,9 @@ Welcome to the introductory material on infectious disease modelling in R for 5-
 
 ## Sessions
 
-1. [Introduction to R](intro_to_r_lw.html)
-2. [Introduction to infectious disease modelling in R](intro_to_SIR_lw.html)
+1. [Introduction to RStudio](intro_to_rsturio_lw.html)
+2. [Introduction to R](intro_to_r_lw.html)
+3. [Introduction to infectious disease modelling in R](intro_to_SIR_lw.html)
 <!--2. [Stochastic models](code_sto_model.html)-->
 <!-- 3. [Using the fitR package](using_fitR.html) -->
 <!-- 4. [Sampling from the posterior distribution using MCMC](mcmc.html) -->

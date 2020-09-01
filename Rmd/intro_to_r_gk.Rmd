@@ -39,7 +39,7 @@ You can use this in your R file to comment what the code is doing in your own wo
 
 ## Working directory
 The first step when creating a new R file is to specify a working directory. This is the folder on your computer in which you are working. It is likely to be the folder in which the R code is saved (but it doesn't have to be). 
-Each computer will have a different specified address for the working directory. Upon opening R, you can find out "where you are" using
+Each computer will have a different specified address for the working directory. Upon opening RStudio, you can find out "where you are" using
 
 ```{r results = "hide"}
 getwd() # Where am I now? 
