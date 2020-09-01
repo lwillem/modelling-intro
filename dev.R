@@ -1,6 +1,6 @@
 require('rmarkdown')
 
-project_dir <- path.expand("~/code/modelling")
+project_dir <- path.expand("~/Documents/university/teaching/GitHub_course_repos/modelling_course")
 Rmd_dir <- file.path(project_dir, "Rmd")
 html_dir <- file.path(project_dir, "website")
 
