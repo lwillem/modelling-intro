@@ -1,0 +1,290 @@
+---
+title: "Introduction to infectious disease modelling in R"
+---
+
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+```
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, tidy=TRUE, warning=FALSE)
+```
+
+# Objectives
+The aim of this session is to introduce you to coding of the Susceptible-Infected-Recovered transmission model and to solve the corresponding ordinary differential equations within R.  
+
+In this session, you will
+
+1. simulate an SIR model in R
+2. adapt an SIR model to include births and deaths, producing cycles
+
+
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. All the data to download is in the [github repository](https://github.com/sbfnk/chennai-modelling/tree/master/data) (links to download any data files are given below when you are supposed to load them). 
+
+You can either work in a single R window, or use the user friendly interface RStudio, which allows you to have your saved R code, separate to your executed commands. It also holds the plot, environment and history window. Using RStudio you can keep your model code (in a file called 'file.R', where you can replace 'file' with any name you like) separate to your executed code in the Console window. In this 'file.R' you can store the useful and checked code for future use. For example, you could start a new R file and store in it all the commands below.   
+
+# Basic syntax
+
+## Working directory
+The first step when creating a new R file is to specify a working directory. This is the folder on your computer in which you are working. It is likely to be the folder in which the R code is saved (but it doesn't have to be). 
+Each computer will have a different specified address for the working directory. Upon opening R, you can find out "where you are" using
+
+```{r results = "hide"}
+getwd() # Where am I now? 
+``` 
+
+You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+For example, on Gwen's computer this is:
+
+```{r results = "hide", eval = FALSE}
+setwd("~/Imperial/Chennai_workshop/")
+```
+You can also label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
+
+```{r results = "hide", eval = FALSE}
+home <- "~/Imperial/Chennai_workshop/" ## on a OS X
+setwd(home)
+```
+
+or
+
+```{r results = "hide", eval = FALSE}
+home <- "C:\\Documents\\Chennai_workshop\\" ## on windows
+setwd(home)
+```
+
+## Packages and libraries
+
+As R is open source, it is being developed and added to all the time. It is likely that you may need commands that are not in the standard R programme that you have installed. 
+
+To get access to these other functions, you need to install 'packages'. These contain 'libraries' of functions, already coded into R, that can perform new or different functions. 
+
+There are two ways to do this:
+1) In RStudio, go to the "Packages" tab and search for the required package and load it. 
+2) Type
+
+```{r results = "hide",eval = FALSE}
+install.packages("packagename")
+```
+
+replacing "packagename" with the name of the package you would like to install.
+For example, can you install the package `deSolve`? We will use this to solve ordinary differential equations later on in this practical.
+
+Once installed you then have to load the package at the start of the R file. This is done using 
+
+```{r results = "hide"}
+library(deSolve) # load in the deSolve library of functions
+```
+
+## Writing your own functions
+
+Functions are useful ways of packaging up pieces of code. If you are going to do a set of commands multiple times then it can be simpler and cleaner to place them in a function that has been thoroughly checked and that you have not altered subsequently.
+
+To build a function you use the syntax
+
+```{r eval = FALSE}
+name_of_function <- function(inputs){ code }
+```
+
+Within the 'code' section you need to include the main coding information, which uses the inputs and also 'returns' an output. 
+
+For example, if Gwen were to build her own function for calculating the mean she might do:
+```{r results = "hide"}
+gwen_mean <- function(vector, times){
+  sum_vector <- sum(vector)
+  length_vector <- length(vector)
+  gwen_mean <- sum_vector / length_vector 
+  gwen_mean_power <- gwen_mean ^ times
+  return(list(gwen_mean = gwen_mean, gwen_mean_power = gwen_mean_power))
+}
+```
+
+To run the function you need the function name and the correct inputs:
+```{r results = "hide"}
+gwen_mean( c(1,2,3,43) , 3) # prints output
+gh_mean <- gwen_mean(c(1,2,3,43), 3)
+gh_mean
+```
+
+You can store all the functions that you have in one big .R file and load them into your current R file using the command `source`. 
+
+Can you understand what the following function does? 
+```{r results = "hide"}
+find_day_many <- function(matrix){
+  u <- unique(matrix$ward) # What wards are there?
+  days <- c() # store in here
+  for(i in 1:length(u)){
+    w <- which(matrix$ward == u[i]) # find which rows of the data are for this ward
+    r <- which(matrix[w,"number"] > 1) # find which rows for this ward have more than 1 person
+    days <- c(days,matrix[w[r],"time"]) # when are there 2 or more infected? 
+  }
+  return(days)
+}
+```
+
+Does this give you the output you expected? You will need to use some of the commands for looking at data that were introduced above. The file `ward_data.csv` can be found [here](https://github.com/sbfnk/chennai-modelling/raw/master/data/ward_data.csv).
+
+```{r echo = FALSE}
+curl_download("https://github.com/sbfnk/chennai-modelling/raw/master/data/ward_data.csv", destfile = "ward_data.csv")
+```
+
+```{r results = "hide"}
+wardd <- read.csv("ward_data.csv")
+d <- find_day_many(wardd)
+d
+```
+
+# Writing and solving ordinary differential equations
+In order to write and solve ODEs, you need to learng the basic `ode` syntax in R and load the package that we installed earlier (`deSolve`). Remember that to do this you need to type:
+```{r results = "hide"}
+library(deSolve) 
+```
+
+The package `deSolve` includes a function `ode` that solves ODE equations. This function needs certain inputs. Have a look at
+```{r results = "hide", tidy = FALSE}
+?ode
+```
+and see if you can understand what the required inputs are. 
+
+For this part of the practical, we will build and solve our own SIR model. We will compare it to data and try to determine the correct parameters. 
+
+Firstly we need to read in the data, which is stored in "data_sir.csv". As before, download this from [here](https://github.com/sbfnk/chennai-modelling/raw/master/data/data_sir.csv) and point R to the correct working directory where you have this data saved. Then you can type:
+
+```{r echo = FALSE}
+curl_download("https://github.com/sbfnk/chennai-modelling/raw/master/data/data_sir.csv", destfile = "data_sir.csv")
+```
+
+```{r results = "hide"}
+data <- read.csv("data_sir.csv") 
+```
+Can you make a simple plot to check what this SIR outbreak looks like? 
+
+As described in the help pages for `ode`, this function itself requires several inputs including another function. 
+
+The first input it requires are the initial conditions. We have to specify the initial conditions for all of the states. Here we have three states, S, I and R:
+```{r results = "hide"}
+init <- c(S = 0, I = 0, R = 0)
+```
+Can you alter this initial vector for a population of 100,000 to have initially one infected and the rest susceptible? 
+
+The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the timesteps over which the ODE will be solved. These are specified by the method. Here lets assume lets say we want output every year for 40 years. 
+```{r results = "hide"}
+times <- seq(0, 40, by = 1) 
+```
+
+The third required input is the function itself, which governs the dynamics between the states. Here as we have an SIR model we can translate the differential equations into three simple relationships:
+```{r results = "hide"}
+sir <- function(time, state, parameters) { # {{Curly brackets indicate the beginning and end of functions}}
+  # This is the meat of the function - what happens to the parameters. Here it needs to be a list}}
+  with(as.list(c(state, parameters)), {
+    dS = -beta * S * I  # The change in S 
+    dI = beta * S * I - gamma * I
+    dR = gamma * I
+    return(list(c(dS, dI, dR))) # {{"Return" as in "spit out" the values that you want}}
+  }) 
+} 
+```
+
+Finally, the `ode` function requires the input parameters, which here are only beta and gamma:
+```{r results = "hide"}
+parameters <- c(beta = 2/100000, gamma = 0.5)
+```
+
+In order to run the function we input all of the above and save the output in a vector called `out`:
+```{r results = "hide"}
+init <- c(S = 100000 - 1, I = 1, R = 0)
+out <- ode(y = init,  func = sir, times = times, parms = parameters)
+head(out) 
+```
+What does the output data look like? Does it make sense? Can you build a simple plot to look at the change in the number Infected over time? 
+
+To look at all of the model output we can plot everything on the same graph:
+```{r results = "hide"}
+plot(out[,"time"],out[,"S"],type="l",lwd = 10, col="green",xlab="Time",ylab="Number")
+lines(out[,"time"],out[,"I"],col="red",lwd = 10)
+lines(out[,"time"],out[,"R"],col="blue",lwd = 10)
+legend(25, 40000, c("Susceptibles", "Infecteds", "Recovereds"), lwd = 10, lty = 1, col = 2:4) # Add legend and specific position
+```
+
+Does this match the data you read before in using `read.csv` well? Note, that the data given is the proportions infected over time. So in order to compare you either need to convert the data to numbers or the numbers to data. Try and do this, and plot the data and model output on the same graph. A solution is given below if you get stuck. 
+
+What we are doing here is assessing our model's "fit" to the data. This is a key stage in the development of any model - does it refect reality? The simplest way to do this is by plotting model output and data together and comparing them by eye. Over the next few days, we will introduce several more formal and quantitative methods for assessing a model "fit".  
+
+
+```{r }
+data$number = data$proportion * 100000
+plot(out[,"time"],out[,"S"],type="l",lwd = 5, col="green",xlab="Time",ylab="Number")
+lines(out[,"time"],out[,"I"],col="red",lwd = 5)
+lines(out[,"time"],out[,"R"],col="blue",lwd = 5)
+legend(25, 80000, c("Susceptibles", "Infecteds", "Recovereds"), lwd = 5, lty = 1, col = 2:4) #
+points(data$time,data$number)
+```
+
+Assume you know that the value for `beta` is 2/100000. Can you write a function that considers a range of different parameters for `gamma`, runs the model with these various values and then plots the outcomes with the data? From this what is the best estimate you can get for `gamma`? 
+
+Note that this was output generated with a set value for gamma and so you can find a solution - however in the real world epidemic there is unlikely to be such a perfect fit! 
+
+The solution to the code is below, but try not to look at this before having a go yourself. This will use all the skills you've learnt in R above and will prepare you for the rest of the course. 
+
+
+```{r results = "hide"}
+# Run for many values of gamma
+gamma_values <- seq(0.2,0.8,0.1) # vector of possible gamma values
+store_I <- matrix(0,length(gamma_values) * length(times) ,3) ### Empty vector where we will store the output
+
+# Run through and solve with each gamma value
+for(i in 1:length(gamma_values)){ # Length = how many entries in vector
+  # What gamma value in this run? 
+  gamma_new <- gamma_values[i]
+  # New parameter set
+  parameters <- c(beta = 2/100000, gamma = gamma_new)
+  # Run with this new parameter set
+  out <- ode(y = init, times = times, func = sir, parms = parameters)
+  # Store the number of infecteds this produces
+  stored <- cbind(out[,"time"],out[,"I"],gamma_new) # Bind the columns with time, the infected and the new gamma
+  store_I[((i-1)*length(times)+1):(i*length(times)),]=stored # Store in the big matrix 
+}
+# Have a look at what you have...(again wouldn't usually include this in the saved R code)
+head(store_I)
+colnames(store_I)<-c("Time","Infecteds","gamma_new")
+
+# Plot 
+plot(store_I[,"Time"],store_I[,"Infecteds"],type="l",xlab="Time",ylab="Number")
+points(data$time,data$number) # compare visually to data
+
+```
+
+You can store your data for the SIR solution at different gamma values using (as above):
+
+```{r eval = FALSE}
+setwd(home) # Where do you want to store it? maybe have a "store" folder? 
+write.csv(store_I,"store_changing_gamma.csv") # What you want to save and then the name to give the file
+```
+
+# Going further
+
+## The SIR model with births and deaths
+
+In the lecture yesterday, you saw the infection cycles that occur when you use an SIR model with births and deaths. If you have gotten this far, try to build and solve using ode, your own version of this SIR model with births and deaths. 
+
+Remember that the set of ordinary differential equations for this is:
+$$\frac{dS}{dt} = - \beta \frac{I}{N} S + \nu N - \mu S \\
+\frac{dI}{dt} =  \beta \frac{I}{N} S -\gamma I - \mu I \\
+\frac{dR}{dt} = \gamma I - \mu R $$.
+
+Initial parameters from the lecture were:
+$$ \beta = 500, \gamma = 50, \nu = 0.02 $$.
+
+Remember that the population size should stay constant, at say 1,000. 
+
+## Extending the SIR model
+
+If you have time, you can now try to build more complex versions of the SIR model to match the infectious disease you are interested in. For example, you could try and include multiple strains of influenza or extend the model to include some of the complexity of TB. The first stage would be to sketch the model structure on paper. Remember that simplicity is the key and that you will need data to inform any parameter values. Secondly, translate the model structure into differential equations. Thirdly, translate the differential equations into a new function to use in the ode solver function. 
+
+
+<div>
+# Navigate
+Top: [Index](index.html)
+</div>
+

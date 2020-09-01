@@ -1,24 +1,24 @@
 ---
 title: "Introduction to infectious disease modelling in R"
-author: by Sebastian Funk, Gwen Knight and Anton Camacho
+author: by Lander Willem (based on work from Sebastian Funk, Gwen Knight and Anton Camacho)
 output:
   html_document:
     toc: false  
 ---
 
-![](ext_fig/lshtm_cmmid.png)
+![](ext_fig/simid_course_logo_combine.jpg)
 
-Welcome to the introductory material on infectious disease modelling in R. The material included here is based on the Modelling Infectious Diseases course at The Institute of Mathematical Sciences, Chennai, India, held as part of the [Workshop on Infectious Disease Modeling](http://www.imsc.res.in/~sitabhra/meetings/infection15/), 23-28 November, 2015. Below you will find the lab practical sessions, which can also be used for self-study.
-
+Welcome to the introductory material on infectious disease modelling in R for 5-day course on "Modelling infectious Diseases and Health Economics" as part of the Antwerp Summer University. The tutorials are based a work from Sebastian Funk, Gwen Knight and Anton Camacho from the London School of Hygiene & Tropical Medicine. We fully acknowledge their work and are thankfull for making them open-source via [GitHub](https://github.com/sbfnk/modelling).
 
 ## Required software
-* [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-3.2.0.
-* [RStudio](http://www.rstudio.com/products/rstudio/download/) (optional) is a popular graphic user interface (GUI).
+* [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-3.5.0.
+* [RStudio](http://www.rstudio.com/products/rstudio/download/) (recommended) is a popular graphic user interface (GUI).
 
-## Lab sessions
+## Sessions
 
-1. [R Introduction and deterministic models](intro_to_r_gk.html)
-2. [Stochastic models](code_sto_model.html)
+1. [Introduction to R](intro_to_r_lw.html)
+2. [Introduction to infectious disease modelling in R](intro_to_SIR_lw.html)
+<!--2. [Stochastic models](code_sto_model.html)-->
 <!-- 3. [Using the fitR package](using_fitR.html) -->
 <!-- 4. [Sampling from the posterior distribution using MCMC](mcmc.html) -->
 
