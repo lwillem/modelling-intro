@@ -25,10 +25,10 @@ Whth the following screenshot of RStudio, we would like to focus on different us
 
 
 
-1. The R-file (`SIMID_R_tutorial.R` in this case) in which you can add and modify code and save afterwards. You can execute the code (see below).
+1. The R-file (`simid_R_tutorial.R` in this case) in which you can add and modify code and save afterwards. You can execute the code (see below).
 
 2. Your working directory. This is the folder on your computer in which you are working. It is likely to be the folder in which the R code is saved (but it doesn't have to be). 
-Each computer will have a different specified address for the working directory. Upon opening R, you can find out "where you are" using
+Each computer will have a different specified address for the working directory. Upon opening RStudio, you can find out "where you are" using
 
 3. The console where you can by type (or copy and paste) the R commands to execute (hit `enter`).
 
