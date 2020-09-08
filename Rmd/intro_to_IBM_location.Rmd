@@ -11,7 +11,7 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FAL
 ```
 
 # Objectives
-The aim of this tutorial is to run scenairo analyses with an individual-based model in R that accounts for location specific mixing.
+The aim of this tutorial is to run scenario analyses with an individual-based model in R that accounts for location specific mixing.
 
 In this session, you will
 
@@ -22,7 +22,7 @@ The best thing to do is to read each section and type (or copy and paste) the R 
 
 # Modelling concepts
 
-The individual-based model will make use of a virtual population in wich each individual is part of a household, school/work (based on age), and the general community. Each day (= time step), indiviuals can interact at home, school/work and in the community. We specify for each location a contact probability or average number of contacts per day.
+The individual-based model will make use of a virtual population in which each individual is part of a household, school/work (based on age), and the general community. Each day (= time step), individuals can interact at home, school/work and in the community. We specify for each location a contact probability or average number of contacts per day.
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -47,7 +47,9 @@ source('ibm_functions.R')
 
 # Base case scenario
 
+<n style="color:darkred">
 First, lets run the model with the default parameters:
+</n>
 
 ```{r }
 # you can run the location-specific IBM with default parameters (see console)
@@ -55,8 +57,9 @@ run_ibm_location()
 
 ```
 
+<n style="color:darkred">
 What can you learn from these graphs?
-
+</n>
 
 # Change some parameters
 ```{r eval=FALSE}
@@ -75,14 +78,18 @@ run_ibm_location(transmission_prob =  0.15,
 
 
 ## Scenarios
+<n style="color:darkred">
 Now, what happens if you...
 
 * increase the population size?
-* start with more infected indviduals?
-* increase the average number of community contacts?
-* increase the contact probability at schools?
-* increase the contact probability at workplaces?
+* start with more infected individuals?
+* allow only housheold contacts?
+* allow only community contacts?
+* allow only school contacts?
+* allow only household and school contacts?
+* allow only household and workplace contacts?
 * ... etc.
+</n>
 
 <div>
 # Navigate
