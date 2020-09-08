@@ -1,0 +1,536 @@
+---
+title: "Introduction to individual-based models (IBMs) for infectious diseases"
+---
+
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+set.seed(2020)
+```
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE)
+```
+
+# Objectives
+The aim of this tutorial is to introduce you to individual-based modelling for infectious diseases in R. The dynamics of the stochastic model we target here cannot be captured by ordinary differential equations.
+
+In this session, you will
+
+1. Setup an individual-based model population with random movement
+2. Include SIR-dynamics 
+3. Combine all features into a loop to run over multiple time steps
+
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code.
+
+# Modelling concepts
+
+Modelling goals: 
+
+* Learn about random numbers in R
+* To create a population matrix (or data.frame) with one row per individual and one column per person characteristic
+* Add random walk (with borders)
+* Add health states for being susceptible (S), infected (I) and recovered (R)
+* Include transmission and recovery dynamics
+* Combine everything into a loop to process multiple time steps
+
+
+
+# Set working directory
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
+
+```{r results = "hide", eval = FALSE}
+home <- "~/Documents/Modelling_intro/" ## on a OS X
+setwd(home)
+```
+
+or
+
+```{r results = "hide", eval = FALSE}
+home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+setwd(home)
+```
+
+# Random numbers in R
+
+In R, you can generate random numbers using e.g. `sample`, `runif`, `rnorm`,`rbinom`. Please have a look at:
+```{r results = "hide"}
+?sample
+?runif
+?rnorm
+?rbinom
+?set.seed
+```
+
+Which function is used to sample from a uniform, normal or binomial distribution? 
+
+Random numbers in R (and other programs) are derived from a "random number stream", which you can initiate with `set.seed`. Seeding the random stream is very useful to obtain stochastic results that are reproducible. As such, you can check whether model output has changed (or not) if you continue programming.
+
+For example, set the random seed to 2020 and sample 3 numbers between 1 and 10, and sample 15 numbers with replacement. 
+```{r eval = FALSE}
+set.seed(2020)
+sample(x = 1:10,size = 3)
+sample(x = 1:10,size = 15,replace = T)
+```
+
+
+What happens if you do this again, with and without the `set.seed` operation? Do you get the same random numbers?
+
+It is also possible to sample from a binomial distribution for different individuals at once.
+
+```{r eval = FALSE}
+# set number of samples, a probability vector and the number of trials to execute
+num_samples <- 4
+p_vector    <- c(0,0.5,0.9,1)
+num_trials  <- 1
+  
+# sample from the binomial distribution, for each given probability
+binom_sample <- rbinom(num_samples, num_trials, p_vector)
+
+# if the sample is 1, we have a success
+binom_sample
+binom_sample == 1
+
+```
+
+
+# Setup the population
+
+For this tutorial, we will use a matrix to store the population using one row per individual and one column per person characteristic. We will use a special matrix format, called `data.frame`, in which you can easily access columns using the column names. The following code illustrates the usefulness of the `data.frame` and how to access and modify elements.
+
+```{r eval=FALSE}
+
+# inspect data.frame
+?data.frame
+
+# create a data.frame with columns 'id' and 'age'
+new_data <- data.frame(id = c(1:4),      # set id's from 1 up to 4
+                       age = c(5,8,9,1)  # set ages
+                       )
+
+# we can access all ages using:
+new_data$age
+
+# we can access the age of the 2nd person
+new_data$age[2]
+
+# or change the age of the person with id == 3
+new_data$age[new_data$id == 3] <- 10
+
+# inspect the data.frame, anything changed?
+new_data
+  
+```
+
+
+Now, let us create a `data.frame` for a population of 1000 individuals with a health state together with a x- and y coordinate. During the setup, we randomly locate each person in a 10x10 area.
+```{r }
+
+pop_size    <- 300     
+area_size   <- 10    # 10x10 square
+xy_coordinates <- seq(0,area_size,0.01)  # get sequence per 0.01
+
+# setup population: one row per individual, one column per attribute, row index = id
+pop_data     <- data.frame(health  = rep('S', length=pop_size),  # all individuals start in state 'S' (= susceptible)
+                           x_coord = sample(x = xy_coordinates, size = pop_size,replace = T), # sample random x coordinate
+                           y_coord = sample(x = xy_coordinates, size = pop_size,replace = T), # sample random y coordinate
+                           stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
+
+```
+
+Can you check the dimensions of the pop_data matrix?
+```{r eval = FALSE}
+dim(pop_data)
+```
+
+# Random walk
+
+We want to simulate a random walk process with a given maximum velocity. The direction and distance should be randomized. As such, we set a maximum distance and create a function to apply the random walk during one time step.
+
+```{r }
+
+# set max distance per time step 
+max_distance <- 1   # squares per day
+
+random_walk <- function(pop_data, max_distance){
+  # step 1: move each person at random along the x and y axis
+  pop_data$x_coord <- pop_data$x_coord + runif(n = pop_size,min = -max_distance, max = max_distance)
+  pop_data$y_coord <- pop_data$y_coord + runif(n = pop_size,min = -max_distance, max = max_distance)
+  
+  # step 2: if an individual crosses a model boundary: set back at the border
+  pop_data$x_coord[pop_data$x_coord > area_size] <- area_size
+  pop_data$y_coord[pop_data$y_coord > area_size] <- area_size
+  pop_data$x_coord[pop_data$x_coord < 0]         <- 0
+  pop_data$y_coord[pop_data$y_coord < 0]         <- 0
+  
+  # return the adjusted population data.frame
+  return(pop_data)
+}
+
+```
+
+If you want to visualize the random walk, you can create a plot before and after applying the function. Please note that it is possible to highlight a one individual using `points`:
+```{r}
+
+# plot the area, using all locations with color '1' => black
+plot(x = pop_data$x_coord,
+     y = pop_data$y_coord,
+     col = 1)
+
+# highlight one individual, using color 2 (= red)
+points(x = pop_data$x_coord[1],
+       y = pop_data$y_coord[1],
+       col = 2)
+
+# update population
+pop_data <- random_walk(pop_data,max_distance)
+
+# highlight the selected individual again, using color '3' (= green)
+points(x = pop_data$x_coord[1],
+       y = pop_data$y_coord[1],
+       col = 3)
+
+```
+
+# Social contacts (based on proximity)
+
+We assume that susceptible individuals can acquire an infection if they are close to an infected individual. We define proximity here with a maximum distance in terms of `contact_range`. To probability for a social contact, depends on the number people that are within the specified range and the population-based average number of social contacts individuals have per time step (=per day). 
+
+```{r}
+
+# set proximity parameter and the population-based average number of contacts per day
+contact_range <- 1
+avg_num_contacts_day <-  5
+
+# calculate the distance matrix using the 'dist' function and store as matrix
+distance_matrix <- as.matrix(dist(pop_data[,c('x_coord','y_coord')],upper=T))
+
+# create a matrix with Booleans whether individuals are close enough
+eligible_contacts_matrix <- distance_matrix <= contact_range
+
+# set the diagonal to FALSE, to prevent self-contacts 
+diag(eligible_contacts_matrix) <- FALSE
+
+```
+
+Let's visualise this:
+
+```{r}
+# which indididuals are close enough to our index person?
+plot(x = pop_data$x_coord,
+     y = pop_data$y_coord)
+points(x = pop_data$x_coord[1],
+       y = pop_data$y_coord[1],
+       col = 3,
+       pch=20)
+points(x = pop_data$x_coord[eligible_contacts_matrix[1,]],
+       y = pop_data$y_coord[eligible_contacts_matrix[1,]],
+       col = 4)
+legend('topleft',
+       c('index person',
+       'eligible contacts'),
+       col = c(3,4),
+       pch = c(20,1))
+
+
+```
+
+Now, we will write a function to count the number of individuals that are close enough, and calculate the probability for a social contact with each of them. Please note that Booleans can be summed, using `r TRUE` as 1 and `r FALSE` as 0.
+
+```{r}
+
+get_contact_probability <- function(eligible_contacts_matrix,index_person){
+  
+  # select the eligible contacts from the index person
+  eligible_contacts <- eligible_contacts_matrix[index_person,]
+  
+  # how many individuals can our index person contact this time step?
+  num_eligible_contacts <- sum(eligible_contacts)
+  
+  # what is the contact probability per person?
+  contact_probability <- avg_num_contacts_day / num_eligible_contacts
+  
+  # limit the probability to 0.95 (this is an arbitrary choice)
+  contact_probability[contact_probability > 0.95] <- 0.95
+    
+  # assign the probability for each individual that is close enough
+  p_contact_vector <- eligible_contacts * contact_probability
+  
+  # return the probability vector
+  return(p_contact_vector)
+}
+
+
+```
+
+Does the `contact_probability` for individual 1 corresponds with the number of potential contacts in the plot above? What is the contact probability with each of them?
+
+```{r }
+
+p_contact <- get_contact_probability(eligible_contacts_matrix,1)
+table(p_contact)
+
+```
+
+
+# Introduce infected individuals
+
+Start with the introduction of infected cases into the population:
+
+```{r }
+
+# set number of infected cases to start the simulation
+num_infected_cases <- 10
+
+# or select all individuals from row 1 till the specified number of cases.
+pop_data$health[1:num_infected_cases] <- 'I'
+
+## it is also possible to sample random individuals to change their health state
+#pop_data$health[sample(1:pop_size,size = num_infected_cases)] <- 'I'
+
+```
+
+Can you visualize the infected individuals like the following plot? (note: using `pch=20` gives you full dots)
+```{r echo=FALSE}
+# which indididuals are close enough to our index person?
+plot(x = pop_data$x_coord,
+     y = pop_data$y_coord,
+     xlab='x coordinate',
+     ylab='y coordinate')
+points(x = pop_data$x_coord[pop_data$health == 'I'],
+       y = pop_data$y_coord[pop_data$health == 'I'],
+       col = 2,
+       pch = 20)
+legend('topright',
+       c('susceptible',
+         'infected'),
+       pch=c(1,20),
+       col=1:2)
+```
+
+# Transmission dynamics
+
+To specify a transmission event upon contact, we define the transmission probability when two individuals meet and perform a Bernoulli experiment for each social contact between a infected and susceptible individual.
+
+
+```{r }
+
+# disease parameters 
+transmission_prob     <- 0.1  # transmission probability per social contact 
+
+# identify all infected individuals
+boolean_infected <- pop_data$health == 'I'   # = vector with Booleans (TRUE/FALSE)
+ind_infected     <- which(boolean_infected)  # = vector with row indices
+num_infected     <- length(ind_infected)     # = single value: count data
+
+# we specified the eligible contacts above
+#eligible_contacts_matrix
+
+# evaluate the contacts and transmission events for person 1, starting from the contact probability
+p_contact_vector    <- get_contact_probability(eligible_contacts_matrix,1)
+
+# exclude contacts with non-susceptible individuals
+p_contact_vector[pop_data$health != 'S'] <- 0
+
+# sample from binomial distribution, given the contact and transmission probability
+binom_infection_vector <-  rbinom(pop_size, size = 1, prob = p_contact_vector * transmission_prob) 
+
+# update population matrix with new infections, if binomial sample == 1
+pop_data$health[binom_infection_vector == 1] <- 'I'
+
+```
+
+Can you visualize the infected individuals? (note: you might have different results since we are working with stochastic processes)
+```{r echo=FALSE}
+
+# which indididuals are close enough to our index person?
+plot(x = pop_data$x_coord,
+     y = pop_data$y_coord,
+     xlab='x coordinate',
+     ylab='y coordinate')
+points(x = pop_data$x_coord[pop_data$health == 'I'],
+       y = pop_data$y_coord[pop_data$health == 'I'],
+       col = 2,
+       pch = 20)
+points(x = pop_data$x_coord[binom_infection_vector == 1],
+       y = pop_data$y_coord[binom_infection_vector == 1],
+       col = 5,
+       pch = 20)
+legend('topright',
+       c('susceptible',
+         'infected',
+         'infected by person 1'),
+       pch=c(1,20,20),
+       col=c(1,2,5))
+```
+
+# Recovery
+Each time step, we have to account for infected individual that recover. We can handle this using a recovery probability, based on an average number of days infected, and binomial sample.
+
+```{r }
+
+# set disease parameter: from days infected to recovery rate and a probability
+num_days_infected    <- 3
+recovery_rate <- 1/num_days_infected
+recovery_probability <- 1-exp(-recovery_rate)
+
+# we identified the infected individuals above
+##boolean_infected <- pop_data$health == 'I'  
+
+# get vector with a probability to recover for each individual
+#(if not infected, the Boolean is FALSE (=0), the probability is 0)
+p_recover_vect <- boolean_infected * recovery_probability
+
+# sample individuals that recover
+binom_recover_vector <- rbinom(pop_size, size = 1, prob = p_recover_vect)
+
+# update population data
+pop_data$health[binom_recover_vector == 1] <- 'R'
+
+```
+
+Can you visualize the final health states?
+
+```{r echo=FALSE}
+
+# which indididuals are close enough to our index person?
+plot(x = pop_data$x_coord,
+     y = pop_data$y_coord,
+     xlab='x coordinate',
+     ylab='y coordinate')
+points(x = pop_data$x_coord[pop_data$health == 'I'],
+       y = pop_data$y_coord[pop_data$health == 'I'],
+       col = 2,
+       pch = 20)
+points(x = pop_data$x_coord[binom_infection_vector == 1],
+       y = pop_data$y_coord[binom_infection_vector == 1],
+       col = 3,
+       pch = 20)
+legend('topright',
+       c('susceptible',
+         'infected',
+         'recovered'),
+       pch=c(1,20,20),
+       col=c(1,2,3))
+```
+
+
+# Add all parts into a loop...
+
+We coded the population, random movement, social contacts, transmission and recovery. Now it is time to combine all these elements into a loop to iterate over different days.
+
+
+
+```{r eval = FALSE}
+# use iterator 'day_i' to process day 1,2,3 and 4
+for(day_i in 1:4){
+  # print the day index
+  print(day_i)
+}
+
+# this is the same as
+all_days <- 1:10
+for(day_i in all_days){
+  # print the day index
+  print(day_i)
+}
+
+```
+
+So, specify the number of days and run over each day using a for-loop, and compile the full transmission model. To keep track of the health states over time, you can use a matrix (population size x number of days) and store `pop_data$health` after each time step. 
+
+```{r}
+# set number of days
+num_days <- 20
+
+# create matrix to log the population health states over time
+pop_data_log <- matrix(NA,nrow=pop_size,ncol=num_days)
+
+for(day_i in 1:num_days){
+
+  # update location
+  pop_data <- random_walk(pop_data,max_distance)
+
+  # identify all infected individuals
+  boolean_infected <- pop_data$health == 'I'   # = vector with Booleans TRUE/FALSE
+  ind_infected     <- which(boolean_infected)  # = vector with indices
+  num_infected     <- length(ind_infected)     # = single value: count data
+  
+  # evaluate the transmission events for each infected individual
+  for(infected_i in ind_infected){
+    p_contact_vector    <- get_contact_probability(eligible_contacts_matrix,infected_i)
+  
+  # exclude contacts with non-susceptible individuals
+  p_contact_vector[pop_data$health != 'S'] <- 0
+  
+  # sample from binomial distribution, given the contact and transmission probability
+  binom_infection_vector <-  rbinom(pop_size, size = 1, prob = p_contact_vector * transmission_prob) 
+  
+  # update population matrix with new infections, if binomial sample == 1
+  pop_data$health[binom_infection_vector == 1] <- 'I'
+  }
+  
+  # sample individuals that recover (from the originally infected individuals only!)
+  p_recover_vect <- boolean_infected * recovery_probability
+  binom_recover_vector <- rbinom(pop_size, size = 1, prob = p_recover_vect)
+  pop_data$health[binom_recover_vector == 1] <- 'R'
+  
+  # log health states
+  pop_data_log[,day_i] <- pop_data$health  
+}
+
+```
+
+Plot the health states over time:
+
+```{r}
+
+# count the number of S, I or R health states per column (= per time step)
+num_susceptible_time <- colSums(pop_data_log == 'S')
+num_infected_time <- colSums(pop_data_log == 'I')
+num_recovered_time <- colSums(pop_data_log == 'R')
+
+# plot over time
+plot(num_susceptible_time,
+     col=1,lwd=2,type='l',
+     ylim=c(0,pop_size),
+     xlab='Time',
+     ylab='Individuals')
+lines(num_infected_time,col=2,lwd=2)
+lines(num_recovered_time,col=3,lwd=2)
+legend('top',
+        c('S','I','R'),
+        col=1:3,
+        ncol=3,
+        lwd=2)
+
+
+```
+
+# Scenario analyses
+
+Now you have a working model, you can start changing input parameters and explore the effect on the transmission dynamics. E.g. what happens if you...
+
+* increase the population size?
+* decrease the area size?
+* change the velocity?
+* start with more infected indviduals?
+* increase the contact range?
+* increase the transmission probability?
+* decrease the average number of contacts per day?
+* change the time horizon?
+* ... etc.
+
+(note: the next tutorial will handle these questions with a pre-coded model)
+
+# Extending the SIR model
+
+If you have time, you can now try to build more complex versions of the SIR model to match the infectious disease you are interested in. For example, you could include a latent (or "Exposed") stage or extend the model to include waning immunity, vaccination, maternal immunity, etc. 
+
+
+<div>
+# Navigate
+Top: [Index](index.html) Next: [IBM scenario analyses](intro_to_IBM_scenario.html)
+</div>
+

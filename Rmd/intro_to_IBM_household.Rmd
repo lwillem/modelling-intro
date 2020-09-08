@@ -1,0 +1,75 @@
+---
+title: "Location specific IBM"
+---
+
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+set.seed(2020)
+source('../lib/ibm_functions.R')
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+```
+
+# Objectives
+The aim of this tutorial is to run scenairo analyses with an individual-based model in R that accounts for location specific mixing.
+
+In this session, you will
+
+1. Run an IBM with household, school/work and community mixing.
+2. Discuss the impact of transmission parameters and features
+
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code.
+
+# Set working directory
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
+
+```{r results = "hide", eval = FALSE}
+home <- "~/Documents/Modelling_intro/" ## on a OS X
+home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+setwd(home)
+```
+
+# Load model code
+
+You can use your model from the previous tutorial, or load an IBM function from the GitHub repository.
+
+```{r eval= FALSE}
+# download R file with IBM function
+curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", destfile = "ibm_functions.R")
+source('ibm_functions.R')
+```
+
+# Scenario analyses
+
+Now you have a working model, you can start changing input parameters and explore the effect on the transmission dynamics. First, lets run our model with the default parameters:
+
+```{r }
+# you can run the location-specific IBM with default parameters (see console)
+run_ibm_location()
+
+```
+
+What can you learn from these graphs?
+
+
+## Scenarios...
+Now, what happens if you...
+
+* increase the population size?
+* decrease the area size?
+* change the velocity?
+* start with more infected indviduals?
+* increase the contact range?
+* increase the transmission probability?
+* decrease the average number of contacts per day?
+* change the time horizon?
+* ... etc.
+
+
+<div>
+# Navigate
+Top: [Index](index.html)
+</div>
+

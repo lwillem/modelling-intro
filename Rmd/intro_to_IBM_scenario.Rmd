@@ -1,0 +1,111 @@
+---
+title: "Scenario Analyses with the random walk IBM"
+---
+
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+set.seed(2020)
+source('../lib/ibm_functions.R')
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+```
+
+# Objectives
+The aim of this tutorial is to run scenairo analyses with the random walk individual-based model in R from the previous tutorial.
+
+In this session, you will
+
+1. Run the IBM with different model parameters
+2. Discuss the impact of transmission parameters and features
+
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code.
+
+# Set working directory
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
+
+```{r results = "hide", eval = FALSE}
+home <- "~/Documents/Modelling_intro/" ## on a OS X
+home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+setwd(home)
+```
+
+# Load model code
+
+You can use your model from the previous tutorial, or load an IBM function from the GitHub repository.
+
+```{r eval= FALSE}
+# download R file with IBM function
+curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", destfile = "ibm_functions.R")
+source('ibm_functions.R')
+```
+
+# Scenario analyses
+
+Now you have a working model, you can start changing input parameters and explore the effect on the transmission dynamics. First, lets run our model with the default parameters:
+
+```{r }
+# you can run the IBM with default parameters (see console)
+run_ibm_random_walk()
+
+```
+
+What can you learn from these graphs?
+
+## Dynamics over time?
+
+This IBM is able to show the location and health states of each individual over time. Therefore, you have to increase the parameter `plot_time_delay` to set a delay between two time steps (= default this is 0 = no time between 2 time steps = no plots)
+
+```{r eval=FALSE}
+# you can run the IBM with default parameters (see console)
+run_ibm_random_walk(plot_time_delay = 0.2)
+
+```
+
+## Vaccination?
+
+This IBM is able to account for vaccination. Therefore, you have to increase the parameter `vaccine_coverage`. By default, the vacciated individuals are randomly distributed over the area. 
+
+```{r eval=TRUE}
+
+# set vaccination coverage to 60% with population that does not move
+run_ibm_random_walk(max_velocity = 0,
+                    vaccine_coverage = 0.6)
+
+
+```
+
+## Clustered vaccine refusal?
+
+What happens if vaccine refusal is geographically clustered, and individuals do not move? Run the following and have a look at the outcomes.
+
+```{r eval=TRUE}
+
+# is vaccination clustered?
+run_ibm_random_walk(max_velocity = 0,
+                    vaccine_coverage = 0.6,
+                    apply_spatial_vaccine_refusal = TRUE)
+
+
+```
+
+## Scenarios...
+Now, what happens if you...
+
+* increase the population size?
+* decrease the area size?
+* change the velocity?
+* start with more infected indviduals?
+* increase the contact range?
+* increase the transmission probability?
+* decrease the average number of contacts per day?
+* change the time horizon?
+* ... etc.
+
+
+<div>
+# Navigate
+Top: [Index](index.html) Next: [IBM household transmission](intro_to_IBM_household.html)
+</div>
+
