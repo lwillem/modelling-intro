@@ -83,7 +83,7 @@ Now, what happens if you...
 
 * increase the population size?
 * start with more infected individuals?
-* allow only housheold contacts?
+* allow only household contacts?
 * allow only community contacts?
 * allow only school contacts?
 * allow only household and school contacts?
