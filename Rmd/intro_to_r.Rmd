@@ -428,6 +428,6 @@ table(d)
 <div>
 
 # Navigate
-Top: [Index](index.html) Next: [Introduction to infectious disease modelling in R](intro_to_SIR_lw.html)
+Top: [Index](index.html) Next: [Introduction to infectious disease modelling in R](intro_to_SIR.html)
 </div>
 

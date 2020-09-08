@@ -531,6 +531,6 @@ If you have time, you can now try to build more complex versions of the SIR mode
 
 <div>
 # Navigate
-Top: [Index](index.html) Next: [IBM scenario analyses](intro_to_IBM_scenario.html)
+Top: [Index](index.html) Next: [IBM scenario analyses](intro_to_IBM_walk.html)
 </div>
 

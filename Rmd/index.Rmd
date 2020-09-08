@@ -8,7 +8,7 @@ output:
 
 ![](ext_fig/simid_course_logo_combine.jpg)
 
-Welcome to the introductory material on infectious disease modelling in R for 5-day course on "Modelling infectious Diseases and Health Economics" as part of the Antwerp Summer University. The tutorials are based a work from Sebastian Funk, Gwen Knight and Anton Camacho from the London School of Hygiene & Tropical Medicine. We fully acknowledge their work and are thankfull for making them open-source via [GitHub](https://github.com/sbfnk/modelling).
+Welcome to the introductory material on infectious disease modelling in R for 5-day course on "Modelling infectious Diseases and Health Economics" as part of the Antwerp Summer University. Some tutorials are based a work from Sebastian Funk, Gwen Knight and Anton Camacho from the London School of Hygiene & Tropical Medicine. We fully acknowledge their work and are thankfull for making them open-source via [GitHub](https://github.com/sbfnk/modelling).
 
 ## Required software
 * [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-3.5.0.
@@ -17,8 +17,11 @@ Welcome to the introductory material on infectious disease modelling in R for 5-
 ## Sessions
 
 1. [Introduction to RStudio](intro_to_RStudio.html)
-2. [Introduction to R](intro_to_r_lw.html)
-3. [Introduction to infectious disease modelling in R](intro_to_SIR_lw.html)
+2. [Introduction to R](intro_to_r.html)
+3. [Introduction to infectious disease modelling with R](intro_to_SIR.html)
+4. [Introduction to Individual-Based Models (IBMs) using R](intro_to_IBM_coding.html)
+5. [IBM with random walks](intro_to_IBM_walk.html)
+6. [IBM with location-specific mixing](intro_to_IBM_location.html)
 <!--2. [Stochastic models](code_sto_model.html)-->
 <!-- 3. [Using the fitR package](using_fitR.html) -->
 <!-- 4. [Sampling from the posterior distribution using MCMC](mcmc.html) -->

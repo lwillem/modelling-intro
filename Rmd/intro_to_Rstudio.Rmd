@@ -43,6 +43,6 @@ Each computer will have a different specified address for the working directory.
 <div>
 
 # Navigate
-Top: [Index](index.html) Next: [Introduction to R](intro_to_r_lw.html)
+Top: [Index](index.html) Next: [Introduction to R](intro_to_r.html)
 </div>
 

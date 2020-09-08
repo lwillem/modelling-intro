@@ -106,6 +106,6 @@ Now, what happens if you...
 
 <div>
 # Navigate
-Top: [Index](index.html) Next: [IBM household transmission](intro_to_IBM_household.html)
+Top: [Index](index.html) Next: [IBM household transmission](intro_to_IBM_location.html)
 </div>
 
