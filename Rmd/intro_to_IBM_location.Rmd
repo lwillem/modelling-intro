@@ -1,5 +1,5 @@
 ---
-title: "Location specific IBM"
+title: "Introduction to location-specific IBMs"
 ---
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
@@ -18,7 +18,11 @@ In this session, you will
 1. Run an IBM with household, school/work and community mixing.
 2. Discuss the impact of transmission parameters and features
 
-The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code.
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. <n style="color:darkred"> Hands-on questions are indicated in **red** </n>
+
+# Modelling concepts
+
+The individual-based model will make use of a virtual population in wich each individual is part of a household, school/work (based on age), and the general community. Each day (= time step), indiviuals can interact at home, school/work and in the community. We specify for each location a contact probability or average number of contacts per day.
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -33,7 +37,7 @@ setwd(home)
 
 # Load model code
 
-You can use your model from the previous tutorial, or load an IBM function from the GitHub repository.
+Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
 
 ```{r eval= FALSE}
 # download R file with IBM function
@@ -41,9 +45,9 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_fun
 source('ibm_functions.R')
 ```
 
-# Scenario analyses
+# Base case scenario
 
-Now you have a working model, you can start changing input parameters and explore the effect on the transmission dynamics. First, lets run our model with the default parameters:
+First, lets run the model with the default parameters:
 
 ```{r }
 # you can run the location-specific IBM with default parameters (see console)
@@ -54,19 +58,31 @@ run_ibm_location()
 What can you learn from these graphs?
 
 
-## Scenarios...
+# Change some parameters
+```{r eval=FALSE}
+
+# increase num_contacts_community_day to 6
+run_ibm_location(num_contacts_community_day = 6)
+
+# set num_schools to 5
+run_ibm_location(num_school = 6)
+
+# set transmission_prob to 0.15 (and switch off the demographic plots)
+run_ibm_location(transmission_prob =  0.15,
+                 bool_show_demographics = FALSE)
+
+```
+
+
+## Scenarios
 Now, what happens if you...
 
 * increase the population size?
-* decrease the area size?
-* change the velocity?
 * start with more infected indviduals?
-* increase the contact range?
-* increase the transmission probability?
-* decrease the average number of contacts per day?
-* change the time horizon?
+* increase the average number of community contacts?
+* increase the contact probability at schools?
+* increase the contact probability at workplaces?
 * ... etc.
-
 
 <div>
 # Navigate

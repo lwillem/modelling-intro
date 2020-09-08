@@ -11,14 +11,14 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FAL
 ```
 
 # Objectives
-The aim of this tutorial is to run scenairo analyses with the random walk individual-based model in R from the previous tutorial.
+The aim of this tutorial is to perform scenario analyses with an individual-based model in R based on the random walk dynamics from the previous tutorial.
 
 In this session, you will
 
 1. Run the IBM with different model parameters
-2. Discuss the impact of transmission parameters and features
+2. Discuss the impact of transmission parameters and model features
 
-The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code.
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. <n style="color:darkred"> Hands-on questions are indicated in **red** </n>
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -33,7 +33,7 @@ setwd(home)
 
 # Load model code
 
-You can use your model from the previous tutorial, or load an IBM function from the GitHub repository.
+Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model with random walks and vaccination yourselves.
 
 ```{r eval= FALSE}
 # download R file with IBM function
@@ -43,15 +43,16 @@ source('ibm_functions.R')
 
 # Scenario analyses
 
-Now you have a working model, you can start changing input parameters and explore the effect on the transmission dynamics. First, lets run our model with the default parameters:
+First, lets run the model with the default parameters:
 
 ```{r }
 # you can run the IBM with default parameters (see console)
 run_ibm_random_walk()
 
 ```
-
-What can you learn from these graphs?
+<n style="color:darkred">
+What can you learn from these graphs? What about the model parameters that are printed to the console?
+</n>
 
 ## Dynamics over time?
 
@@ -65,11 +66,11 @@ run_ibm_random_walk(plot_time_delay = 0.2)
 
 ## Vaccination?
 
-This IBM is able to account for vaccination. Therefore, you have to increase the parameter `vaccine_coverage`. By default, the vacciated individuals are randomly distributed over the area. 
+This IBM is able to account for vaccination. Therefore, you have to specify the parameter `vaccine_coverage`. By default, vaccinated individuals are randomly distributed over the area. To make this clear, we suggest to exclude the random movement, and use a static population (with velocity = 0).
 
 ```{r eval=TRUE}
 
-# set vaccination coverage to 60% with population that does not move
+# set vaccination coverage to 60% with a population that does not move
 run_ibm_random_walk(max_velocity = 0,
                     vaccine_coverage = 0.6)
 
@@ -78,7 +79,9 @@ run_ibm_random_walk(max_velocity = 0,
 
 ## Clustered vaccine refusal?
 
-What happens if vaccine refusal is geographically clustered, and individuals do not move? Run the following and have a look at the outcomes.
+<n style="color:darkred">
+What happens if vaccine refusal is geographically clustered and individuals do not move? Run the following and have a look at the outcomes.
+</n>
 
 ```{r eval=TRUE}
 
@@ -90,19 +93,25 @@ run_ibm_random_walk(max_velocity = 0,
 
 ```
 
+<n style="color:darkred">
+What happens if individuals still move? Or the vaccine coverage is only 30%? If you run this multiple times, do you get the same outcome?
+</n>
+
 ## Scenarios...
-Now, what happens if you...
+<n style="color:darkred">
+Now, what happens to the **total incidence** and **epedemic peak** if you...
 
-* increase the population size?
+
+* change the population size to 50 or 6000?
 * decrease the area size?
-* change the velocity?
-* start with more infected indviduals?
+* change the velocity to 20?
+* start with 1 or 500 infected individuals?
 * increase the contact range?
-* increase the transmission probability?
-* decrease the average number of contacts per day?
-* change the time horizon?
+* increase the transmission probability to 0.4?
+* change the average number of contacts per day to 2 or 20?
+* change the time horizon to 100 days?
 * ... etc.
-
+</n>
 
 <div>
 # Navigate
