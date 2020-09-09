@@ -81,8 +81,10 @@ run_ibm_location(transmission_prob =  0.15,
 <n style="color:darkred">
 Now, what happens if you...
 
-* increase the population size?
+* change the population size to 100 or 2000?
 * start with more infected individuals?
+* add more schools
+* decrease the number of workplaces
 * allow only household contacts?
 * allow only community contacts?
 * allow only school contacts?

@@ -84,6 +84,10 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   ######################################################### #
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
   ######################################################### #
+  
+  # save start time
+  time_start <- Sys.time()
+  
   # initialize random number generator
   set.seed(rng_seed)
   
@@ -243,8 +247,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage','apply_spatial_vaccine_refusal',
                  'rng_seed','area_size','max_velocity','avg_num_contacts_day',
                  'max_contact_distance', 'num_days_infected','transmission_prob',
-                 'num_contacts_community_day','contact_prob_household','contact_prob_school',
-                 'num_schools','plot_time_delay'
+                 'plot_time_delay'
   )
   
   print('MODEL PARAMETERS')
@@ -266,6 +269,10 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   # print peak details
   print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=2),'%'))
   print(paste0('Peak day:        ',which(log_i == max(log_i)))[1])
+  
+  # print total run time
+  total_time <- as.double(Sys.time() - time_start,unit='secs')
+  print(paste0('Total run time: ',round(total_time,digits=0),'s'))
 }
 
 #' @title Calculate the social contact probability
@@ -553,6 +560,9 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
   ######################################################### #
   
+  # save start time
+  time_start <- Sys.time()
+  
   # initialize random number generator
   set.seed(rng_seed)
   
@@ -733,11 +743,10 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   
   ## PRINT MODEL PARAMETERS AND RESULTS ----
   # collect possible parameter names
-  all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage','apply_spatial_vaccine_refusal',
-                 'rng_seed','avg_num_contacts_day',
-                 'max_contact_distance', 'num_days_infected','transmission_prob',
+  all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage',
+                 'rng_seed', 'num_days_infected','transmission_prob',
                  'num_contacts_community_day','contact_prob_household','contact_prob_school','contact_prob_workplace',
-                 'num_schools','plot_time_delay'
+                 'num_schools','target_school_ages','num_workplaces','bool_show_demographics'
   )
   
   print('MODEL PARAMETERS')
@@ -745,8 +754,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   # loop over the given parameter names, if present, add name & value
   for(i_param in all_param){
     if(exists(i_param)){
-      # param_str <- paste(param_str,'||',i_param,':',get(i_param))
-      print(paste(i_param,':',get(i_param)))
+      print(paste(i_param,':',paste(get(i_param),collapse = ',')))
     }
   }
   
@@ -759,6 +767,10 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   # print peak details
   print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=2),'%'))
   print(paste0('Peak day:        ',which(log_i == max(log_i)))[1])
+  
+  # print total run time
+  total_time <- as.double(Sys.time() - time_start,unit='secs')
+  print(paste0('Total run time: ',round(total_time,digits=0),'s'))
   
 }
 
