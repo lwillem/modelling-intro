@@ -1,0 +1,151 @@
+---
+title: "Location-specific IBM tutorials"
+author: "lwillem"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+library('curl')
+
+set.seed(2020)
+source('lib/ibm_functions.R')
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, 
+                      warning=FALSE, fig.height = 6, fig.width = 10)
+
+# set default: echo = false
+#knitr::opts_chunk$set(echo = FALSE)
+
+
+```
+# Load model code
+
+Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
+
+If the `curl` packages is not installed yet, you can do so by:
+```{r results = "hide", eval=FALSE}
+install.packages(curl) # install the curl library (to import data)
+```
+
+```{r eval= FALSE}
+# load package 'curl'
+library('curl')
+
+# download R file with IBM function
+curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", destfile = "ibm_functions.R")
+
+# load the IBM functions
+source('ibm_functions.R')
+```
+
+\clearpage
+# Base case scenario
+
+```{r }
+# you can run the location-specific IBM with default parameters (see console)
+run_ibm_location()
+
+```
+
+\clearpage
+# Population size 100
+```{r pop_size_small, eval=TRUE}
+run_ibm_location(pop_size = 100,
+                 bool_show_demographics = FALSE,
+                 add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Population size 2000
+```{r pop_size_large, eval=TRUE}
+run_ibm_location(pop_size = 2000,
+                 bool_show_demographics = FALSE,
+                 add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Start with more infected individuals
+```{r num_infected_seeds, eval=TRUE}
+run_ibm_location(num_infected_seeds = 100,
+                 bool_show_demographics = FALSE,
+                 add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Add schools
+```{r num_schools, eval=TRUE}
+run_ibm_location(num_schools = 10,
+                 bool_show_demographics = TRUE,
+                 add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Decrease the number of workplaces
+```{r num_workplaces, eval=TRUE}
+run_ibm_location(num_workplaces = 20,
+                 bool_show_demographics = TRUE,
+                 add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Allow only household contacts
+```{r only_hh, eval=TRUE}
+run_ibm_location(num_contacts_community_day = 0,
+                 contact_prob_household = 1,
+                 contact_prob_school = 0,
+                 contact_prob_workplace = 0,
+                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Allow only household and community contacts
+```{r hh_community, eval=TRUE}
+run_ibm_location(num_contacts_community_day = 5,
+                 contact_prob_household = 1,
+                 contact_prob_school = 0,
+                 contact_prob_workplace = 0,
+                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Allow only school contacts
+```{r only_school, eval=TRUE}
+run_ibm_location(num_contacts_community_day = 0,
+                 contact_prob_household = 0,
+                 contact_prob_school = 1,
+                 contact_prob_workplace = 0,
+                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Allow only household and school contacts
+```{r hh_school, eval=TRUE}
+run_ibm_location(num_contacts_community_day = 5,
+                 contact_prob_household = 1,
+                 contact_prob_school = 0.5,
+                 contact_prob_workplace = 0,
+                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+
+```
+
+\clearpage
+# Allow only household and workplace contacts
+```{r hh_workplace, eval=TRUE}
+run_ibm_location(num_contacts_community_day = 0,
+                 contact_prob_household = 1,
+                 contact_prob_school = 0,
+                 contact_prob_workplace = 0.5,
+                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+
+```
+

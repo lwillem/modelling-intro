@@ -539,8 +539,11 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              transmission_prob     = 0.1,      # transmission probability per social contact                  
                              
                              # visualisation parameter
-                             bool_show_demographics       = TRUE        # delay in seconds to slow down the "real-time" plot ||default = O||
-){
+                             bool_show_demographics       = TRUE,        # delay in seconds to slow down the "real-time" plot ||default = O||
+
+                             add_baseline_prevalence = FALSE, #option to add the prevalence with default param
+                             return_prevelance = FALSE # option to return the prevalence (and stop)
+                             ){
   
   ######################################################### #
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
@@ -653,6 +656,10 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   log_r <- colSums(log_pop_data == 'R')  / pop_size
   log_v <- colSums(log_pop_data == 'V')  / pop_size
   
+  if(return_prevelance){
+    return(log_i)
+  }
+  
   # change figure configuration => 3 subplots
   par(mfrow=c(2,2))
   
@@ -669,6 +676,12 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   lines(log_v,  col=4,lwd=2)
   
   legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
+  
+  if(add_baseline_prevalence){
+    log_i_baseline <- run_ibm_location(return_prevelance = T,bool_show_demographics=F)
+    lines(log_i_baseline,  col=2,lwd=2,lty=2)
+    legend('topright',legend=c('I (default)'),col=2,lwd=2,lty=3,cex=0.7)
+  }
   
   if(all(is.na(pop_data$secondary_cases))){
     pop_data$secondary_cases <- -1
