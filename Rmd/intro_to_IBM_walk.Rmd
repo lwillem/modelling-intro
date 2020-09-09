@@ -23,7 +23,7 @@ The best thing to do is to read each section and type (or copy and paste) the R 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
 
-You can label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example:
 
 ```{r results = "hide", eval = FALSE}
 home <- "~/Documents/Modelling_intro/" ## on a OS X
@@ -33,11 +33,22 @@ setwd(home)
 
 # Load model code
 
+If the `curl` package is not installed yet, you can do so by
+```{r results = "hide", eval=FALSE}
+install.packages(curl) # install the curl library (to import data)
+```
+
 Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model with random walks and vaccination yourselves.
 
 ```{r eval= FALSE}
+
+# load package 'curl'
+library('curl')
+
 # download R file with IBM function
 curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", destfile = "ibm_functions.R")
+
+# load the IBM functions
 source('ibm_functions.R')
 ```
 

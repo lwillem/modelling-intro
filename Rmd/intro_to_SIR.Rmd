@@ -35,7 +35,8 @@ $$
 \frac{dS}{dt} &= - \beta \frac{I}{N} S  \\
 \frac{dI}{dt} &=  \beta \frac{I}{N} S -\gamma I \\
 \frac{dR}{dt} &= \gamma I
-\end{align}$$
+\end{align}
+$$
 
 with $\beta$ as the transmission rate and $\gamma$ the recovery rate.
 
@@ -57,6 +58,12 @@ setwd(home)
 ```
 
 # Load packages and libraries
+
+If packages are not installes yet, you can do so by
+```{r results = "hide", eval=FALSE}
+install.packages(curl) # install the curl library (to import data)
+install.packages(deSolve) # install the deSolve library (to solve ODE's)
+```
 
 Once installed, you have to load the package(s) at the start of the R file. This is done using 
 
@@ -140,7 +147,7 @@ What we are doing here is assessing our model's "fit" to the data. This is a key
 
 
 ```{r }
-data$number = data$proportion * 100000
+data$number <- data$proportion * 100000
 plot(out[,"time"],out[,"S"],type="l",lwd = 5, col="green",xlab="Time",ylab="Number")
 lines(out[,"time"],out[,"I"],col="red",lwd = 5)
 lines(out[,"time"],out[,"R"],col="blue",lwd = 5)

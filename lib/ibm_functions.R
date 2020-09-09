@@ -52,7 +52,8 @@ get_default_parameters <- function(){
               
               num_workplaces = 100,
               
-              rng_seed = 2020))
+              rng_seed = 2020,
+              ))
   
   
 }
@@ -273,6 +274,9 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   # print total run time
   total_time <- as.double(Sys.time() - time_start,unit='secs')
   print(paste0('Total run time: ',round(total_time,digits=0),'s'))
+  
+  # set back the defaul par(mfrow)
+  par(mfrow=c(1,1))
 }
 
 #' @title Calculate the social contact probability
@@ -302,24 +306,6 @@ get_contact_probability <- function(average_num_contacts,num_possible_contacts)
   # return the probability
   return(contact_probability)
 
-}
-
-run_ibm_location <- function(pop_size = 1000,  # population size
-                              num_days = 50,    # time horizon
-                              num_infected_seeds = 3, # initial infections
-                              vaccine_coverage = 0.1, # vaccine state
-
-                              num_days_infected  = 7, # disease parameter
-                              transmission_prob  = 0.1, # transmission dynamics
-                              avg_num_contacts_day = 10, 
-                              
-                              plot_time_delay  = 0, # visualisation parameter (0 = no plots)
-                              
-                              rng_seed = as.numeric(format(Sys.time(),'%S')) # random number seed = current time (seconds)
-){
-  
-  print("in progress...")
-  
 }
 
 #' @title EXAMPLE to incorporate spatial vaccine refusal
@@ -684,6 +670,10 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   
   legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
   
+  if(all(is.na(pop_data$secondary_cases))){
+    pop_data$secondary_cases <- -1
+  }
+
   boxplot(secondary_cases ~ time_of_infection, data=pop_data,
           xlab='time of infection (day)',
           ylab='secondary cases',
@@ -693,6 +683,9 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
           xaxt='n')
   axis(1,seq(0,num_days,5))
   
+  if(all(is.na(pop_data$generation_interval))){
+    pop_data$generation_interval <- -1
+  }
   boxplot(generation_interval ~ time_of_infection, data=pop_data,
           xlab='time of infection (day)',
           ylab='generation interval (days)',
@@ -772,6 +765,8 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   total_time <- as.double(Sys.time() - time_start,unit='secs')
   print(paste0('Total run time: ',round(total_time,digits=0),'s'))
   
+  # set back the defaul par(mfrow)
+  par(mfrow=c(1,1))
 }
 
 #' @title Create a synthetic population with households
@@ -866,18 +861,21 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
   boolean_workplace_pop    <- pop_data$age > max(target_school_ages)
   pop_data$workplace_id[!boolean_workplace_pop] <- NA
  
-  # create a figure with 8 subplots
-  par(mfrow=c(2,4))
-  hist(pop_data$age,-1:70,main='total population',xlab='age')
-  hist(pop_data$age[pop_data$member_id==1],-1:70,main='adult 1',xlab='age')
-  hist(pop_data$age[pop_data$member_id==2],-1:70,main='adult 2',xlab='age')
-  hist(pop_data$age[pop_data$member_id==3],-1:70,main='child 1',xlab='age')
-  hist(pop_data$age[pop_data$member_id==4],-1:70,main='child 2',xlab='age')
-  hist(table(pop_data$hh_id),main='household size',xlab='household size')
+  if(bool_show_demographics){
+    # create a figure with 8 subplots
+    par(mfrow=c(2,4))
+    hist(pop_data$age,-1:70,main='total population',xlab='age')
+    hist(pop_data$age[pop_data$member_id==1],-1:70,main='adult 1',xlab='age')
+    hist(pop_data$age[pop_data$member_id==2],-1:70,main='adult 2',xlab='age')
+    hist(pop_data$age[pop_data$member_id==3],-1:70,main='child 1',xlab='age')
+    hist(pop_data$age[pop_data$member_id==4],-1:70,main='child 2',xlab='age')
+    hist(table(pop_data$hh_id),main='household size',xlab='household size')
+    
+    # check class and workplace size
+    hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
+    hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
+  }
   
-  # check class and workplace size
-  hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
-  hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
   
   return(pop_data)
   
