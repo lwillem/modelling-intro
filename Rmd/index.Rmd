@@ -25,10 +25,8 @@ Welcome to the introductory material on infectious disease modelling in R for 5-
 <!--2. [Stochastic models](code_sto_model.html)-->
 <!-- 3. [Using the fitR package](using_fitR.html) -->
 <!-- 4. [Sampling from the posterior distribution using MCMC](mcmc.html) -->
-
-
-X. [Demo Decision Tree (basic)](HTA_flu_basic.html)
-X. [Demo Decision Tree (BCEA package)](HTA_flu_CEAresults.html)
+7. [Demo Decision Tree (basic)](HTA_flu_basic.html)
+8. [Demo Decision Tree (BCEA package)](HTA_flu_CEAresults.html)
 
 <!-- ## Lecture Slides -->
 
