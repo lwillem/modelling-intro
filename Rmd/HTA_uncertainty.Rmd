@@ -1,0 +1,129 @@
+---
+title: "Uncertainty distributions for the parameters of the flu model"
+toc: FALSE
+---
+
+(Page under construction)
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+set.seed(2020)
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+```
+
+This model was developed by Philippe Beutels and Joke Bilcke, for illustration and teaching purposes only. 
+Please make contact if you would like to use this model in any public way.
+
+In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised 
+within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to 
+influenza, and only if vacccination targets a small proportion of the population that does not at the same time form a 
+core transmitter group of the virus (eg it is unlikely to be suitable to model childhood influenza vaccination). Note 
+that for most applications, practical use of this model would likely entail having separate, though similarly simple 
+decision trees to obtain the unit cost estimates (implying that these cells would be intermediary 
+outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number
+of consultations, the unit costs per consultation, medication use, hospital days etc for cases of pneumonia, and all 
+other relevant disease stages)).
+
+Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. 
+This is due to the exclusion of herd immunity effects in this model.  
+
+For further information, questions or comments please contact: 
+philippe.beutels@uantwerp.be or joke.bilcke@uantwerp.be
+Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID)
+Vaccine and Infectious Disease Institute (Vaxinfectio)
+University of Antwerp
+Universiteitsplein 1
+2610 Antwerp
+Belgium
+
+# Set working directory
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
+
+```{r results = "hide", eval = FALSE}
+home <- "~/Documents/Modelling_intro/" ## on a OS X
+home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+setwd(home)
+```
+
+# Set number of samples
+```{r }
+nsamples=10000
+
+```
+
+# Normal uncertainty distributions
+```{r }
+
+set.seed(698) # use this to get exactly the same results each time you run the code (e.g. for code checking)
+foi=rnorm(nsamples,4/100,sqrt(0.04*(1-0.04)/100))			#--> sample size too small for normal distr
+prophosp=rnorm(nsamples,0.1,0.03)			#--> sample size too small for normal distr
+casefat=rnorm(nsamples,0.03,0.003)  		#--> sample size too small for normal distr
+lifexp=rnorm(nsamples,12,2)				#--> normal distr ok
+ve=rnorm(nsamples,0.6,(0.7-0.5)/(2*1.96))		#--> normal distr ok		
+admcost=rnorm(nsamples,50,4)				#--> normal distr ok
+costhosp=rnorm(nsamples,2000,100)			#--> normal distr ok
+costnonhosp=rnorm(nsamples,100,5)			#--> normal distr ok
+qalyhosp=rnorm(nsamples,0.018,0.0018) 		#--> normal distr ok
+qalynonhosp=rnorm(nsamples,0.0082,0.0018) 	#--> sample size slightly too low for normal distr
+
+```
+
+# Uncertainty distributions for small sample sizes
+```{r }
+
+foi2=rbeta(nsamples,4,96)
+prophosp2=rbeta(nsamples,10,90)
+casefat2=rbeta(nsamples,30,970)
+lifexp2=rgamma(nsamples,12^2/2^2,12/2^2)
+ve2_lognormal=1-exp(rnorm(nsamples,log(0.4),(log(0.5)-log(0.3))/(2*1.96)))
+  ve2mean=0.6
+  ve2se=(0.7-0.5)/(2*1.96)
+  ve2alpha=((ve2mean**2*(1-ve2mean))/ve2se**2)-ve2mean
+ve2_beta=rbeta(nsamples,ve2alpha,ve2alpha*(1-ve2mean)/ve2mean)
+admcost2=rgamma(nsamples,50^2/4^2,50/4^2)
+costhosp2=rgamma(nsamples,2000^2/100^2,2000/100^2)
+costnonhosp2=rgamma(nsamples,100^2/5^2,100/5^2)
+	qalyhosp2_alpha=(0.018^2*(1-0.018)/0.0018^2)-0.018
+qalyhosp2=rbeta(nsamples,qalyhosp2_alpha,qalyhosp2_alpha*(1-0.018)/0.018)
+	qalynonhosp2_alpha=(0.0082^2*(1-0.0082)/0.0018^2)-0.0082
+qalynonhosp2=rbeta(nsamples,qalynonhosp2_alpha,qalynonhosp2_alpha*(1-0.0082)/0.0082)
+
+```
+
+# Density plots
+```{r }
+# To check if sample size is sufficiently large to use normal distribution
+#par(mfrow=c(4,3))
+plot(density(foi))
+lines(density(foi2),col='red')
+plot(density(prophosp))
+lines(density(prophosp2),col='red')
+plot(density(casefat))
+lines(density(casefat2),col='red')
+plot(density(lifexp))
+lines(density(lifexp2),col='red')
+plot(density(ve))
+lines(density(ve2_lognormal),col='red')
+lines(density(ve2_beta),col='green')
+plot(density(admcost))
+lines(density(admcost2),col='red')
+plot(density(costhosp))
+lines(density(costhosp2),col='red')
+plot(density(costnonhosp))
+lines(density(costnonhosp2),col='red')
+plot(density(qalyhosp))
+lines(density(qalyhosp2),col='red')
+plot(density(qalynonhosp))
+lines(density(qalynonhosp2),col='red')
+par(mfrow=c(1,1))
+
+```
+
+
+<div>
+# Navigate
+Top: [Index](index.html)
+</div>
+
