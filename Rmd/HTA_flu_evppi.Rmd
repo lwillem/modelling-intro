@@ -1,5 +1,5 @@
 ---
-title: "Demo Decision Tree (BCEA)"
+title: "Demo Decision Tree (EVPPI)"
 toc: FALSE
 ---
 
@@ -62,15 +62,16 @@ Once installed, you have to load the package(s) at the start of the R file. This
 library(BCEA)
 ```
 
-# Number of samples to draw
+
+# Set number of samples
 ```{r results = "hide"}
 Nsamples<-5000
 
 ```
 
 # Input
-
 ```{r results = "hide"}
+
 
 set.seed(698) # use this to get exactly the same results each time you run the code (e.g. for code checking)
 targetgroup<-2500000 								#people>65 years
@@ -138,7 +139,7 @@ diff_totaldirectcosts1.5<--(diff_treatmentcosts1.5+diff_vaccinationcosts1.5)
 
 ```
 
-# Cost-effectiveness output (using BCEA package)
+# Cost-effectiveness output (using the BCEA package)
 ```{r results = "hide"}
 #Prepare and run the function
 c=cbind(noprogram_totaldirectcosts,program_totaldirectcosts)
@@ -177,6 +178,28 @@ m <- bcea(e,c,ref=2,interventions=ints,plot=T) #ref specifies to compare 'Vaccin
         colnames(m_evpi)=c('wtp value','evpi')
 
 ```
+
+# Assess importance measures: EVPPI 
+```{r}
+#combine all uncertain input parameters in a single dataset
+uncinput=cbind(force_of_infection,proportion_hospitalised,casefatality_ratio,life_expectancy,vaccine_efficacy,administrationcosts_perdose,
+               cost_per_hospitalised_case,cost_per_nonhospitalised_case,QALYslost_per_hospitalised_case,
+               QALYslost_per_nonhospitalised_case)
+uncinputnames=c('foi','prophosp','CFR','LE','VE','costADMIN','costHOSP','costNONHOSP','QALYlossHOSP','QALYlossNONHOSP')
+colnames(uncinput)=uncinputnames
+#run the evppi function (need to have run the bcea function before)
+m_evppi=evppi(parameter=uncinputnames,input=uncinput,he=m,method='so',n.blocks=10)
+plot.evppi(m_evppi,pos='right',col=rainbow(ncol(uncinput)))
+```
+
+
+```{r eval=FALSE}
+#data to construct EVPPI plot
+m_evppi$evppi
+
+```
+
+
 
 
 <div>
