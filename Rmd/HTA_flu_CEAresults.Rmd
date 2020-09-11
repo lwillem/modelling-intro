@@ -1,0 +1,184 @@
+---
+title: "Demo Decision Tree (BCEA)"
+toc: FALSE
+---
+
+(page under construction)
+
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+library('BCEA')
+set.seed(2020)
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+```
+
+This model was developed by Philippe Beutels and Joke Bilcke, for illustration and teaching purposes only. 
+Please make contact if you would like to use this model in any public way.
+
+In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised 
+within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to 
+influenza, and only if vacccination targets a small proportion of the population that does not at the same time form a 
+core transmitter group of the virus (eg it is unlikely to be suitable to model childhood influenza vaccination). Note 
+that for most applications, practical use of this model would likely entail having separate, though similarly simple 
+decision trees to obtain the unit cost estimates (implying that these cells would be intermediary 
+outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number
+of consultations, the unit costs per consultation, medication use, hospital days etc for cases of pneumonia, and all 
+other relevant disease stages)).
+
+Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. 
+This is due to the exclusion of herd immunity effects in this model.  
+
+For further information, questions or comments please contact: 
+philippe.beutels@uantwerp.be or joke.bilcke@uantwerp.be
+Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID)
+Vaccine and Infectious Disease Institute (Vaxinfectio)
+University of Antwerp
+Universiteitsplein 1
+2610 Antwerp
+Belgium
+
+# Set working directory
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
+
+```{r results = "hide", eval = FALSE}
+home <- "~/Documents/Modelling_intro/" ## on a OS X
+home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+setwd(home)
+```
+
+# load packages
+
+If BCEA package is not installed yet, you can do so by
+```{r results = "hide", eval=FALSE}
+install.packages('BCEA')
+```
+
+Once installed, you have to load the package(s) at the start of the R file. This is done using 
+
+```{r results = "hide"}
+library(BCEA)
+```
+
+
+# NUMBER OF SAMPLES TO DRAW
+```{r results = "hide"}
+Nsamples<-5000
+
+```
+```{r results = "hide"}
+
+# INPUT
+set.seed(698) # use this to get exactly the same results each time you run the code (e.g. for code checking)
+targetgroup<-2500000 								#people>65 years
+uptake_program<-0.80
+force_of_infection<-rbeta(Nsamples,4,96) 	#draw Nsamples randomly from a beta distribution with parameters 4 and 96
+proportion_hospitalised<-rbeta(Nsamples,10,90)
+casefatality_ratio<-rbeta(Nsamples,30,970)
+life_expectancy<-rnorm(Nsamples,mean=12,sd=2) 				#in years
+vaccine_efficacy<-rnorm(Nsamples,mean=0.6,sd=(0.7-0.5)/(2*1.96))
+vaccineprice_perdose<-10 							#dollars
+administrationcosts_perdose<-rnorm(Nsamples,50,4) 			#dollars
+cost_per_hospitalised_case<-rnorm(Nsamples,2000,100) 			#dollars
+cost_per_nonhospitalised_case<-rnorm(Nsamples,100,5) 			#dollars
+fixed_program_costs<-0 								#dollars
+QALYslost_per_hospitalised_case<-rnorm(Nsamples,mean=0.018,sd=0.0018)
+	alphaqalynonhosp=(0.0082^2*(1-0.0082)/0.0018^2)-0.0082
+QALYslost_per_nonhospitalised_case<-rbeta(Nsamples,alphaqalynonhosp,alphaqalynonhosp*(1-0.0082)/0.0082)
+discountrate<-0.015
+
+```
+```{r results = "hide"}
+
+#INTERMEDIARY OUTPUT
+
+variable_vaccinationcost_perdose<-vaccineprice_perdose+administrationcosts_perdose
+treatment_costs_per_case<-cost_per_hospitalised_case*proportion_hospitalised+(1-proportion_hospitalised)*cost_per_nonhospitalised_case
+QALYslost_per_case<-QALYslost_per_hospitalised_case*proportion_hospitalised+(1-proportion_hospitalised)*QALYslost_per_nonhospitalised_case
+discounted_life_expectancy<-rep(NA,Nsamples)
+for (i in 1:Nsamples)
+{discounted_life_expectancy[i]<-sum(1/((1+discountrate)^(1:life_expectancy[i])))}
+
+#Program
+program_infections<-targetgroup*uptake_program*force_of_infection*(1-vaccine_efficacy)+targetgroup*(1-uptake_program)*force_of_infection
+program_hospitalisations<-program_infections*proportion_hospitalised
+program_deaths<-program_infections*casefatality_ratio
+program_lifeyearslost<-program_deaths*discounted_life_expectancy
+program_QALYslost<-program_infections*QALYslost_per_case+program_lifeyearslost
+
+program_treatmentcosts<-program_infections*treatment_costs_per_case
+program_vaccinationcosts<-ifelse(uptake_program!=0,targetgroup*uptake_program*variable_vaccinationcost_perdose+fixed_program_costs,targetgroup*uptake_program*varaible_vaccinationcost_perdose)
+program_totaldirectcosts<-program_treatmentcosts+program_vaccinationcosts
+
+#No Program
+noprogram_infections<-targetgroup*force_of_infection
+noprogram_hospitalisations<-noprogram_infections*proportion_hospitalised
+noprogram_deaths<-noprogram_infections*casefatality_ratio
+noprogram_lifeyearslost<-noprogram_deaths*discounted_life_expectancy
+noprogram_QALYslost<-noprogram_infections*QALYslost_per_case+noprogram_lifeyearslost
+
+noprogram_treatmentcosts<-noprogram_infections*treatment_costs_per_case
+noprogram_vaccinationcosts<-0
+noprogram_totaldirectcosts<-noprogram_treatmentcosts+noprogram_vaccinationcosts
+
+#Difference between 'program' and 'no program' (events and costs averted)
+diff_infections1.5<-noprogram_infections-program_infections
+diff_hospitalisations1.5<-noprogram_hospitalisations-program_hospitalisations
+diff_deaths1.5<-noprogram_deaths-program_deaths
+diff_lifeyearslost1.5<-noprogram_lifeyearslost-program_lifeyearslost
+diff_QALYslost1.5<-noprogram_QALYslost-program_QALYslost
+
+diff_treatmentcosts1.5<-noprogram_treatmentcosts-program_treatmentcosts
+diff_vaccinationcosts1.5<-noprogram_vaccinationcosts-program_vaccinationcosts
+diff_totaldirectcosts1.5<--(diff_treatmentcosts1.5+diff_vaccinationcosts1.5)
+
+```
+
+#PRODUCE COST-EFFECTIVENESS OUTPUT USING THE BCEA R Package
+```{r results = "hide"}
+#Prepare and run the function
+c=cbind(noprogram_totaldirectcosts,program_totaldirectcosts)
+e=cbind(-noprogram_QALYslost,-program_QALYslost) ##negative sign because input needs to be health gain (and we are loosing health due to flu)
+ints=c("Standard care","Vaccination")
+m <- bcea(e,c,ref=2,interventions=ints,plot=T) #ref specifies to compare 'Vaccination' to 'Standard care'
+#Generate output
+### 1. Cost-effectiveness plane --> see plots
+### 2. Which decision should I take, given current information and for a range of WTP values? 
+        #--> see plots cost-effectiveness plane and expected incremental benefit
+        #--> see summary: 'optimal decision' and 'Vaccination vs Standard care'
+        summary(m)
+        #--> or calculate manually:
+        mean(diff_totaldirectcosts1.5)/mean(diff_QALYslost1.5) #average ICER
+        k=25000
+        mean((diff_QALYslost1.5*k)-diff_totaldirectcosts1.5)#average INMB for k
+        #--> average INMB of vaccination compared to standard care, for the range of WTP values considered
+        m$eib 
+### 3. How much evidence is there in favor of the decision, for a range of WTP values 
+        #--> see plot cost-effectiveness acceptability curve
+        #--> see summary 'Vaccination vs Standard care: CEAC'
+        summary(m)
+        #--> construct a cost-effectiveness acceptability frontier plot
+        m_ceaf<-multi.ce(m)
+        ceaf.plot(m_ceaf,graph='ggplot2') #but no color used?
+        #data needed to construct CEAC and CEAF plots
+        m_ceafceac=cbind(m$k,ints[m$best],m$ceac) 
+        colnames(m_ceafceac)=c('wtp value','optimal decision','probability highest INMB ref')
+        
+### 4. Is there value in further research? 
+        #--> see Expected Value of Information plot
+        #--> see summary 'EVPI'
+        summary(m)
+        #data needed to construct EVPI plot:
+        m_evpi=cbind(m$k,m$evi)
+        colnames(m_evpi)=c('wtp value','evpi')
+
+```
+
+
+<div>
+# Navigate
+Top: [Index](index.html)
+</div>
+

@@ -402,8 +402,8 @@ points(x = pop_data$x_coord[pop_data$health == 'I'],
        y = pop_data$y_coord[pop_data$health == 'I'],
        col = 2,
        pch = 20)
-points(x = pop_data$x_coord[binom_infection_vector == 1],
-       y = pop_data$y_coord[binom_infection_vector == 1],
+points(x = pop_data$x_coord[binom_recover_vector == 1],
+       y = pop_data$y_coord[binom_recover_vector == 1],
        col = 3,
        pch = 20)
 legend('topright',
