@@ -1,14 +1,19 @@
 ---
-title: "Introduction to infectious disease modelling in R"
-author: by Lander Willem (based on work from Sebastian Funk, Gwen Knight and Anton Camacho)
+title: "Introduction to infectious disease modelling and health economic research in R"
+author: by Lander Willem and colleagues from the University of Antwerp and Hasselt University as part of the SIMID consortium
 output:
   html_document:
     toc: false  
 ---
 
-![](ext_fig/simid_course_logo_combine.jpg)
+<hr>
+<img src="ext_fig/logo_chermid.png" height="50px"> &nbsp; &nbsp;
+<img src="ext_fig/logo_dsi.png" height="80px"> &nbsp; &nbsp;
+<img src="ext_fig/logo_simid_yellow.png" height="80px">
+<hr>
 
-Welcome to the introductory material on infectious disease modelling in R for 5-day course on "Modelling infectious Diseases and Health Economics" as part of the Antwerp Summer University. 
+
+Welcome to the introductory material on infectious disease modelling and health economics in R.
 
 ## Required software
 * [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-3.5.0.
