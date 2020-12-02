@@ -538,10 +538,10 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              transmission_prob     = 0.1,      # transmission probability per social contact                  
                              
                              # visualisation parameter
-                             bool_show_demographics       = TRUE,        # delay in seconds to slow down the "real-time" plot ||default = O||
+                             bool_show_demographics       = TRUE, # option to show the demography figures
 
                              add_baseline_prevalence = FALSE, #option to add the prevalence with default param
-                             return_prevelance = FALSE # option to return the prevalence (and stop)
+                             return_prevelance = FALSE        # option to return the prevalence (and stop)
                              ){
   
   ######################################################### #
