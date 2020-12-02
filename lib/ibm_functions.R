@@ -46,9 +46,9 @@ get_default_parameters <- function(){
               
               # social contact parameters
               num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community 
-              contact_prob_household     = 1,    # fully connected 
-              contact_prob_school        = 0.5,  # propability for an "effective contact" at school 
-              contact_prob_workplace     = 0.1,
+              contact_prob_household     = 1,    # probability for an "effective contact" at home (1 = fully connected)
+              contact_prob_school        = 0.5,  # probability for an "effective contact" at school 
+              contact_prob_workplace     = 0.1,  # probability for an "effective contact" at work 
               
               num_workplaces = 100,
               
@@ -514,7 +514,6 @@ geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distan
 }
 
 
-
 run_ibm_location <- function(pop_size              = 2000,     # population size                         
                              num_days              = 50,       # number of days to simulate (time step = one day) 
                              num_infected_seeds    = 3,        # initial number of intected individuals   
@@ -530,9 +529,9 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              
                              # social contact parameters
                              num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community 
-                             contact_prob_household     = 1,    # fully connected 
-                             contact_prob_school        = 0.5,  # propability for an "effective contact" at school 
-                             contact_prob_workplace     = 0.3,  # average number of "effective contacts" per day in the general community 
+                             contact_prob_household     = 1,    # probability for an "effective contact" at home (1 = fully connected)
+                             contact_prob_school        = 0.5,  # probability for an "effective contact" at school 
+                             contact_prob_workplace     = 0.3,  # probability for an "effective contact" at work  
                              
                              # disease parameters
                              num_days_infected     = 7,        # average number of days individuals are infected/infectious   
