@@ -110,7 +110,8 @@ What happens if individuals still move? Or the vaccine coverage is only 30%? If 
 
 ## Scenarios...
 <n style="color:darkred">
-Now, what happens to the **total incidence** and **epedemic peak** if you...
+Now, it is time to adapt the model parameters and see what happens to the **total incidence** and **epidemic peak**. The names of the parameters are listed in the box above. What happens if you...
+</n>
 
 
 * change the population size to 100 or 2000?
@@ -122,7 +123,7 @@ Now, what happens to the **total incidence** and **epedemic peak** if you...
 * change the average number of contacts per day to 2 or 20?
 * change the time horizon to 100 days?
 * ... etc.
-</n>
+
 
 <div>
 # Navigate
