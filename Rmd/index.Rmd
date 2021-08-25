@@ -19,7 +19,7 @@ Welcome to the introductory material on infectious disease modelling and health 
 * [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-3.5.0.
 * [RStudio](http://www.rstudio.com/products/rstudio/download/) (recommended) is a popular graphic user interface (GUI).
 
-## Sessions
+## Tutorials
 
 1. [Introduction to RStudio](intro_to_RStudio.html)
 2. [Introduction to R](intro_to_r.html)

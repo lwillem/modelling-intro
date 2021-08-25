@@ -138,7 +138,7 @@ To look at all of the model output we can plot everything on the same graph:
 plot(out[,"time"],out[,"S"],type="l",lwd = 5, col="green",xlab="Time",ylab="Number")
 lines(out[,"time"],out[,"I"],col="red",lwd = 5)
 lines(out[,"time"],out[,"R"],col="blue",lwd = 5)
-legend(23, 80000, c("Susceptibles", "Infecteds", "Recovereds"), lwd = 3, lty = 1, col =c("green","red","blue")) # Add legend and specific position
+legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, col =c("green","red","blue")) # Add legend and specific position
 ```
 
 Does this match the data you read before in using `read.csv` well? Note, that the data given is the proportions infected over time. So in order to compare you either need to convert the data to numbers or the numbers to data. Try and do this, and plot the data and model output on the same graph. A solution is given below if you get stuck. 
@@ -151,7 +151,7 @@ data$number <- data$proportion * 100000
 plot(out[,"time"],out[,"S"],type="l",lwd = 5, col="green",xlab="Time",ylab="Number")
 lines(out[,"time"],out[,"I"],col="red",lwd = 5)
 lines(out[,"time"],out[,"R"],col="blue",lwd = 5)
-legend(23, 80000, c("Susceptibles", "Infecteds", "Recovereds"), lwd = 3, lty = 1, col = c("green","red","blue")) #
+legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, col = c("green","red","blue")) #
 points(data$time,data$number)
 ```
 
