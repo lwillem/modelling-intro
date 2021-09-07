@@ -79,7 +79,10 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
                                 
                                 plot_time_delay  = 0, # visualisation parameter (0 = no plots)
                                 
-                                rng_seed = as.numeric(format(Sys.time(),'%S')) # random number seed = current time (seconds)
+                                rng_seed = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
+                                
+                                add_baseline_prevalence = FALSE, # option to add the prevalence with default param
+                                return_prevelance = FALSE        # option to return the prevalence (and stop)
                                 ){
   
   ######################################################### #
@@ -201,6 +204,9 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   log_r <- colSums(log_pop_data == 'R')  / pop_size
   log_v <- colSums(log_pop_data == 'V')  / pop_size
   
+  if(return_prevelance){
+    return(data.frame(log_i=log_i,log_r=log_r))
+  }
   
   # change figure configuration => 3 subplots
   #par(mfrow=c(1,3))
@@ -225,6 +231,14 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   
   legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
   
+  if(add_baseline_prevalence){
+    out_baseline <- run_ibm_random_walk(rng_seed=rng_seed, return_prevelance = T)
+    lines(out_baseline$log_i,  col=2,lwd=2,lty=2)
+    legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7)
+  } else{
+    out_baseline = NA
+  }
+  
   boxplot(secondary_cases ~ time_of_infection, data=pop_data,
           xlab='time of infection (day)',
           ylab='secondary cases',
@@ -243,7 +257,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
           xaxt='n')
   axis(1,seq(0,num_days,5))
 
-  ## PRINT MODEL PARAMETERS AND RESULTS ----
+  ## PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage','apply_spatial_vaccine_refusal',
                  'rng_seed','area_size','max_velocity','avg_num_contacts_day',
@@ -252,31 +266,54 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   )
   
   print('MODEL PARAMETERS')
-  
   # loop over the given parameter names, if present, add name & value
   for(i_param in all_param){
     if(exists(i_param)){
       # param_str <- paste(param_str,'||',i_param,':',get(i_param))
-      print(paste(i_param,':',get(i_param)))
+      print(paste0(i_param,': ',get(i_param)))
     }
   }
+  
+  # # print total incidence
+  print_model_results(log_i = log_i,
+                      log_r = log_r,
+                      time_start=time_start,
+                      out_baseline = out_baseline)
+
+  # set back the defaul par(mfrow)
+  par(mfrow=c(1,1))
+}
+
+print_model_results <- function(log_i,log_r,time_start,out_baseline=NA){
+  
+  add_baseline_prevalence <- !any(is.na(out_baseline))
+  if(add_baseline_prevalence){
+    # default epidemic characteristics
+    default_ti <- paste0('   [baseline: ',round((out_baseline$log_i[length(out_baseline$log_i)] +
+                                                   out_baseline$log_r[length(out_baseline$log_r)])*100,digits=0),'%]')
+    default_pp <- paste0('   [baseline: ',round(max(out_baseline$log_i)*100,digits=0),'%]')
+    default_pd <- paste0('    [baseline: ',which(out_baseline$log_i == max(out_baseline$log_i))[1],']')
+  }
+ 
+  print(add_baseline_prevalence)
   
   # print total incidence
   print('-------------')
   print('MODEL RESULTS')
   
-  print(paste0('total incidence: ',round((log_i[length(log_i)] + log_r[length(log_r)])*100,digits=2),'%'))
+  print(paste0('total incidence: ',round((log_i[length(log_i)] + log_r[length(log_r)])*100,digits=0),'%',
+               ifelse(add_baseline_prevalence,default_ti,'')))
   
   # print peak details
-  print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=2),'%'))
-  print(paste0('Peak day:        ',which(log_i == max(log_i)))[1])
+  print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=0),'%',
+               ifelse(add_baseline_prevalence,default_pp,'')))
+  print(paste0('Peak day:        ',which(log_i == max(log_i))[1], 
+               ifelse(add_baseline_prevalence,default_pd,'')))
   
   # print total run time
   total_time <- as.double(Sys.time() - time_start,unit='secs')
-  print(paste0('Total run time: ',round(total_time,digits=0),'s'))
+  print(paste0('Total run time:  ',round(total_time,digits=0),'s'))
   
-  # set back the defaul par(mfrow)
-  par(mfrow=c(1,1))
 }
 
 #' @title Calculate the social contact probability
