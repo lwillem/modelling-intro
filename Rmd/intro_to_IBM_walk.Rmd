@@ -124,7 +124,7 @@ Now, it is time to adapt the model parameters and see what happens to the **tota
 * change the time horizon to 100 days?
 * ... etc.
 
-(TIP: the `run_ibm_random_walk` function has an option to `add_baseline_prevalence = TRUE` to add the prevalence with the default parameters. However, this increases the run time since the model is executed twice.)
+(TIP: the `run_ibm_random_walk` function has an option to `add_baseline = TRUE` to add model results with the default parameters. However, this increases the run time since the model is executed twice.)
 
 <div>
 # Navigate

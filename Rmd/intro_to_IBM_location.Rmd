@@ -103,7 +103,7 @@ Now, what happens if you...
 * ... etc.
 </n>
 
-(TIP: the `run_ibm_location` function has an option to `add_baseline_prevalence = TRUE` to add the prevalence with the default parameters. However, this increases the run time since the model is executed twice.)
+(TIP: the `run_ibm_location` function has an option to `add_baseline = TRUE` to add model results with the default parameters. However, this increases the run time since the model is executed twice.)
 
 <div>
 # Navigate

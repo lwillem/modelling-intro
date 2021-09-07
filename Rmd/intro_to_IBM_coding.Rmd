@@ -198,7 +198,7 @@ We assume that susceptible individuals can acquire an infection if they are clos
 
 # set proximity parameter and the population-based average number of contacts per day
 max_contact_distance <- 1
-avg_num_contacts_day <-  5
+target_num_contacts_day <-  5
 
 # calculate the distance matrix using the 'dist' function and store as matrix
 distance_matrix <- as.matrix(dist(pop_data[,c('x_coord','y_coord')],upper=T))
@@ -246,7 +246,7 @@ get_contact_probability <- function(eligible_contacts_matrix,index_person){
   num_eligible_contacts <- sum(eligible_contacts)
   
   # what is the contact probability per person?
-  contact_probability <- avg_num_contacts_day / num_eligible_contacts
+  contact_probability <- target_num_contacts_day / num_eligible_contacts
   
   # limit the probability to 0.95 (this is an arbitrary choice)
   contact_probability[contact_probability > 0.95] <- 0.95

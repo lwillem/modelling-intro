@@ -34,7 +34,7 @@ get_default_parameters <- function(){
               
               num_days_infected  = 7, # disease parameter
               transmission_prob  = 0.1, # transmission dynamics
-              avg_num_contacts_day = 10, 
+              target_num_contacts_day = 10, 
               max_contact_distance = 2,
               
               plot_time_delay  = 0.1,
@@ -73,15 +73,15 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
                                 max_velocity = 1,
                                 
                                 num_days_infected  = 7, # disease parameter
-                                transmission_prob  = 0.1, # transmission dynamics
-                                avg_num_contacts_day = 10, 
+                                transmission_prob  = 0.1, # transmission probability per contact
+                                target_num_contacts_day = 10, 
                                 max_contact_distance = 2,
                                 
                                 plot_time_delay  = 0, # visualisation parameter (0 = no plots)
                                 
                                 rng_seed = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
                                 
-                                add_baseline_prevalence = FALSE, # option to add the prevalence with default param
+                                add_baseline = FALSE, # option to add the prevalence with default param
                                 return_prevelance = FALSE        # option to return the prevalence (and stop)
                                 ){
   
@@ -130,7 +130,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   
   # illustrate social contact radius
   if(plot_time_delay>0)
-  geo_plot_social_contact_radius(pop_data,area_size,max_contact_distance,avg_num_contacts_day,num_days)
+  geo_plot_social_contact_radius(pop_data,area_size,max_contact_distance,target_num_contacts_day,num_days)
   
   ####################################### #
   # RUN THE MODEL    ----                      
@@ -167,7 +167,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
       
       # calculate contact probability
       # tip: ?get_contact_probability
-      contact_probability    <- get_contact_probability(avg_num_contacts_day,num_possible_contacts)
+      contact_probability    <- get_contact_probability(target_num_contacts_day,num_possible_contacts)
       
       # new infections are possible if individuals are susceptible and within the range of the transmission distance
       flag_new_infection     <- pop_data$health == 'S' &
@@ -229,12 +229,12 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   lines(log_r,  col=3,lwd=2)
   lines(log_v,  col=4,lwd=2)
   
-  legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
+  legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7,bg='white')
   
-  if(add_baseline_prevalence){
+  if(add_baseline){
     out_baseline <- run_ibm_random_walk(rng_seed=rng_seed, return_prevelance = T)
     lines(out_baseline$log_i,  col=2,lwd=2,lty=2)
-    legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7)
+    legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7,bg='white')
   } else{
     out_baseline = NA
   }
@@ -260,7 +260,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
   ## PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage','apply_spatial_vaccine_refusal',
-                 'rng_seed','area_size','max_velocity','avg_num_contacts_day',
+                 'rng_seed','area_size','max_velocity','target_num_contacts_day',
                  'max_contact_distance', 'num_days_infected','transmission_prob',
                  'plot_time_delay'
   )
@@ -286,8 +286,8 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
 
 print_model_results <- function(log_i,log_r,time_start,out_baseline=NA){
   
-  add_baseline_prevalence <- !any(is.na(out_baseline))
-  if(add_baseline_prevalence){
+  add_baseline <- !any(is.na(out_baseline))
+  if(add_baseline){
     # default epidemic characteristics
     default_ti <- paste0('   [baseline: ',round((out_baseline$log_i[length(out_baseline$log_i)] +
                                                    out_baseline$log_r[length(out_baseline$log_r)])*100,digits=0),'%]')
@@ -295,20 +295,18 @@ print_model_results <- function(log_i,log_r,time_start,out_baseline=NA){
     default_pd <- paste0('    [baseline: ',which(out_baseline$log_i == max(out_baseline$log_i))[1],']')
   }
  
-  print(add_baseline_prevalence)
-  
   # print total incidence
   print('-------------')
   print('MODEL RESULTS')
   
   print(paste0('total incidence: ',round((log_i[length(log_i)] + log_r[length(log_r)])*100,digits=0),'%',
-               ifelse(add_baseline_prevalence,default_ti,'')))
+               ifelse(add_baseline,default_ti,'')))
   
   # print peak details
   print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=0),'%',
-               ifelse(add_baseline_prevalence,default_pp,'')))
+               ifelse(add_baseline,default_pp,'')))
   print(paste0('Peak day:        ',which(log_i == max(log_i))[1], 
-               ifelse(add_baseline_prevalence,default_pd,'')))
+               ifelse(add_baseline,default_pd,'')))
   
   # print total run time
   total_time <- as.double(Sys.time() - time_start,unit='secs')
@@ -555,7 +553,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              num_days              = 50,       # number of days to simulate (time step = one day) 
                              num_infected_seeds    = 3,        # initial number of intected individuals   
                              vaccine_coverage      = 0 ,       # vaccine coverage [0,1]                
-                             rng_seed     = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
+                             rng_seed              = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
                              
                              # schools =  number of classes per age group
                              num_schools            = 2,         
@@ -577,7 +575,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              # visualisation parameter
                              bool_show_demographics       = TRUE, # option to show the demography figures
 
-                             add_baseline_prevalence = FALSE, #option to add the prevalence with default param
+                             add_baseline = FALSE, #option to add the prevalence with default param
                              return_prevelance = FALSE        # option to return the prevalence (and stop)
                              ){
   
@@ -693,7 +691,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   log_v <- colSums(log_pop_data == 'V')  / pop_size
   
   if(return_prevelance){
-    return(log_i)
+    return(data.frame(log_i=log_i,log_r=log_r))
   }
   
   # change figure configuration => 3 subplots
@@ -711,12 +709,14 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   lines(log_r,  col=3,lwd=2)
   lines(log_v,  col=4,lwd=2)
   
-  legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7)
+  legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7,bg='white')
   
-  if(add_baseline_prevalence){
-    log_i_baseline <- run_ibm_location(return_prevelance = T,bool_show_demographics=F)
-    lines(log_i_baseline,  col=2,lwd=2,lty=2)
-    legend('topright',legend=c('I (default)'),col=2,lwd=2,lty=3,cex=0.7)
+  if(add_baseline){
+    out_baseline <- run_ibm_location(return_prevelance = T,bool_show_demographics=F)
+    lines(out_baseline$log_i,  col=2,lwd=2,lty=2)
+    legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7,bg='white')
+  } else{
+    out_baseline <- NA
   }
   
   if(all(is.na(pop_data$secondary_cases))){
@@ -783,7 +783,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
        las=2,
        cex.axis=0.7)
   
-  ## PRINT MODEL PARAMETERS AND RESULTS ----
+  ## PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage',
                  'rng_seed', 'num_days_infected','transmission_prob',
@@ -792,28 +792,19 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   )
   
   print('MODEL PARAMETERS')
-  
   # loop over the given parameter names, if present, add name & value
   for(i_param in all_param){
     if(exists(i_param)){
-      print(paste(i_param,':',paste(get(i_param),collapse = ',')))
+      print(paste0(i_param,': ',paste(get(i_param),collapse = ',')))
     }
   }
   
   # print total incidence
-  print('-------------')
-  print('MODEL RESULTS')
-  # print total incidence
-  print(paste0('Total incidence: ',round((log_i[num_days] + log_r[num_days])*100,digits=2),'%'))
-  
-  # print peak details
-  print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=2),'%'))
-  print(paste0('Peak day:        ',which(log_i == max(log_i)))[1])
-  
-  # print total run time
-  total_time <- as.double(Sys.time() - time_start,unit='secs')
-  print(paste0('Total run time: ',round(total_time,digits=0),'s'))
-  
+  print_model_results(log_i = log_i,
+                      log_r = log_r,
+                      time_start=time_start,
+                      out_baseline = out_baseline)
+
   # set back the defaul par(mfrow)
   par(mfrow=c(1,1))
 }

@@ -34,7 +34,8 @@ install.packages(curl) # install the curl library (to import data)
 library('curl')
 
 # download R file with IBM function
-curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", destfile = "ibm_functions.R")
+curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", 
+              destfile = "ibm_functions.R")
 
 # load the IBM functions
 source('ibm_functions.R')
@@ -42,7 +43,6 @@ source('ibm_functions.R')
 
 \clearpage
 # Base case scenario
-
 ```{r }
 # you can run the location-specific IBM with default parameters (see console)
 run_ibm_random_walk(rng_seed = 2000)
@@ -54,7 +54,7 @@ run_ibm_random_walk(rng_seed = 2000)
 ```{r eval=TRUE}
 run_ibm_random_walk(num_infected_seeds = 10,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -63,27 +63,27 @@ run_ibm_random_walk(num_infected_seeds = 10,
 ```{r eval=TRUE}
 run_ibm_random_walk(num_infected_seeds = 50,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 
 \clearpage
-# number of days infected 3 (instead of 7)
+# Number of days infected: 3 (instead of 7)
 ```{r eval=TRUE}
 run_ibm_random_walk(num_days_infected = 3,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 
 \clearpage
-# number of days infected 10 (instead of 7)
+# Number of days infected: 10 (instead of 7)
 ```{r eval=TRUE}
 run_ibm_random_walk(num_days_infected = 10,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -92,7 +92,7 @@ run_ibm_random_walk(num_days_infected = 10,
 ```{r pop_size_small, eval=TRUE}
 run_ibm_random_walk(pop_size = 100,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -101,7 +101,7 @@ run_ibm_random_walk(pop_size = 100,
 ```{r pop_size_large, eval=TRUE}
 run_ibm_random_walk(pop_size = 2000,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -110,7 +110,7 @@ run_ibm_random_walk(pop_size = 2000,
 ```{r eval=TRUE}
 run_ibm_random_walk(area_size = 10,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -119,7 +119,7 @@ run_ibm_random_walk(area_size = 10,
 ```{r eval=TRUE}
 run_ibm_random_walk(area_size = 40,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -128,7 +128,7 @@ run_ibm_random_walk(area_size = 40,
 ```{r eval=TRUE}
 run_ibm_random_walk(max_contact_distance = 1,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -137,7 +137,7 @@ run_ibm_random_walk(max_contact_distance = 1,
 ```{r eval=TRUE}
 run_ibm_random_walk(max_contact_distance = 4,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -146,7 +146,7 @@ run_ibm_random_walk(max_contact_distance = 4,
 ```{r eval=TRUE}
 run_ibm_random_walk(max_velocity = 0,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
@@ -155,68 +155,68 @@ run_ibm_random_walk(max_velocity = 0,
 ```{r eval=TRUE}
 run_ibm_random_walk(max_velocity = 4,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 \clearpage
-# transmission probability 0.05 (instead of 0.1)
+# Transmission probability 0.05 (instead of 0.1)
 ```{r eval=TRUE}
 run_ibm_random_walk(transmission_prob = 0.05,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 \clearpage
-# transmission probability 0.4 (instead of 0.1)
+# Transmission probability 0.4 (instead of 0.1)
 ```{r eval=TRUE}
 run_ibm_random_walk(transmission_prob = 0.4,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 \clearpage
-# vaccine coverage 50% (uniform)
+# Vaccine coverage 50% (uniform)
 ```{r eval=TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.5,
                     apply_spatial_vaccine_refusal = F,
                     max_velocity = 0,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 \clearpage
-# vaccine coverage 50% (clustered)
+# Vaccine coverage 50% (clustered)
 ```{r eval=TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.5,
                     apply_spatial_vaccine_refusal = T,
                     max_velocity = 0,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 \clearpage
-# vaccine coverage 80% (uniform)
+# Vaccine coverage 80% (uniform)
 ```{r eval=TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.8,
                     apply_spatial_vaccine_refusal = F,
                     max_velocity = 0,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```
 
 \clearpage
-# vaccine coverage 80% (clustered)
+# Vaccine coverage 80% (clustered)
 ```{r eval=TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.8,
                     apply_spatial_vaccine_refusal = T,
                     max_velocity = 0,
                     rng_seed = 2000,
-                    add_baseline_prevalence = T)
+                    add_baseline = T)
 
 ```

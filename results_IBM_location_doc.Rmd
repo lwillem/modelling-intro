@@ -34,7 +34,8 @@ install.packages(curl) # install the curl library (to import data)
 library('curl')
 
 # download R file with IBM function
-curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", destfile = "ibm_functions.R")
+curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_functions.R", 
+              destfile = "ibm_functions.R")
 
 # load the IBM functions
 source('ibm_functions.R')
@@ -53,8 +54,9 @@ run_ibm_location()
 # Population size 100
 ```{r pop_size_small, eval=TRUE}
 run_ibm_location(pop_size = 100,
+                 rng_seed = 20,
                  bool_show_demographics = FALSE,
-                 add_baseline_prevalence = T)
+                 add_baseline = T)
 
 ```
 
@@ -62,8 +64,9 @@ run_ibm_location(pop_size = 100,
 # Population size 2000
 ```{r pop_size_large, eval=TRUE}
 run_ibm_location(pop_size = 2000,
+                 rng_seed = 20,
                  bool_show_demographics = FALSE,
-                 add_baseline_prevalence = T)
+                 add_baseline = T)
 
 ```
 
@@ -71,8 +74,9 @@ run_ibm_location(pop_size = 2000,
 # Start with more infected individuals
 ```{r num_infected_seeds, eval=TRUE}
 run_ibm_location(num_infected_seeds = 100,
+                 rng_seed = 20,
                  bool_show_demographics = FALSE,
-                 add_baseline_prevalence = T)
+                 add_baseline = T)
 
 ```
 
@@ -80,8 +84,9 @@ run_ibm_location(num_infected_seeds = 100,
 # Add schools
 ```{r num_schools, eval=TRUE}
 run_ibm_location(num_schools = 10,
+                 rng_seed = 20,
                  bool_show_demographics = TRUE,
-                 add_baseline_prevalence = T)
+                 add_baseline = T)
 
 ```
 
@@ -89,8 +94,9 @@ run_ibm_location(num_schools = 10,
 # Decrease the number of workplaces
 ```{r num_workplaces, eval=TRUE}
 run_ibm_location(num_workplaces = 20,
+                 rng_seed = 20,
                  bool_show_demographics = TRUE,
-                 add_baseline_prevalence = T)
+                 add_baseline = T)
 
 ```
 
@@ -101,7 +107,7 @@ run_ibm_location(num_contacts_community_day = 0,
                  contact_prob_household = 1,
                  contact_prob_school = 0,
                  contact_prob_workplace = 0,
-                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
 
 ```
 
@@ -112,7 +118,7 @@ run_ibm_location(num_contacts_community_day = 5,
                  contact_prob_household = 1,
                  contact_prob_school = 0,
                  contact_prob_workplace = 0,
-                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
 
 ```
 
@@ -123,7 +129,7 @@ run_ibm_location(num_contacts_community_day = 0,
                  contact_prob_household = 0,
                  contact_prob_school = 1,
                  contact_prob_workplace = 0,
-                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
 
 ```
 
@@ -134,7 +140,7 @@ run_ibm_location(num_contacts_community_day = 5,
                  contact_prob_household = 1,
                  contact_prob_school = 0.5,
                  contact_prob_workplace = 0,
-                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
 
 ```
 
@@ -145,7 +151,7 @@ run_ibm_location(num_contacts_community_day = 0,
                  contact_prob_household = 1,
                  contact_prob_school = 0,
                  contact_prob_workplace = 0.5,
-                 bool_show_demographics = FALSE, add_baseline_prevalence = T)
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
 
 ```
 
