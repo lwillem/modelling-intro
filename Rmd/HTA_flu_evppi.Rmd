@@ -3,7 +3,9 @@ title: "Demo Decision Tree (EVPPI)"
 toc: FALSE
 ---
 
-(page under construction)
+<div style="text-align: right">
+[Home page](index.html)
+</div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 library('curl')

@@ -3,7 +3,10 @@ title: "Uncertainty distributions for the parameters of the flu model"
 toc: FALSE
 ---
 
-(Page under construction)
+<div style="text-align: right">
+[Home page](index.html)
+</div>
+
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 library('curl')
 set.seed(2020)

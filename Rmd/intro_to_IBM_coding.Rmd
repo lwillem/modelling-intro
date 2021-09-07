@@ -2,6 +2,10 @@
 title: "Introduction to IBMs for infectious diseases"
 ---
 
+<div style="text-align: right">
+[Home page](index.html)
+</div>
+
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 library('curl')
 set.seed(2020)
@@ -170,7 +174,7 @@ random_walk <- function(pop_data, max_velocity){
 If you want to visualize the random walk, you can create a plot before and after applying the function. Please note that it is possible to highlight a one individual using `points`:
 ```{r}
 
-# plot the area, using all locations with color '1' => black
+# plot the area and all indivdiuals, using color 1 (= black)
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
      col = 1)
@@ -178,14 +182,16 @@ plot(x = pop_data$x_coord,
 # highlight one individual, using color 2 (= red)
 points(x = pop_data$x_coord[1],
        y = pop_data$y_coord[1],
+       pch = 20, # other symbol
        col = 2)
 
 # update population
 pop_data <- random_walk(pop_data,max_velocity)
 
-# highlight the selected individual again, using color '3' (= green)
+# highlight the selected individual again, using color 3 (= green)
 points(x = pop_data$x_coord[1],
        y = pop_data$y_coord[1],
+       pch = 20, # other symbol
        col = 3)
 
 ```
@@ -223,12 +229,13 @@ points(x = pop_data$x_coord[1],
        pch=20)
 points(x = pop_data$x_coord[eligible_contacts_matrix[1,]],
        y = pop_data$y_coord[eligible_contacts_matrix[1,]],
+       pch = 20,
        col = 4)
-legend('topleft',
+legend('topright',
        c('index person',
        'eligible contacts'),
        col = c(3,4),
-       pch = c(20,1))
+       pch = c(20,20))
 
 
 ```
@@ -315,7 +322,7 @@ To specify a transmission event upon contact, we define the transmission probabi
 ```{r }
 
 # disease parameters 
-transmission_prob     <- 0.1  # transmission probability per social contact 
+transmission_prob     <- 0.4  # transmission probability per social contact 
 
 # identify all infected individuals
 boolean_infected <- pop_data$health == 'I'   # = vector with Booleans (TRUE/FALSE)
@@ -324,6 +331,9 @@ num_infected     <- length(ind_infected)     # = single value: count data
 
 # we specified the eligible contacts above
 #eligible_contacts_matrix
+
+# get indices of infected invididuals
+#ind_infected
 
 # evaluate the contacts and transmission events for person 1, starting from the contact probability
 p_contact_vector    <- get_contact_probability(eligible_contacts_matrix,1)
@@ -348,17 +358,17 @@ plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
      xlab='x coordinate',
      ylab='y coordinate')
-points(x = pop_data$x_coord[pop_data$health == 'I'],
-       y = pop_data$y_coord[pop_data$health == 'I'],
+points(x = pop_data$x_coord[1],
+       y = pop_data$y_coord[1],
        col = 2,
        pch = 20)
 points(x = pop_data$x_coord[binom_infection_vector == 1],
        y = pop_data$y_coord[binom_infection_vector == 1],
        col = 5,
        pch = 20)
-legend('topright',
+legend('bottomright',
        c('susceptible',
-         'infected',
+         'person 1 (infected)',
          'infected by person 1'),
        pch=c(1,20,20),
        col=c(1,2,5))
@@ -406,7 +416,7 @@ points(x = pop_data$x_coord[binom_recover_vector == 1],
        y = pop_data$y_coord[binom_recover_vector == 1],
        col = 3,
        pch = 20)
-legend('topright',
+legend('bottomright',
        c('susceptible',
          'infected',
          'recovered'),

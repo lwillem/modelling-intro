@@ -2,6 +2,10 @@
 title: "Introduction to R"
 ---
 
+<div style="text-align: right">
+[Home page](index.html)
+</div>
+
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 library('curl')
 ```
