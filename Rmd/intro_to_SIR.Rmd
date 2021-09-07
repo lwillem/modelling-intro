@@ -29,6 +29,7 @@ The best thing to do is to read each section and type (or copy and paste) the R 
 # Modelling concept
 
 Modelling goals: 
+
 * To create a transmission model with susceptible (S), infected (I) and recovered (R) individuals 
 * To plot the health states over time
 * To adapt model parameters and compare model outcomes
