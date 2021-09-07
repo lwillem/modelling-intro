@@ -106,7 +106,7 @@ init <- c(S = 0, I = 0, R = 0)
 ```
 Can you alter this initial vector for a population of 100,000 to have initially one infected and the rest susceptible? 
 
-The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the timesteps over which the ODE will be solved. These are specified by the method. Here lets assume lets say we want output every year for 40 years. 
+The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the timesteps over which the ODE will be solved. These are specified by the method. Here let's assume we want output every year for 40 years. 
 ```{r results = "hide"}
 times <- seq(0, 40, by = 1) 
 ```

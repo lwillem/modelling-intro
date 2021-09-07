@@ -62,7 +62,7 @@ source('ibm_functions.R')
 # Base case scenario
 
 <n style="color:darkred">
-First, lets run the model with the default parameters:
+First, let's run the model with the default parameters:
 </n>
 
 ```{r }

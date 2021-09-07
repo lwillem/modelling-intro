@@ -58,7 +58,7 @@ source('ibm_functions.R')
 
 # Scenario analyses
 
-First, lets run the model with the default parameters:
+First, let's run the model with the default parameters:
 
 ```{r }
 # you can run the IBM with default parameters (see console)
