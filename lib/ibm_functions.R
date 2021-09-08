@@ -889,18 +889,27 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
                          stringsAsFactors = F)
   
   # initiate school classes by age and number of schools
-  # eg. 'class3_1' is the 1th classroom with 3-year olds children
-  pop_data$classroom_id <- paste0('class',pop_data$age,'_',sample(num_schools,pop_size,replace =T))
-  
-  # set 'classroom_id' for infants and adults to 'NA' (=none)
-  boolean_school_pop    <- pop_data$age %in% target_school_ages
-  pop_data$classroom_id[!boolean_school_pop] <- NA
+  if(num_schools>0){
+    # eg. 'class3_1' is the 1th classroom with 3-year olds children
+    pop_data$classroom_id <- paste0('class',pop_data$age,'_',sample(num_schools,pop_size,replace =T))
+    
+    # set 'classroom_id' for infants and adults outside the target ages to 'NA' (=none)
+    boolean_school_pop    <- pop_data$age %in% target_school_ages
+    pop_data$classroom_id[!boolean_school_pop] <- NA
+  } else {
+    pop_data$classroom_id <- NA
+  }
+
   
   # initiate workplaces
-  pop_data$workplace_id <- sample(num_workplaces,pop_size,replace =T)
-  boolean_workplace_pop    <- pop_data$age > max(target_school_ages)
-  pop_data$workplace_id[!boolean_workplace_pop] <- NA
- 
+  if(num_workplaces > 0){
+    pop_data$workplace_id <- sample(num_workplaces,pop_size,replace =T)
+    boolean_workplace_pop    <- pop_data$age > max(target_school_ages)
+    pop_data$workplace_id[!boolean_workplace_pop] <- NA    
+  } else {
+    pop_data$workplace_id <- NA
+  }
+
   if(bool_show_demographics){
     # create a figure with 8 subplots
     par(mfrow=c(2,4))
@@ -912,8 +921,8 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
     hist(table(pop_data$hh_id),main='household size',xlab='household size')
     
     # check class and workplace size
-    hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
-    hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
+    if(num_schools > 0) hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
+    if(num_workplaces > 0) hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
   }
   
   
