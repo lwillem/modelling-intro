@@ -52,7 +52,7 @@ get_default_parameters <- function(){
               
               num_workplaces = 100,
               
-              rng_seed = 2020,
+              rng_seed = 2020
               ))
   
   
@@ -86,6 +86,27 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
                                 ){
   
   ######################################################### #
+  # DEFENSIVE CHECKS  ----
+  ######################################################### #
+  
+  if(num_infected_seeds > pop_size){
+    warning("ERROR: population size < number of infected seeds")
+    return(NULL)
+  }
+  
+  if(any(c(pop_size,num_days,num_infected_seeds,vaccine_coverage,
+           area_size,max_velocity,num_days_infected,transmission_prob,
+           target_num_contacts_day,max_contact_distance,plot_time_delay)<0)){
+    warning("ERROR: negative values not allowed as function parameter")
+    return(NULL)
+  }
+  
+  if(!is.logical(c(apply_spatial_vaccine_refusal,add_baseline,return_prevelance))){
+    warning("ERROR: 'apply_spatial_vaccine_refusal', 'add_baseline' and 'return_prevelance' should be a boolean")
+    return(NULL)
+  }
+  
+  ######################################################### #
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
   ######################################################### #
   
@@ -101,7 +122,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
                              y_coord = sample(seq(0,area_size,0.01),pop_size,replace = T), # sample random y coordinate
                              infector            = NA,            # column to store the source of infection
                              time_of_infection   = NA,            # column to store the time of infection
-                             generation_interval = NA,            # column to store the generation interval
+                             generation_interval = 0,             # column to store the generation interval
                              secondary_cases     = 0,             # column to store the number of secondary cases
                              stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
   
@@ -448,12 +469,12 @@ geo_plot_health_states <- function(pop_data,area_size,day_i,num_days,plot_time_d
     # setup global variables for one participant 'X' (once!)
     if(day_i == 1 | !exists('participant_id')){
       
-      # select all (centered) individuals (<1 from the centre)
-      id_centered <- which(abs(pop_data$x_coord-(area_size/2)) < 1 &
-                             abs(pop_data$y_coord-(area_size/2)) < 1)
+      # select most centered individuals (min distance from the centre)
+       diff_cntr <- abs(pop_data$x_coord-(area_size/2)) + 
+                    abs(pop_data$y_coord-(area_size/2))
+      participant_id <- which(order(diff_cntr) == 1)
       
-      # sample one id and create matrix to log the x- and y-coordinates
-      participant_id   <<- sample(id_centered,1)
+      #create matrix to log the x- and y-coordinates
       log_part_coord   <<- matrix(NA,nrow=2,ncol=num_days)
     }
     
@@ -578,6 +599,28 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              add_baseline = FALSE, #option to add the prevalence with default param
                              return_prevelance = FALSE        # option to return the prevalence (and stop)
                              ){
+  
+  ######################################################### #
+  # DEFENSIVE CHECKS  ----
+  ######################################################### #
+  
+  if(num_infected_seeds > pop_size){
+    warning("ERROR: population size < number of infected seeds")
+    return(NULL)
+  }
+
+  if(any(c(pop_size,num_days,num_infected_seeds,vaccine_coverage,num_schools,
+           target_school_ages,num_workplaces,num_contacts_community_day,
+           contact_prob_household,contact_prob_school,contact_prob_workplace,
+           num_days_infected,transmission_prob)<0)){
+    warning("ERROR: negative values not allowed as function parameter")
+    return(NULL)
+  }
+  
+  if(!is.logical(c(bool_show_demographics,add_baseline,return_prevelance))){
+    warning("ERROR: 'bool_show_demographics', 'add_baseline' and 'return_prevelance' should be a boolean")
+    return(NULL)
+  }
   
   ######################################################### #
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
@@ -884,7 +927,7 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
                          health              = 'S',           # column to store the health state
                          infector            = NA,            # column to store the source of infection
                          time_of_infection   = NA,            # column to store the time of infection
-                         generation_interval = NA,            # column to store the generation interval
+                         generation_interval = 0,            # column to store the generation interval
                          secondary_cases     = 0,             # column to store the number of secondary cases
                          stringsAsFactors = F)
   
@@ -921,8 +964,8 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
     hist(table(pop_data$hh_id),main='household size',xlab='household size')
     
     # check class and workplace size
-    if(num_schools > 0) hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
-    if(num_workplaces > 0) hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
+    if(any(!is.na(pop_data$classroom_id))) hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
+    if(any(!is.na(pop_data$workplace_id))) hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
   }
   
   
