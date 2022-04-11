@@ -64,7 +64,7 @@ setwd(home)
 
 # Load packages and libraries
 
-If packages are not installes yet, you can do so by
+If packages are not installed yet, you can do so by
 ```{r results = "hide", eval=FALSE}
 install.packages(curl) # install the curl library (to import data)
 install.packages(deSolve) # install the deSolve library (to solve ODE's)
