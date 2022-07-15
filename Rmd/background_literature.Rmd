@@ -1,0 +1,35 @@
+---
+title: "Background literature"
+output:
+  html_document:
+    toc: false  
+---
+
+<div style="text-align: right">
+[Home page](index.html)
+</div>
+
+<hr>
+<img src="ext_fig/logo_chermid.png" height="50px"> &nbsp; &nbsp;
+<img src="ext_fig/logo_dsi.png" height="80px"> &nbsp; &nbsp;
+<img src="ext_fig/logo_simid_yellow.png" height="80px">
+<hr>
+
+### Modelling Infectious Diseases
+
+* <a href="https://onlinelibrary.wiley.com/doi/10.1002/jrsm.1333" target="_blank">The use of mathematical modeling studies for evidence synthesis and guideline development: A glossary  (Porgo et al. 2017)</a>
+* <a href="https://rdcu.be/cRJVp" target="_blank">The SEIRS model for infectious disease dynamics.  (Bjørnstad et al. 2020)</a>
+* <a href="https://doi.org/10.1002/ece3.6848" target="_blank">An introduction to agent-based models as an accessible surrogate to field-based research and teaching (Murphy et al. 2020)</a>
+
+### Health Economics
+* <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1393259/" target="_blank">Economic evaluation of integrated care: an introduction (Vondeling 2004)</a>
+* <a href="https://rdcu.be/cRJWd" target="_blank">The broader economic impact of vaccination: reviewing and appraising the strength of evidence (Jit et al. 2015)</a>
+
+### Social Contact Patterns
+* <a href="https://doi.org/10.1371/journal.pmed.0050074" target="_blank">Social Contacts and Mixing Patterns Relevant to the Spread of Infectious Diseases (Mossong et al. 2008)</a>
+* <a href="http://www.socialcontactdata.org/" target="_blank">http://www.socialcontactdata.org/</a>
+
+
+<div style="text-align: right">
+[Home page](index.html)
+</div>
