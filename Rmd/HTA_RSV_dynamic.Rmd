@@ -1,0 +1,346 @@
+---
+title: "Demo RSV: with static and dynamic disease model"
+toc: FALSE
+---
+
+<div style="text-align: right">
+[Home page](index.html)
+</div>
+
+```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+library('curl')
+library('knitr')
+library('EpiDynamics')
+set.seed(2020)
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 4, fig.width = 6)
+```
+
+This tutorial has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. 
+Please make contact if you would like to use this model in any public way.
+
+The burden of respiratory syncytial virus (RSV) in older adults resembles that of influenza and may even be considered worse due to the lack of preventive interventions (Zeevat 2022). In this tutorial we explore the cost-effectiveness of a hypothetical RSV vaccine for the adult population of in the Netherlands. We start from a static disease model, which is most applicable if vacccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus. In a later stage, we integrate a dynamic transmission model into the health economic evaluation.
+
+For further information, questions or comments please contact: 
+joke.bilcke@uantwerp.be or lander.willem@uantwerp.be from the 
+Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID),
+Vaccine and Infectious Disease Institute (Vaxinfectio),
+University of Antwerp,
+Universiteitsplein 1,
+2610 Antwerp,
+Belgium.
+
+# Set working directory
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+
+You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
+
+```{r results = "hide", eval = FALSE}
+home = "~/Documents/Modelling_intro/" ## on a OS X
+home = "C:\\Documents\\Modelling_intro\\" ## on windows
+setwd(home)
+```
+
+
+
+
+# MODEL INPUT
+
+Input parameters are inspired by the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
+
+```{r }
+
+# population and disease input
+population_size           = 4557901 # NL population +60
+rsv_incidence_per_season  = 0.03525 # in the absence of vaccination
+rsv_recovery_time         = 7 # days
+
+# health economic input
+cost_per_episode          = 122 # euro
+qaly_loss_per_episode     = 0.002196
+
+# vaccine characteristics
+vaccine_efficacy  = 0.40
+cost_per_dose     = 10 # euro 
+admin_cost        = 50 # euro
+
+# program settings
+scenario_uptake = 0.2 # doses
+time_horizon = 365 # days
+
+```
+
+# PRE-PROCESSING
+Based on the input above, we can compute the program cost and the proportion of the population that will be effectively protected:
+```{r}
+program_costs = population_size * scenario_uptake * (cost_per_dose + admin_cost)
+proportion_protected =  scenario_uptake * vaccine_efficacy
+```
+
+
+# STATIC DISEASE MODEL
+```{r }
+# TRANSLATE TO STATIC MODEL SETTING
+force_of_infection  = rsv_incidence_per_season
+
+# INFECTIONS (prevented)
+reference_infections = population_size * force_of_infection
+program_infections = population_size * scenario_uptake * force_of_infection * (1-vaccine_efficacy) + 
+                       population_size * (1 - scenario_uptake) * force_of_infection
+prevented_cases = reference_infections - program_infections
+
+# COSTS AND EFFECTS
+prevented_cost_burden = prevented_cases * cost_per_episode
+qaly_gain = prevented_cases * qaly_loss_per_episode
+
+# INCREMENTAL COST EFFECTIVENESS RATIO
+program_icer = (program_costs - prevented_cost_burden)  / qaly_gain
+
+# PRINT RESULTS
+round(c(reference_infections = reference_infections,
+        program_infections = program_infections,
+        qaly_gain = qaly_gain,
+        program_icer_k = program_icer / 1e3),digits=2)
+
+```
+
+
+
+
+# DYNAMIC DISEASE MODEL: introduction
+
+For the dynamic model, we make use of the [EpiDynamics](https://cran.r-project.org/web/packages/EpiDynamics/EpiDynamics.pdf) package with build in functions. For example, we can adopt the 'SIR' function:
+
+```{r}
+# check if the "EpiDynamics" package is installed, if not, install package
+if(!'EpiDynamics' %in% installed.packages()){ install.packages('EpiDynamics') }
+
+# load library
+library(EpiDynamics)
+
+# Parameters and initial conditions. 
+parameters = list(beta = 5.147, gamma = 1 / rsv_recovery_time)
+initials = c(S = 1 - 1e-06 - 0.2, I = 1e-06, R = 0.2) 
+
+# Solve and plot. 
+sir = SIR(pars = parameters, init = initials, time = 0:time_horizon) 
+
+# Plot output
+PlotMods(sir)
+```
+
+To define the number of infections, we can calculate the change in the "Recovered" compartment:
+```{r}
+sir$results$R[nrow(sir$results)] - sir$results$R[1]
+```
+
+# DYNAMIC DISEASE MODEL: RSV
+
+To meet the target incidence of RSV for this CEA, we can assume a high existing immunity level in the population. 
+```{r }
+# set initial immunity levels
+initials['R'] = 0.951
+initials['S'] = 1 - sum(initials['I']+initials['R'])
+
+# Solve 
+dynamic_rsv_reference = SIR(pars = parameters,init = initials,time = 0:time_horizon)
+
+# calculate total infections
+dynamic_cases_reference = diff(dynamic_rsv_reference$results$R[c(1,nrow(dynamic_rsv_reference$results))]) * population_size
+dynamic_cases_reference # print to terminal
+```
+
+To include vaccination in the model, we can consider vaccine uptake as transfer from "Suseptible" to "Recovered":
+
+```{r }
+initials['S'] = initials['S'] * (1-proportion_protected)
+initials['R'] = 1 - sum(initials['S']+initials['I'])
+
+# Solve 
+dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
+
+#PlotMods(dynamic_rsv)
+dynamic_cases_program = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+
+# prevented cases
+dynamic_cases_prevented = dynamic_cases_reference - dynamic_cases_program
+
+# CEA
+dynamic_costs_prevented = dynamic_cases_prevented * cost_per_episode
+dynamic_qaly_gain = dynamic_cases_prevented * qaly_loss_per_episode
+
+# ICER
+dynamic_icer = (program_costs - dynamic_costs_prevented)  / dynamic_qaly_gain
+
+# PRINT RESULTS
+round(c(dynamic_cases_reference=dynamic_cases_reference,
+        dynamic_cases_program=dynamic_cases_program,
+        dynamic_qaly_gain=dynamic_qaly_gain,
+        dynamic_icer=dynamic_icer / 1e3),digits=2)
+
+```
+
+# DYNAMIC DISEASE MODEL: seasonality
+
+Another option is to include seasonality and less (long-lasting) immunity. To do this, the 'SIRSinusoidalForcing' function can be used, in which the SIR model is extended with sinusoidal forcing of the transmission rate. 
+
+We provide the parameters here:
+
+```{r}
+
+## EpiDynamics PACKAGE: seasonality
+parameters = list(beta0 = 0.358385, 
+                  beta1 = 3, 
+                  gamma = 1 / rsv_recovery_time,
+                  omega = 4 * pi / 365,
+                  mu = 0) # no births/deaths at this stage
+
+initials = c(S = 1 - 2e-5 - 0.8, 
+             I = 2e-5,
+             R = 0.8)
+
+# Solve and plot.
+seasonal_rsv_reference = SIRSinusoidalForcing(pars = parameters,
+                                 init = initials,
+                                 time = 0:time_horizon)
+
+#PlotMods(seasonal_rsv_reference)
+seasonal_cases_reference = diff(seasonal_rsv_reference$results$R[c(1,nrow(seasonal_rsv_reference$results))]) * population_size
+
+```
+
+To include vaccination in the model, we can consider vaccine uptake as transfer from "Suseptible" to "Recovered":
+```{r}
+initials['S'] = initials['S'] * (1-proportion_protected)
+initials['R'] = 1 - sum(initials['S']+initials['I'])
+
+# Solve
+seasonal_rsv = SIRSinusoidalForcing(pars = parameters,
+                                 init = initials,
+                                 time = 0:(1 * 365))
+
+#PlotMods(seasonal_rsv)
+seasonal_cases_program = diff(seasonal_rsv$results$R[c(1,nrow(seasonal_rsv$results))]) * population_size
+
+# prevented cases
+seasonal_cases_prevented = seasonal_cases_reference - seasonal_cases_program
+
+# CEA
+seasonal_costs_prevented = seasonal_cases_prevented * cost_per_episode
+seasonal_qaly_gain = seasonal_cases_prevented * qaly_loss_per_episode
+
+# ICER
+seasonal_icer = (program_costs - seasonal_costs_prevented)  / seasonal_qaly_gain
+
+# print results
+round(c(seasonal_cases_reference=seasonal_cases_reference,
+        seasonal_cases_program=seasonal_cases_program,
+        seasonal_qaly_gain=seasonal_qaly_gain,
+        seasonal_icer_k=seasonal_icer / 1e3),digits=2)
+
+```
+
+In an SIR model, the basic reproduction number is defined by the beta and gamma parameter. I.e., R_0 = beta * 1/gamma. We can use this for the seasonal implementation of 'beta' and calculate a theoretical reproduction number over time.
+```{r}
+
+# inspect seasonal RSV model:
+seasonal_rsv$model
+
+# i.e. the implementation of the seasonality:
+# beta <- beta0 * (1 + beta1 * sin(omega * time))
+
+# as such:
+seasonal_beta = parameters$beta0 * (1 + parameters$beta1 * sin(parameters$omega * 0:time_horizon))
+
+# plot "theoretical" basic reproduction number
+plot(0:time_horizon,
+     seasonal_beta * rsv_recovery_time,
+     xlab='time (days)',
+     ylab='reproduction number')
+abline(h=1)
+
+# Please note that this formula assumes a fully susceptible population and 1 infected!!
+```
+
+
+# SUMMARY
+
+```{r, echo=F}
+
+data.frame(model = c('static','dynamic - immunity', 'dynamic - seasonal'),
+           reference_infections = c(reference_infections, 
+                                    dynamic_cases_reference, 
+                                    seasonal_cases_reference),
+              program_infections = c(program_infections,
+                                      dynamic_cases_program,
+                                      seasonal_cases_program),
+              qaly_gain = c(qaly_gain,dynamic_qaly_gain,seasonal_qaly_gain),
+              program_icer_k = c(program_icer,dynamic_icer,seasonal_icer )/ 1e3) -> db_out
+
+db_out[,-1] <- round(db_out[,-1])
+
+db_out$infections_reduction <- round((db_out$reference_infections - db_out$program_infections) / reference_infections,digits=2)
+
+kable(db_out)
+ 
+```
+
+```{r echo=F}
+
+
+plot(x = dynamic_rsv_reference$time,
+         y = dynamic_rsv_reference$results$I,
+        xlab='time (days)',
+        ylab='prevalence (infected)',
+     ylim=c(0,max(c(dynamic_rsv_reference$results$I,seasonal_rsv_reference$results$I))),
+        col=1,
+        lwd=2,
+        type='l')
+lines(x = dynamic_rsv$time,
+         y = dynamic_rsv$results$I,
+        col=1,
+        lwd=2,
+      lty=2)
+
+lines(x = seasonal_rsv_reference$time,
+         y = seasonal_rsv_reference$results$I,
+        col=4,
+        lwd=2)
+lines(x = seasonal_rsv$time,
+         y = seasonal_rsv$results$I,
+        col=4,
+        lwd=2,
+      lty=2)
+legend('topright',
+       c('dynamic - immunity: reference',
+         'dynamic - immunity: program',
+         'dynamic - seasonality: reference',
+         'dynamic - seasonality: program'),
+       lwd=2,
+       col=c(1,1,4,4),
+       lty=c(1,2,1,2),
+       cex=0.8)
+# lines(x = seasonal_rsv_reference$time,
+#          y = rep(reference_infections/population_size/time_horizon,time_horizon+1),
+#         col=5,
+#         lwd=2)
+
+```
+
+
+# What if?
+
+<n style="color:darkred">
+
+* What happens to the ICERs if you change the vaccine uptake to 0.1 or 0.7? 
+* Does it affect the outcome for all disease models? Why (not)?
+* What happens to the ICERs if we combine RSV and Influenza vaccine uptake? (tip: "admission cost")
+
+</n>
+
+
+<div>
+# Navigate
+Top: [Index](index.html)
+</div>
+
