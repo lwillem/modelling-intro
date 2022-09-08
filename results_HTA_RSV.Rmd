@@ -18,7 +18,7 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE,
 ```
 
 # Introduction
-This document contains suluations of a tutorial on the cost-effectiveness of RSV vaccine strategies that has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
+This document contains solutions of a tutorial on the cost-effectiveness of RSV vaccine strategies that has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
 
 A secondary aim is to make use of generic functions to perform the cost-effectiveness analysis for multiple scenarios. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
 
@@ -206,19 +206,19 @@ seasonal_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
 ```{r, eval=T}
 plot(c(seasonal_out_01$qaly_gain,seasonal_out_02$qaly_gain,seasonal_out_07$qaly_gain),
      c(seasonal_out_01$incr_cost,seasonal_out_02$incr_cost,seasonal_out_07$incr_cost),
-     xlab='QALY gain',ylab='incremental cost',xlim=c(0,350),ylim=c(0,2e8),pch=16,col=1:3,
+     xlab='QALY gain',ylab='incremental cost',xlim=c(0,350),ylim=c(0,2e8),pch=1:3,col=1:3,
      main=paste('SIR with seasonal forcing [incidence:',round(seasonal_out_01$incidence_ref,digits=3),']'))
 lines(c(0,seasonal_out_01$qaly_gain),c(0,seasonal_out_01$incr_cost),col=1,lwd=2)
 lines(c(0,seasonal_out_02$qaly_gain),c(0,seasonal_out_02$incr_cost),col=2,lwd=2)
 lines(c(0,seasonal_out_07$qaly_gain),c(0,seasonal_out_07$incr_cost),col=3,lwd=2)
 legend('topleft',
-       c('uptake: 10%', 'uptake: 20%', 'uptake: 30%'),
-       pch=16,col=1:3)
+       c('uptake: 30%', 'uptake: 20%', 'uptake: 10%'),
+       pch=3:1,col=3:1)
 ```
 
 
 \clearpage
-# CEA: counterfactual (force of infection = 70%)
+# CEA: counter-factual (force of infection = 70%)
 
 ## Static model
 ```{r }
@@ -278,7 +278,7 @@ legend('topright',
 
 * If the (basic) reproduction number is close(r) to one, vaccine-related immunization can tip the balance and result in large herd immunity effects, hence more positive CEA outcomes. Especially with the seasonal model, the high reproduction number is limited in time and reduced transmission seem to have most effect.
 
-* With the dynamic model, we observed an inverse relationship between the ICER and vaccine uptake. The more vaccines are administred, the incremental benefit decreases. The overal QALY gain, off-course, direct related with vaccine uptake.
+* With the dynamic model, we observed an inverse relationship between the ICER and vaccine uptake. The more vaccines are administered, the incremental benefit decreases. The overall QALY gain, off-course, direct related with vaccine uptake.
 
 
 
