@@ -252,4 +252,21 @@ legend('topright',
 
 ```
 
+\newpage
+# Take home messages
+
+* Static disease models do not take herd immunity effects into account. Only personal protection is considered in the economic evaluation. This holds when the target group has almost no effect on the transmission dynamics. The ICER does not change when the vaccine uptake varies. 
+
+* Combining the administration of different vaccines, hence reducing the administration cost, is beneficial for the cost-effectiveness.
+
+* Dynamic disease models enable herd immunity effects. As such, the number of prevented cases can outnumber the (effectively) protected individuals. This reduces the ICER, since the health related gains increase for the same investment.
+
+* If the (basic) reproduction number is very high, vaccine-related immunization has limited impact on the effective transmission rate, hence herd immunity effects are limited. As such, the CEA results are more in line with the CEA based on the static disease model.
+
+* If the (basic) reproduction number is close(r) to one, vaccine-related immunization can tip the balance and result in large herd immunity effects, hence more positive CEA outcomes. Especially with the seasonal model, the high reproduction number is limited in time and reduced transmission seem to have most effect.
+
+* With the dynamic model, we observed an inverse relationship between the ICER and vaccine uptake. The more vaccines are administred, the incremental benefit decreases. The overal QALY gain, off-course, direct related with vaccine uptake.
+
+
+
 
