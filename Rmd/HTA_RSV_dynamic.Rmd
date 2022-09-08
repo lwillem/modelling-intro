@@ -52,7 +52,7 @@ Input parameters are inspired by the work of Zeevat et al (2022), published in t
 
 # population and disease input
 population_size           = 4557901 # NL population +60
-rsv_incidence_per_season  = 0.03525 # in the absence of vaccination
+rsv_incidence             = 0.03525 # in the absence of vaccination
 rsv_recovery_time         = 7 # days
 
 # health economic input
@@ -65,7 +65,7 @@ cost_per_dose     = 10 # euro
 admin_cost        = 50 # euro
 
 # program settings
-scenario_uptake = 0.2 # doses
+uptake = 0.2 # doses
 time_horizon = 365 # days
 
 ```
@@ -73,20 +73,20 @@ time_horizon = 365 # days
 # PRE-PROCESSING
 Based on the input above, we can compute the program cost and the proportion of the population that will be effectively protected:
 ```{r}
-program_costs = population_size * scenario_uptake * (cost_per_dose + admin_cost)
-proportion_protected =  scenario_uptake * vaccine_efficacy
+program_costs = population_size * uptake * (cost_per_dose + admin_cost)
+proportion_protected =  uptake * vaccine_efficacy
 ```
 
 
 # STATIC DISEASE MODEL
 ```{r }
 # TRANSLATE TO STATIC MODEL SETTING
-force_of_infection  = rsv_incidence_per_season
+force_of_infection  = rsv_incidence
 
 # INFECTIONS (prevented)
 reference_infections = population_size * force_of_infection
-program_infections = population_size * scenario_uptake * force_of_infection * (1-vaccine_efficacy) + 
-                       population_size * (1 - scenario_uptake) * force_of_infection
+program_infections = population_size * uptake * force_of_infection * (1-vaccine_efficacy) + 
+                       population_size * (1 - uptake) * force_of_infection
 prevented_cases = reference_infections - program_infections
 
 # COSTS AND EFFECTS
@@ -240,17 +240,23 @@ round(c(seasonal_cases_reference=seasonal_cases_reference,
 
 ```
 
+# REPRODUCTON NUMBER
 In an SIR model, the basic reproduction number is defined by the beta and gamma parameter. I.e., R_0 = beta * 1/gamma. We can use this for the seasonal implementation of 'beta' and calculate a theoretical reproduction number over time.
 ```{r}
 
+# with the parameters of the "immunity model", the basic reproduction number is:
+dynamic_rsv$pars$beta / dynamic_rsv$pars$gamma
+
 # inspect seasonal RSV model:
 seasonal_rsv$model
+seasonal_rsv$pars
 
 # i.e. the implementation of the seasonality:
+# Please note that this formula assumes a fully susceptible population and 1 infected!!
 # beta <- beta0 * (1 + beta1 * sin(omega * time))
 
 # as such:
-seasonal_beta = parameters$beta0 * (1 + parameters$beta1 * sin(parameters$omega * 0:time_horizon))
+seasonal_beta = seasonal_rsv$pars$beta0 * (1 + seasonal_rsv$pars$beta1 * sin(seasonal_rsv$pars$omega * 0:time_horizon))
 
 # plot "theoretical" basic reproduction number
 plot(0:time_horizon,
@@ -259,11 +265,27 @@ plot(0:time_horizon,
      ylab='reproduction number')
 abline(h=1)
 
-# Please note that this formula assumes a fully susceptible population and 1 infected!!
 ```
 
 
 # SUMMARY
+
+Inspect the cost-effectiveness frontier:
+```{r}
+
+plot(x = c(static_qaly_gain,dynamic_qaly_gain,seasonal_qaly_gain),
+     y = c(static_incr_cost,dynamic_incr_cost,seasonal_incr_cost)/1e6,
+     col = 1:3,
+     xlab= 'QALY gain',
+     ylab = 'incremental cost (euro)',
+     pch=16)
+legend('topright',
+       c('static model',
+         'dynamic model - immunity',
+         'dynamic model - seasonality'),
+       fill = 1:3,
+       )
+```
 
 ```{r, echo=F}
 
@@ -283,23 +305,6 @@ db_out$infections_reduction <- round((db_out$reference_infections - db_out$progr
 
 kable(db_out)
  
-```
-
-Inspect the cost-effectiveness frontier:
-```{r}
-
-plot(x = c(static_qaly_gain,dynamic_qaly_gain,seasonal_qaly_gain),
-     y = c(static_incr_cost,dynamic_incr_cost,seasonal_incr_cost)/1e6,
-     col = 1:3,
-     xlab= 'QALY gain',
-     ylab = 'incremental cost (euro)',
-     pch=16)
-legend('topright',
-       c('static model',
-         'dynamic model - immunity',
-         'dynamic model - seasonality'),
-       fill = 1:3,
-       )
 ```
 
 Inspection of the disease prevalence:
@@ -353,8 +358,35 @@ legend('topright',
 * What happens to the ICERs if you change the vaccine uptake to 0.1 or 0.7? 
 * Does it affect the outcome for all disease models? Why (not)?
 * What happens to the ICERs if we combine RSV and Influenza vaccine uptake? (tip: "admission cost")
+* Adapt the "immunity model" to start with an immunity level of 0.96387 and beta equals 15. What happens to the ICER, and why?
+</n>
+
+# Next...
+
+<n style="color:darkred">
+
+Let us assume the seasonal RSV incidence is 70%, while other model parameters remain unchanged. The following model parameters are aligned with the 70% incidence after one year. What are the corresponding ICERs? Can you explain the (new) differences? What about the reproduction numbers? 
 
 </n>
+
+
+```{r, eval=F}
+# STATIC
+force_of_infection = 0.7
+
+# DYNAMIC: 70% INCIDENCE & NO EXISTING IMMUNITY
+parameters = list(beta = 0.2458, gamma = 1 / rsv_recovery_time)
+initials = c(S = 1 - 2e-5, I = 2e-5, R = 0)
+
+# DYNAMIC: 70% INCIDENCE & EXISTING IMMUNITY
+parameters = list(beta = 3.245, gamma = 1 / rsv_recovery_time)
+initials = c(S = 1 - 2e-5 - 0.2999, I = 2e-5, R = 0.2999)
+
+# DYNAMIC: 70% INCIDENCE & SEASONALITY 
+parameters = list(beta0 = 0.11444, beta1 = 1.4, gamma = 1 / rsv_recovery_time, omega = 2 * pi / 365, mu = 0)
+initials = c(S = 1 - 2e-5 , I = 2e-5, R = 0)
+
+```
 
 
 <div>

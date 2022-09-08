@@ -1,0 +1,255 @@
+---
+title: "HTA RSV tutorials"
+author: "lwillem"
+date: "`r Sys.Date()`"
+output: pdf_document
+toc: TRUE
+---
+
+```{r setup, include=FALSE}
+library('curl')
+library('knitr')
+library('EpiDynamics')
+set.seed(2020)
+
+knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, 
+                      warning=FALSE, fig.height = 7, fig.width = 7)
+
+```
+
+# Introduction
+This document contains suluations of a tutorial on the cost-effectiveness of RSV vaccine strategies that has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
+
+A secondary aim is to make use of generic functions to perform the cost-effectiveness analysis for multiple scenarios. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
+
+For further information, questions or comments please contact: 
+joke.bilcke@uantwerp.be or lander.willem@uantwerp.be from the 
+Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID),
+Vaccine and Infectious Disease Institute (Vaxinfectio),
+University of Antwerp,
+Universiteitsplein 1,
+2610 Antwerp,
+Belgium.
+
+\newpage
+# Default model input
+The disease incidence and economic parameters are inspired by the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
+
+```{r }
+# population and disease input
+cea_input <- list(
+  population_size           = 4557901, # NL population +60
+  rsv_incidence             = 0.03525, # in the absence of vaccination
+  rsv_recovery_time         = 7, # days
+  
+  # health economic input
+  cost_per_episode          = 122, # euro
+  qaly_loss_per_episode     = 0.002196,
+  
+  # vaccine characteristics
+  vaccine_efficacy  = 0.40,
+  cost_per_dose     = 10, # euro 
+  admin_cost        = 50, # euro
+  
+  # program settings
+  uptake       = 0.2, # doses
+  time_horizon = 365 # days
+)
+```
+
+\newpage
+# Function library
+## Static disease model
+```{r}
+run_cea_static = function(force_of_infection, cea_input){
+  
+  # INFECTIONS (prevented)
+  cases_ref = cea_input$population_size * force_of_infection
+  cases_vac = cea_input$population_size * cea_input$uptake * force_of_infection *
+    (1 - cea_input$vaccine_efficacy) + cea_input$population_size * 
+    (1 - cea_input$uptake) * force_of_infection
+  
+  # Get prevented cases
+  prevented_cases = cases_ref - cases_vac
+  
+  # COSTS AND EFFECTS
+  program_costs = cea_input$population_size * cea_input$uptake * 
+    (cea_input$cost_per_dose + cea_input$admin_cost)
+  incr_cost = program_costs - (prevented_cases * cea_input$cost_per_episode)
+  qaly_gain = prevented_cases * cea_input$qaly_loss_per_episode
+  
+  # INCREMENTAL COST EFFECTIVENESS RATIO
+  icer = incr_cost  / qaly_gain
+  
+  # PRINT RESULTS
+  db_out = data.frame(incidence_ref = force_of_infection, cases_ref = cases_ref,
+             cases_vac = cases_vac, qaly_gain = qaly_gain, incr_cost = incr_cost,
+             icer_k = icer / 1e3)
+  print(round(db_out,digits=2))
+  
+  return(db_out)
+}
+```
+
+\newpage
+## Dynamic transmission model
+
+```{r eval= TRUE}
+run_cea_dynamic = function(parameters, initials, cea_input) {
+  
+  # retrieve EpiDynamic function
+  sir_function <- ifelse('beta0' %in% names(parameters),SIRSinusoidalForcing,SIR)
+    
+  # Solve (and plot)
+  scen_ref = sir_function(pars = parameters,init = initials,time = 0:cea_input$time_horizon)
+  #PlotMods(scen_ref)
+  
+  # Get relative and absolut incidence
+  incidence_ref = diff(scen_ref$results$R[c(1,nrow(scen_ref$results))])
+  cases_ref = incidence_ref * cea_input$population_size
+  
+  # include vaccination in the model by transfering individuals from "S" to "R":
+  initials['S'] = initials['S'] * (1-(cea_input$uptake * cea_input$vaccine_efficacy))
+  initials['R'] = 1 - sum(initials['S']+initials['I'])
+
+  # Sove (and plot)
+  scen_vac = sir_function(pars = parameters, init = initials, time = 0:cea_input$time_horizon)
+  # PlotMods(scen_vac)
+  
+  # Get relative and absolut incidence
+  program_incidence = diff(scen_vac$results$R[c(1,nrow(scen_vac$results))]) 
+  cases_vac = program_incidence * cea_input$population_size
+  
+  # Get prevented cases, incremental cost and QALY gain
+  prevented_cases = cases_ref - cases_vac
+  program_costs = cea_input$population_size * cea_input$uptake * 
+    (cea_input$cost_per_dose + cea_input$admin_cost)
+  incr_cost = program_costs - (prevented_cases * cea_input$cost_per_episode)
+  qaly_gain = prevented_cases * cea_input$qaly_loss_per_episode
+  
+  # calculate ICER
+  icer = incr_cost / qaly_gain
+  
+  # Calculate R0
+  if('beta0' %in% names(parameters)){
+    seasonal_beta = parameters$beta0 * (1 + parameters$beta1 * 
+                                          sin(parameters$omega * 0:cea_input$time_horizon))
+    R0 =  seasonal_beta / parameters$gamma
+  } else{ R0 = parameters$beta / parameters$gamma }
+
+  # aggregate output
+  db_out = data.frame(incidence_ref=incidence_ref, cases_ref=cases_ref, 
+             cases_vac=cases_vac, qaly_gain=qaly_gain,incr_cost = incr_cost, 
+             R0_min = min(R0), R0_max=max(R0), icer_k=icer / 1e3)
+  print(round(db_out,digits=2))
+  
+  # return results
+  return(db_out)
+}
+```
+
+\clearpage
+# CEA: scenario analysis
+
+Explore CEA results from the online tutorial with default and adjusted parameters:
+
+```{r}
+# initialise adjusted cea_input parameter sets
+cea_input_02 = cea_input_01 = cea_input_07 = cea_input_adm = cea_input
+
+# adjust specific parameters
+cea_input_02$uptake = 0.2 # default uptake of 20%
+cea_input_01$uptake = 0.1 # 10% uptake
+cea_input_07$uptake = 0.7 # 70% uptake
+cea_input_adm$admin_cost = 0 # no (extra) admission costs
+```
+
+## Static model
+```{r }
+static_out_02  <- run_cea_static(force_of_infection = cea_input$rsv_incidence, cea_input_02)
+static_out_01  <- run_cea_static(force_of_infection = cea_input$rsv_incidence, cea_input_01)
+static_out_07  <- run_cea_static(force_of_infection = cea_input$rsv_incidence, cea_input_07)
+static_out_adm <- run_cea_static(force_of_infection = cea_input$rsv_incidence, cea_input_adm)
+```
+
+## Dynamic model with high pre-existing immunity
+```{r}
+parameters = list(beta = 5.147, gamma = 1 / cea_input$rsv_recovery_time)
+initials = c(S = 1 - 2e-5 - 0.951, I = 2e-5, R = 0.951)
+immunity_out_02 <- run_cea_dynamic(parameters, initials, cea_input_02)
+immunity_out_01 <- run_cea_dynamic(parameters, initials, cea_input_01)
+immunity_out_07 <- run_cea_dynamic(parameters, initials, cea_input_07)
+immunity_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
+```
+
+## Dynamic model with very high pre-existing immunity
+```{r}
+parameters = list(beta = 15, gamma = 1 / cea_input$rsv_recovery_time)
+initials = c(S = 1 - 2e-5 - 0.96387, I = 2e-5, R = 0.96387)
+immunity_out_02 <- run_cea_dynamic(parameters, initials, cea_input_02)
+immunity_out_01 <- run_cea_dynamic(parameters, initials, cea_input_01)
+immunity_out_07 <- run_cea_dynamic(parameters, initials, cea_input_07)
+immunity_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
+```
+
+## Dynamic model with seasonality
+```{r}
+parameters = list(beta0 = 0.358385, beta1 = 3, gamma = 1 / cea_input$rsv_recovery_time, 
+                  omega = 4 * pi / 365, mu = 0)
+initials = c(S = 1 - 2e-5 - 0.8, I = 2e-5, R = 0.8)
+seasonal_out_02 <- run_cea_dynamic(parameters, initials, cea_input_02)
+seasonal_out_01 <- run_cea_dynamic(parameters, initials, cea_input_01)
+seasonal_out_07 <- run_cea_dynamic(parameters, initials, cea_input_07)
+seasonal_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
+```
+
+\clearpage
+
+# CEA: counterfactual (force of infection = 70%)
+
+# Static model
+```{r }
+static_out <- run_cea_static(force_of_infection = 0.7, cea_input)
+```
+
+## Dynamic model with NO pre-existing immunity
+```{r }
+parameters = list(beta = 0.2458, gamma = 1 / cea_input$rsv_recovery_time)
+initials = c(S = 1 - 2e-5, I = 2e-5, R = 0)
+dynamic_out <- run_cea_dynamic(parameters, initials, cea_input)
+```
+
+## Dynamic model with pre-existing immunity
+```{r}
+parameters = list(beta = 3.245, gamma = 1 / cea_input$rsv_recovery_time)
+initials = c(S = 1 - 2e-5 - 0.2999, I = 2e-5, R = 0.2999)
+immunity_out <- run_cea_dynamic(parameters, initials, cea_input)
+```
+
+## Dynamic model with seasonality
+```{r}
+parameters = list(beta0 = 0.11444, beta1 = 1.4, gamma = 1 / cea_input$rsv_recovery_time, 
+                  omega = 2 * pi / 365, mu = 0)
+initials = c(S = 1 - 2e-5 , I = 2e-5, R = 0)
+seasonal_out <- run_cea_dynamic(parameters, initials, cea_input)
+```
+
+\newpage
+```{r}
+plot(x = c(static_out$qaly_gain,dynamic_out$qaly_gain,immunity_out$qaly_gain,seasonal_out$qaly_gain),
+     y = c(static_out$incr_cost,dynamic_out$incr_cost,immunity_out$incr_cost,seasonal_out$incr_cost),
+     pch=1:4, col=1:4, lwd=3,
+     xlab= 'QALY gain',
+     ylab = 'incremental cost (euro)')
+abline(h=0,lty=3)
+legend('topright',
+       c('static model',
+         'dynamic model - no previous immunity',
+         'dynamic model - existing immunity',
+         'dynamic model - seasonality'),
+       col = 1:4, pch=1:4, lwd=0, cex=0.8
+       )
+
+```
+
+
