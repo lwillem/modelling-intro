@@ -27,14 +27,11 @@ Welcome to our introductory material for the Summer School on "Modelling Infecti
 4. [Introduction to Individual-Based Models (IBMs) using R](intro_to_IBM_coding.html)
 5. [IBM with random walks](intro_to_IBM_walk.html)
 6. [IBM with location-specific mixing](intro_to_IBM_location.html)
-<!--2. [Stochastic models](code_sto_model.html)-->
-<!-- 3. [Using the fitR package](using_fitR.html) -->
-<!-- 4. [Sampling from the posterior distribution using MCMC](mcmc.html) -->
 7. [Demo Decision Tree (basic)](HTA_flu_basic.html)
 8. [Demo Decision Tree (BCEA package)](HTA_flu_CEAresults.html)
 9. [Demo Uncertainty](HTA_flu_uncertainty.html)
-9. [Demo EVPPI](HTA_flu_evppi.html)
-
+10. [Demo EVPPI](HTA_flu_evppi.html)
+11. [CEA: RSV](HTA_RSV_dynamic.html)
 
 We provide some background literature [here](background_literature.html).
 

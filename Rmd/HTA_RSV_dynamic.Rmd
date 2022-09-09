@@ -1,5 +1,5 @@
 ---
-title: "HTA for RSV with static and dynamic disease model"
+title: "CEA for RSV with static and dynamic disease models"
 toc: FALSE
 ---
 
@@ -46,7 +46,7 @@ setwd(home)
 
 # MODEL INPUT
 
-Input parameters are inspired by the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
+The disease incidence and economic parameters are loosely based on the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
 
 ```{r }
 
@@ -358,6 +358,8 @@ legend('topright',
 * What happens to the ICERs if you change the vaccine uptake to 0.1 or 0.7? 
 * Does it affect the outcome for all disease models? Why (not)?
 * What happens to the ICERs if we combine RSV and Influenza vaccine uptake? (tip: "admission cost")
+* With which parameter settings of the dynamic model, would you expect the same results as with the static model? 
+* We did not do discounting. Would you recommend adding discounting and why?
 * Adapt the "immunity model" to start with an immunity level of 0.96387 and beta equals 15. What happens to the ICER, and why?
 </n>
 
