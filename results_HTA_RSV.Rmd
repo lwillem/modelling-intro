@@ -20,7 +20,8 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE,
 # Introduction
 This document contains solutions of a tutorial on the cost-effectiveness of RSV vaccine strategies that has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
 
-A secondary aim is to make use of generic functions to perform the cost-effectiveness analysis for multiple scenarios. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
+The primary aim of this exercise is to learn how to conduct a (simple) cost-utility analysis making use of a dynamic disease transmission model.
+A secondary aim is to make use of generic functions to perform the cost-utility analysis for multiple scenarios. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
 
 For further information, questions or comments please contact: 
 joke.bilcke@uantwerp.be or lander.willem@uantwerp.be from the 
@@ -33,7 +34,7 @@ Belgium.
 
 \newpage
 # Default model input
-The disease incidence and economic parameters are inspired by the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
+The disease incidence and economic parameters are loosely based on the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
 
 ```{r }
 # population and disease input
@@ -154,7 +155,7 @@ run_cea_dynamic = function(parameters, initials, cea_input) {
 Explore CEA results from the online tutorial with default and adjusted parameters:
 
 ```{r}
-# initialise and adjusted cea_input parameter sets
+# initial and adjusted cea_input parameter sets
 cea_input_02 = cea_input_01 = cea_input_07 = cea_input_adm = cea_input
 cea_input_01$uptake = 0.1 # 10% uptake
 cea_input_07$uptake = 0.7 # 70% uptake
@@ -270,15 +271,16 @@ legend('topright',
 
 * Static disease models do not take herd immunity effects into account. Only personal protection is considered in the economic evaluation. This holds when the target group has almost no effect on the transmission dynamics. The ICER does not change when the vaccine uptake varies. 
 
-* Combining the administration of different vaccines, hence reducing the administration cost, is beneficial for the cost-effectiveness.
+* Adding a new vaccine to an existing vaccination program, hence reducing the cost of the program, is beneficial for the cost-effectiveness of the vaccination program compared to no program.
 
-* Dynamic disease models enable herd immunity effects. As such, the number of prevented cases can outnumber the (effectively) protected individuals. This reduces the ICER, since the health related gains increase for the same investment.
+* Dynamic disease models can enable herd immunity effects. As such, the number of prevented cases can outnumber the (effectively) protected individuals. This can result in a lower ICER as compared to when using a static model, since the health gains accounted for are higher for the same investment. Note that dynamic model can also enable other effects like an age shift (average age of infection increases). If infection at older age results in more severe illness, this can increase the ICER as compared to when using a static model, since the health gains can become lower. E.g. rubella vaccination of infants without catch-up at moderate uptake in Greece.  
 
 * If the (basic) reproduction number is very high, vaccine-related immunization has limited impact on the effective transmission rate, hence herd immunity effects are limited. As such, the CEA results are more in line with the CEA based on the static disease model.
 
-* If the (basic) reproduction number is close(r) to one, vaccine-related immunization can tip the balance and result in large herd immunity effects, hence more positive CEA outcomes. Especially with the seasonal model, the high reproduction number is limited in time and reduced transmission seem to have most effect.
+* If the (basic) reproduction number is close(r) to one, vaccine-related immunization can tip the balance and result in large herd immunity effects, hence resulting in CEA results more in favor of the program. Especially with the seasonal model, the high reproduction number is limited in time and reduced transmission seem to have most effect.
 
-* With the dynamic model, we observed an inverse relationship between the ICER and vaccine uptake. The more vaccines are administered, the incremental benefit decreases. The overall QALY gain, off-course, direct related with vaccine uptake.
+* With the dynamic model used for this example, we observed an inverse relationship between the ICER and vaccine uptake: the more vaccines are administered (i.e. the higher the uptake), the lower the ICER becomes. This is caused by the herd immunity effect. With low uptake resulting in high herd immunity, illness can be prevented 'for free' for the cases prevented due to herd immunity. 
+
 
 
 
