@@ -453,9 +453,11 @@ pre code {
 <div style="text-align: right">
 <p><a href="index.html">Home page</a></p>
 </div>
-<p>This tutorial has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.</p>
-<p>The burden of respiratory syncytial virus (RSV) in older adults resembles that of influenza and may even be considered worse due to the lack of preventive interventions (Zeevat 2022). In this tutorial we explore the cost-effectiveness of a hypothetical RSV vaccine for the adult population of in the Netherlands. We start from a static disease model, which is most applicable if vacccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus. In a later stage, we integrate a dynamic transmission model into the health economic evaluation.</p>
-<p>For further information, questions or comments please contact: <a href="mailto:joke.bilcke@uantwerp.be" class="email">joke.bilcke@uantwerp.be</a> or <a href="mailto:lander.willem@uantwerp.be" class="email">lander.willem@uantwerp.be</a> from the Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID), Vaccine and Infectious Disease Institute (Vaxinfectio), University of Antwerp, Universiteitsplein 1, 2610 Antwerp, Belgium.</p>
+<p>This tutorial has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way. For further information, questions or comments please contact: <a href="mailto:joke.bilcke@uantwerp.be" class="email">joke.bilcke@uantwerp.be</a> or <a href="mailto:lander.willem@uantwerp.be" class="email">lander.willem@uantwerp.be</a> from the Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID), Vaccine and Infectious Disease Institute (Vaxinfectio), University of Antwerp, Universiteitsplein 1, 2610 Antwerp, Belgium.</p>
+<div id="research-question" class="section level1">
+<h1>Research question</h1>
+<p>Is vaccinating elderly against RSV cost-effective when compared to not vaccinating them? RSV refers to respiratory syncytial virus which causes lower respiratory tract infection in infants, elderly and persons with comorbidities. Currently, many new interventions are being tested for preventing RSV, the exercise for today is to evaluate if a vaccination program in elderly is cost-effective compared to no such program, using a static or a dynamic disease transmission model. The main outcome of cost-effective is the ICER expressed as incremental cost per QALY gained. In addition, try to explore different scenario’s (i.e. changing input parameters) and explore how this impacts on the ICER. You can also try to calculate the INMB and/or the NL.</p>
+</div>
 <div id="set-working-directory" class="section level1">
 <h1>Set working directory</h1>
 <p>The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to “set the working directory” or <code>setwd()</code>.</p>
@@ -466,7 +468,7 @@ pre code {
 </div>
 <div id="model-input" class="section level1">
 <h1>MODEL INPUT</h1>
-<p>Input parameters are inspired by the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.</p>
+<p>The disease incidence and economic parameters are loosely based on the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># population and disease input</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">population_size           =<span class="st"> </span><span class="dv">4557901</span> <span class="co"># NL population +60</span></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">rsv_incidence             =<span class="st"> </span><span class="fl">0.03525</span> <span class="co"># in the absence of vaccination</span></a>
@@ -664,8 +666,8 @@ pre code {
 ##         ...)
 ##     return(output)
 ## }
-## &lt;bytecode: 0x7ff553b7f078&gt;
-## &lt;environment: 0x7ff54fa4a270&gt;</code></pre>
+## &lt;bytecode: 0x7fc13ef53eb0&gt;
+## &lt;environment: 0x7fc13ae458f0&gt;</code></pre>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">seasonal_rsv<span class="op">$</span>pars</a></code></pre></div>
 <pre><code>## $beta0
 ## [1] 0.358385

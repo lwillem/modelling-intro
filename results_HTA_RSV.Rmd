@@ -33,6 +33,9 @@ Universiteitsplein 1,
 Belgium.
 
 \newpage
+# Research question
+Is vaccinating elderly against RSV cost-effective when compared to not vaccinating them? RSV refers to respiratory syncytial virus which causes lower respiratory tract infection in infants, elderly and persons with comorbidities. Currently, many new interventions are being tested for preventing RSV, the exercise for today is to evaluate if a vaccination program in elderly is cost-effective compared to no such program, using a static or a dynamic disease transmission model. The main outcome of cost-effective is the ICER expressed as incremental cost per QALY gained. In addition, try to explore different scenario’s (i.e. changing input parameters) and explore how this impacts on the ICER. You can also try to calculate the INMB and/or the NL.
+
 # Default model input
 The disease incidence and economic parameters are loosely based on the work of Zeevat et al (2022), published in the Journal of Infectious Diseases.
 

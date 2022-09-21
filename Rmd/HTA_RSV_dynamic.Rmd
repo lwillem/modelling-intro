@@ -18,9 +18,6 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FAL
 
 This tutorial has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. 
 Please make contact if you would like to use this model in any public way.
-
-The burden of respiratory syncytial virus (RSV) in older adults resembles that of influenza and may even be considered worse due to the lack of preventive interventions (Zeevat 2022). In this tutorial we explore the cost-effectiveness of a hypothetical RSV vaccine for the adult population of in the Netherlands. We start from a static disease model, which is most applicable if vacccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus. In a later stage, we integrate a dynamic transmission model into the health economic evaluation.
-
 For further information, questions or comments please contact: 
 joke.bilcke@uantwerp.be or lander.willem@uantwerp.be from the 
 Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID),
@@ -29,6 +26,10 @@ University of Antwerp,
 Universiteitsplein 1,
 2610 Antwerp,
 Belgium.
+
+# Research question 
+
+Is vaccinating elderly against RSV cost-effective when compared to not vaccinating them? RSV refers to respiratory syncytial virus which causes lower respiratory tract infection in infants, elderly and persons with comorbidities. Currently, many new interventions are being tested for preventing RSV, the exercise for today is to evaluate if a vaccination program in elderly is cost-effective compared to no such program, using a static or a dynamic disease transmission model. The main outcome of cost-effective is the ICER expressed as incremental cost per QALY gained. In addition, try to explore different scenario’s (i.e. changing input parameters) and explore how this impacts on the ICER. You can also try to calculate the INMB and/or the NL.
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -40,7 +41,6 @@ home = "~/Documents/Modelling_intro/" ## on a OS X
 home = "C:\\Documents\\Modelling_intro\\" ## on windows
 setwd(home)
 ```
-
 
 
 
