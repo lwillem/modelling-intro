@@ -1,3 +1,4 @@
+
 ---
 title: "Introduction to R"
 ---
@@ -172,7 +173,7 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/data/data.c
 There are many ways to read in data. Here, as we have a '.csv' file we could use either of:
 
 ```{r results = "hide"}
-mydata <- read.table("data.csv", header=TRUE, sep=",") # Comma seperated... 
+mydata <- read.table("data.csv", header=TRUE, sep=",") # Comma separated... 
 flu_hh <- read.csv("data.csv") # R doesn't like XLS files... likes csv files... (flu in hammersmith hospital)
 ```
 
@@ -291,7 +292,7 @@ which(flu_hh > 60, arr.ind=TRUE) # if want row and column
 if( 2 > 3 ){print("World gone mad")} # Use for error checking. Print does exactly that - gives output into console
 ```
 
-or check that data had been read in ok: 
+or check that data had been read in OK: 
 ```{r results = "hide"}
 if( any(flu_hh$num_inf) < 0){print("Error: data has negative numbers")}
 ```

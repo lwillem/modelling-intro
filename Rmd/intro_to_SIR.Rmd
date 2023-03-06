@@ -67,18 +67,18 @@ setwd(home)
 If packages are not installed yet, you can do so by
 ```{r results = "hide", eval=FALSE}
 install.packages(curl) # install the curl library (to import data)
-install.packages(deSolve) # install the deSolve library (to solve ODE's)
+install.packages(deSolve) # install the deSolve library (to solve ODE)
 ```
 
 Once installed, you have to load the package(s) at the start of the R file. This is done using 
 
 ```{r results = "hide"}
 library(curl) # load in the curl library of function (to import data)
-library(deSolve) # load in the deSolve library of functions (to solve ODE's)
+library(deSolve) # load in the deSolve library of functions (to solve ODE)
 ```
 
 # Writing and solving ordinary differential equations
-In order to write and solve ODEs, you need to learng the basic `ode` syntax in R and load the package that we installed earlier (`deSolve`). 
+In order to write and solve ODE, you need to learn the basic `ode` syntax in R and load the package that we installed earlier (`deSolve`). 
 
 The package `deSolve` includes a function `ode` that solves ODE equations. This function needs certain inputs. Have a look at
 ```{r results = "hide", tidy = FALSE}
@@ -107,7 +107,7 @@ init <- c(S = 0, I = 0, R = 0)
 ```
 Can you alter this initial vector for a population of 100,000 to have initially one infected and the rest susceptible? 
 
-The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the timesteps over which the ODE will be solved. These are specified by the method. Here let's assume we want output every year for 40 years. 
+The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the time steps over which the ODE will be solved. These are specified by the method. Here let's assume we want output every year for 40 years. 
 ```{r results = "hide"}
 times <- seq(0, 40, by = 1) 
 ```
@@ -148,7 +148,7 @@ legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, c
 
 Does this match the data you read before in using `read.csv` well? Note, that the data given is the proportions infected over time. So in order to compare you either need to convert the data to numbers or the numbers to data. Try and do this, and plot the data and model output on the same graph. A solution is given below if you get stuck. 
 
-What we are doing here is assessing our model's "fit" to the data. This is a key stage in the development of any model - does it refect reality? The simplest way to do this is by plotting model output and data together and comparing them by eye. Over the next few days, we will introduce several more formal and quantitative methods for assessing a model "fit".  
+What we are doing here is assessing our model's "fit" to the data. This is a key stage in the development of any model - does it reflect reality? The simplest way to do this is by plotting model output and data together and comparing them by eye. Over the next few days, we will introduce several more formal and quantitative methods for assessing a model "fit".  
 
 
 ```{r }
@@ -180,7 +180,7 @@ for(i in 1:length(gamma_values)){ # Length = how many entries in vector
   parameters <- c(beta = 2/100000, gamma = gamma_new)
   # Run with this new parameter set
   out <- ode(y = init, times = times, func = sir, parms = parameters)
-  # Store the number of infecteds this produces
+  # Store the number of infected individuals this produces
   stored <- cbind(out[,"time"],out[,"I"],gamma_new) # Bind the columns with time, the infected and the new gamma
   store_I[((i-1)*length(times)+1):(i*length(times)),]=stored # Store in the big matrix 
 }

@@ -7,7 +7,7 @@ title: "Introduction to RStudio"
 </div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
-library('curl')
+suppressPackageStartupMessages(library('curl'))
 ```
 
 ```{r setup, echo=FALSE}
@@ -15,14 +15,14 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, tidy=TRUE, 
 ```
 
 # Objectives
-The aim of this tutorial is to introduce you to the basics of [RStudio](http://www.rstudio.com/products/rstudio/download/), which is a very usefull graphic user interface (GUI). The default installation of [RStudio](http://www.rstudio.com/products/rstudio/download/) might contain an old version of [R](http://cran.r-project.org). Please make sure that you also install a recent version of [R](http://cran.r-project.org) (at least version: R-3.5.0).
+The aim of this tutorial is to introduce you to the basics of [RStudio](http://www.rstudio.com/products/rstudio/download/), which is a very useful graphic user interface (GUI). The default installation of [RStudio](http://www.rstudio.com/products/rstudio/download/) might contain an old version of [R](http://cran.r-project.org). Please make sure that you also install a recent version of [R](http://cran.r-project.org) (at least version: R-3.5.0).
 
 We recommend to use [RStudio](http://www.rstudio.com/products/rstudio/download/) to manage your R-code (in a file called 'file.R', where you can replace 'file' with any name you like) separate to your executed code in the Console window. It also holds plots, the environment and history window. In this 'file.R' you can store the useful and checked code for future use. For example, you could start a new R file and store in it all the commands below.   
 
 
 # Example
 
-Whth the following screenshot of RStudio, we would like to focus on different usefull parts.
+With the following screenshot of RStudio, we would like to focus on different useful parts.
 
 
 ![](ext_fig/screenshot_rstudio.jpg)
@@ -38,7 +38,7 @@ Each computer will have a different specified address for the working directory.
 
 4. Window for plots. Use the arrows to get previous plots back.
 
-5. Select R-code in your document and press the "Run" button to execute. Or use the shortcut `cmd + enter`on MacOS or `shift + R` on Windows.
+5. Select R-code in your document and press the "Run" button to execute. Or use the short cut `cmd + enter`on MacOS or `shift + R` on Windows.
 
 6. "Source" button to execute the active R-script.
  

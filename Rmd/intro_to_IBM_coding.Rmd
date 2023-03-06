@@ -124,14 +124,14 @@ new_data
 ```
 
 
-Now, let us create a `data.frame` for a population of 300 individuals with a health state together with a x- and y coordinate. During the setup, we randomly locate each person in a 10x10 area.
+Now, let us create a `data.frame` for a population of 300 individuals with a health state together with a x- and y coordinate. During the set-up, we randomly locate each person in a 10x10 area.
 ```{r }
 
 pop_size    <- 300     
 area_size   <- 10    # 10x10 square
 xy_coordinates <- seq(0,area_size,0.01)  # get sequence per 0.01
 
-# setup population: one row per individual, one column per attribute, row index = id
+# set-up population: one row per individual, one column per attribute, row index = id
 pop_data     <- data.frame(health  = rep('S', length=pop_size),  # all individuals start in state 'S' (= susceptible)
                            x_coord = sample(x = xy_coordinates, size = pop_size,replace = T), # sample random x coordinate
                            y_coord = sample(x = xy_coordinates, size = pop_size,replace = T), # sample random y coordinate
@@ -174,7 +174,7 @@ random_walk <- function(pop_data, max_velocity){
 If you want to visualize the random walk, you can create a plot before and after applying the function. Please note that it is possible to highlight a one individual using `points`:
 ```{r}
 
-# plot the area and all indivdiuals, using color 1 (= black)
+# plot the area and all individuals, using color 1 (= black)
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
      col = 1)
@@ -220,7 +220,7 @@ diag(eligible_contacts_matrix) <- FALSE
 Let's visualize this:
 
 ```{r}
-# which indididuals are close enough to our index person?
+# which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord)
 points(x = pop_data$x_coord[1],
@@ -298,7 +298,7 @@ pop_data$health[1:num_infected_seeds] <- 'I'
 Can you visualize the infected individuals like the following plot? (note: using `pch=20` gives you full dots)
 </p>
 ```{r echo=FALSE}
-# which indididuals are close enough to our index person?
+# which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
      xlab='x coordinate',
@@ -332,7 +332,7 @@ num_infected     <- length(ind_infected)     # = single value: count data
 # we specified the eligible contacts above
 #eligible_contacts_matrix
 
-# get indices of infected invididuals
+# get indices of infected individuals
 #ind_infected
 
 # evaluate the contacts and transmission events for person 1, starting from the contact probability
@@ -353,7 +353,7 @@ Can you visualize the __newly__ infected individuals? (note: you might have diff
 </p>
 ```{r echo=FALSE}
 
-# which indididuals are close enough to our index person?
+# which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
      xlab='x coordinate',
@@ -403,7 +403,7 @@ Can you visualize the final health states?
 </p>
 ```{r echo=FALSE}
 
-# which indididuals are close enough to our index person?
+# which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
      xlab='x coordinate',

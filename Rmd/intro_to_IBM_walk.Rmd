@@ -7,7 +7,7 @@ title: "Scenario Analyses with the random walk IBM"
 </div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
-library('curl')
+suppressPackageStartupMessages(library('curl'))
 set.seed(2020)
 source('../lib/ibm_functions.R')
 
