@@ -8,10 +8,10 @@ title: "Introduction to R"
 </div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
-library('curl')
+suppressPackageStartupMessages(library('curl'))
 ```
 
-```{r setup, echo=FALSE}
+```{r setup, echo=FALSE, warning = FALSE}
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, tidy=TRUE, warning=FALSE)
 ```
 
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, tidy=TRUE, 
 The aim of this tutorial is to introduce you to the basics of coding within R. 
 To do this, we will introduce you to the basic syntax, via the use of some simple commands such as how to read in data and plot. 
 
-In this session, you will
+In this session, you will:
 
 1. familiarise yourself with the basic syntax of R
 2. learn how to create basic plots in R
@@ -60,14 +60,14 @@ setwd("~/Documents/Modelling_course/")
 You can also label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_course/" ## on a OS X
+home <- "~/Documents/Modelling_course/" ## on Mac OS or Linux
 setwd(home)
 ```
 
 or
 
 ```{r results = "hide", eval = FALSE}
-home <- "C:\\Documents\\Modelling_course\\" ## on windows
+home <- "C:\\Documents\\Modelling_course\\" ## on Windows
 setwd(home)
 ```
 
@@ -101,7 +101,7 @@ m[1,] # first row
 m[,1] # first column
 m[,1]<-c(2,3,9) # Error - what does it say?
 m[,1]<-c(2,3) # What happens? 
-m # as multiple then works
+m # let's look again at m
 m[,1]<-c(2,3,9,12) # Assign column 1
 m[,2]<-v # Assign column 2 to be the vector we had earlier
 ```
@@ -146,11 +146,11 @@ There are two ways to do this:
 2) Type
 
 ```{r results = "hide",eval = FALSE}
-install.packages("packagename")
+install.packages(package_name)
 ```
 
-replacing "packagename" with the name of the package you would like to install.
-For example, can you install the packages `deSolve` and 'curl'? We will use this to download data and solve ordinary differential equations later on in the tutorials.
+replacing "package_name" with the name of the package you would like to install.
+For example, can you install the packages `deSolve` and `curl`? We will use these packages to download data and solve ordinary differential equations later on in the tutorials.
 
 Once installed you then have to load the package at the start of the R file. This is done using 
 
@@ -261,7 +261,6 @@ lines(flu_hh[,"time"],flu_hh[,"num_inf"]) # add lines to the same plot (and vice
 plot(flu_hh[,"time"],flu_hh[,"num_inf"],type="l",col="red") # Red line
 plot(flu_hh[,"time"],flu_hh[,"num_inf"],type="l",col="red",xlab="Time",ylab="Number") # Label axis
 dev.off() # stops the par command - one window per plot
-dev.off() # stops the pdf command
 ```
 
 In order to output data, there is a write equivalent to read (again make sure you are in the appropriate working directory):
@@ -395,23 +394,25 @@ my_mean <- calculate_mean_power(c(1,2,3,43), 3)
 my_mean
 ```
 
-You can store all the functions that you have in one big .R file and load them into your current R file using the command `source`. 
+You can store all the functions that you have in a separate R-file and load them into your current R file using the command `source`. 
 
-Can you understand what the following function does? 
+Can you understand what the following function does for a matrix containing the ward name, the reporting time (in days) and the number of infected patients: 
+
 ```{r results = "hide"}
 find_day_many <- function(matrix){
   u <- unique(matrix$ward) # What wards are there?
   days <- c() # store in here
   for(i in 1:length(u)){
     w <- which(matrix$ward == u[i]) # find which rows of the data are for this ward
-    r <- which(matrix[w,"number"] > 1) # find which rows for this ward have more than 1 person
-    days <- c(days,matrix[w[r],"time"]) # when are there 2 or more infected? 
+    r <- which(matrix[w,"number"] > 1) # find rows for this ward with more than 1 infected patient
+    days <- c(days,matrix[w[r],"time"]) # add days when there are 2 or more infected 
   }
   return(days)
 }
 ```
 
-To test the function, the file `ward_data.csv` can be found [here](https://github.com/lwillem/modelling-intro/raw/master/data/ward_data.csv).
+To test the function, a file `ward_data.csv` can be found [here](https://github.com/lwillem/modelling-intro/raw/master/data/ward_data.csv) or loaded using the following code:
+
 
 ```{r echo = TRUE, eval = FALSE}
 #download the ward data
@@ -421,14 +422,45 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/data/ward_d
 Test the function above with the ward data. Does it give you the output you expected? You will need to use some of the commands for looking at data that were introduced above.
 
 ```{r results = "hide"}
-wardd <- read.csv("ward_data.csv")
-d <- find_day_many(wardd)
-d
+ward_data <- read.csv("ward_data.csv")
+days <- find_day_many(ward_data)
 
 # get overview in table format
-table(d)
+table(days)
 ```
 
+```{r, eval=FALSE, include=FALSE}
+
+plot(table(days),ylab='infected patients',xlab='time (days)')
+
+
+matrix <- ward_data
+find_wards <- function(matrix){
+  u <- unique(matrix$ward) # What wards are there?
+  wards <- c() # store in here
+  for(i in 1:length(u)){
+    w <- which(matrix$ward == u[i]) # find which rows of the data are for this ward
+    r <- which(matrix[w,"number"] > 1) # find rows for this ward with more than 1 infected patient
+    wards <- c(wards,matrix[w[r],"ward"]) # add days when there are 2 or more infected 
+  }
+  return(wards)
+}
+
+plot(table(wards),xlab='ward',ylab='days with > 1 infected patient')
+
+
+
+```
+
+
+# Assignment
+
+<n style="color:darkred">
+
+* How many infected patients are hospitalized on days 10, 11 and 12? 
+* Can you plot the number of patients over time?
+* Write a new function to count the number of days with more than one infected patient per ward, call the function with the `ward_data` and plot the result.
+</n>
 
 <div>
 

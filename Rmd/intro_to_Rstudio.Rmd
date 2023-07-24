@@ -15,7 +15,7 @@ knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, tidy=TRUE, 
 ```
 
 # Objectives
-The aim of this tutorial is to introduce you to the basics of [RStudio](http://www.rstudio.com/products/rstudio/download/), which is a very useful graphic user interface (GUI). The default installation of [RStudio](http://www.rstudio.com/products/rstudio/download/) might contain an old version of [R](http://cran.r-project.org). Please make sure that you also install a recent version of [R](http://cran.r-project.org) (at least version: R-3.5.0).
+The aim of this tutorial is to introduce you to the basics of [RStudio](http://www.rstudio.com/products/rstudio/download/), which is a very useful graphic user interface (GUI). The default installation of [RStudio](http://www.rstudio.com/products/rstudio/download/) might contain an old version of [R](http://cran.r-project.org). Please make sure that you also install a recent version of [R](http://cran.r-project.org) (at least version: R-4.0.0).
 
 We recommend to use [RStudio](http://www.rstudio.com/products/rstudio/download/) to manage your R-code (in a file called 'file.R', where you can replace 'file' with any name you like) separate to your executed code in the Console window. It also holds plots, the environment and history window. In this 'file.R' you can store the useful and checked code for future use. For example, you could start a new R file and store in it all the commands below.   
 
