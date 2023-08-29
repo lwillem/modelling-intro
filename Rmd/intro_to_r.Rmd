@@ -446,7 +446,8 @@ find_wards <- function(matrix){
   return(wards)
 }
 
-plot(table(wards),xlab='ward',ylab='days with > 1 infected patient')
+wards <- find_wards(ward_data)
+plot(table(wards),xlab='ward',ylab='days with > 1 infected patient',ylim=c(0,10))
 
 
 

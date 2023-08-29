@@ -8,7 +8,7 @@ toc: FALSE
 </div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
-library('curl')
+suppressPackageStartupMessages(library('curl'))
 library('knitr')
 library('EpiDynamics')
 set.seed(2020)
@@ -29,7 +29,20 @@ Belgium.
 
 # Research question 
 
-Is vaccinating elderly against RSV cost-effective when compared to not vaccinating them? RSV refers to respiratory syncytial virus which causes lower respiratory tract infection in infants, elderly and persons with comorbidities. Currently, many new interventions are being tested for preventing RSV, the exercise for today is to evaluate if a vaccination program in elderly is cost-effective compared to no such program, using a static or a dynamic disease transmission model. The main outcome of cost-effective is the ICER expressed as incremental cost per QALY gained. In addition, try to explore different scenario’s (i.e. changing input parameters) and explore how this impacts on the ICER. You can also try to calculate the INMB and/or the NL.
+In this session, we delve into a critical question: Is vaccinating the elderly against Respiratory Syncytial Virus (RSV) a cost-effective strategy when compared to not vaccinating them? RSV is known to cause lower respiratory tract infections in infants, the elderly, and individuals with underlying health conditions.
+
+Amidst the backdrop of numerous emerging interventions aimed at preventing RSV, our focus today is to conduct a comprehensive evaluation of the cost-effectiveness of implementing a vaccination program for the elderly. To achieve this, we will employ both static and dynamic disease transmission models, allowing us to gain valuable insights into the potential impact of vaccination strategies.
+
+While the ICER serves as a crucial measure of cost-effectiveness, we'll also encourage you to extend your analysis further. Consider calculating the Incremental Net Monetary Benefit (INMB) and the Net Loss (NL) associated with the vaccination program. This broader perspective will enhance your grasp of the economic implications and provide a more comprehensive view of the intervention's impact.
+
+# Objectives of the Tutorial:
+
+* Evaluate the cost-effectiveness of an elderly vaccination program against RSV in comparison to a scenario without such a program.
+* Utilize disease transmission models to analyze the dynamics of RSV spread and its interactions within the population.
+* Highlight the primary outcome measure of cost-effectiveness: the Incremental Cost-Effectiveness Ratio (ICER), quantified as the incremental cost per QALY gained.
+* Calculate and interpret the INMB and/or the NL.
+
+As we delve into the topic, we encourage you to explore various scenarios by manipulating input parameters. By doing so, you can gain a nuanced understanding of how altering these factors influences the ICER. This hands-on exploration will empower you to grasp the sensitivity of our analysis and its implications for decision-making.
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -65,7 +78,7 @@ cost_per_dose     = 10 # euro
 admin_cost        = 50 # euro
 
 # program settings
-uptake = 0.2 # doses
+uptake = 0.2 # proportion of the population
 time_horizon = 365 # days
 
 ```
@@ -79,14 +92,16 @@ proportion_protected =  uptake * vaccine_efficacy
 
 
 # STATIC DISEASE MODEL
+
+We commence by delving into the static disease model. The following code delineates the model's intrinsic parameters and conducts ICER computation. The outcomes revolve around the baseline disease impact, portraying anticipated infections. Moreover, we explore infections within the intervention scenario, subsequently estimating the associated QALY improvement. This culmination leads us to the metric of cost-effectiveness: the ICER. This value is expressed in thousands of euros and rounded for clarity.
+
 ```{r }
 # TRANSLATE TO STATIC MODEL SETTING
 force_of_infection  = rsv_incidence
 
 # INFECTIONS (prevented)
 reference_infections = population_size * force_of_infection
-program_infections = population_size * uptake * force_of_infection * (1-vaccine_efficacy) + 
-                       population_size * (1 - uptake) * force_of_infection
+program_infections = population_size * (1 - proportion_protected) * force_of_infection
 prevented_cases = reference_infections - program_infections
 
 # COSTS AND EFFECTS
@@ -100,16 +115,19 @@ static_icer = static_incr_cost  / static_qaly_gain
 round(c(reference_infections = reference_infections,
         program_infections = program_infections,
         static_qaly_gain = static_qaly_gain,
-        static_icer_k = static_icer / 1e3),digits=2)
+        static_icer = static_icer),digits=2)
 
 ```
 
 
 
 
-# DYNAMIC DISEASE MODEL: introduction
+# DYNAMIC DISEASE MODEL: general
 
-For the dynamic model, we make use of the [EpiDynamics](https://cran.r-project.org/web/packages/EpiDynamics/EpiDynamics.pdf) package with build in functions. For example, we can adopt the 'SIR' function:
+Moving forward, our exploration advances to encompass the dynamic transmission model, while adhering to the identical model parameters and fundamental disease attributes as established in the static model.
+
+For this example, we utilize the [EpiDynamics](https://cran.r-project.org/web/packages/EpiDynamics/EpiDynamics.pdf)  package, which features an array of built-in functions tailored for such analyses. A noteworthy example is the incorporation of the 'SIR' function, adeptly employed for quantifying the disease burden. Through this approach, we effectively calculate the disease's impact while considering distinct initial conditions and transmission parameters:
+
 
 ```{r}
 # check if the "EpiDynamics" package is installed, if not, install package
@@ -129,17 +147,17 @@ sir = SIR(pars = parameters, init = initials, time = 0:time_horizon)
 PlotMods(sir)
 ```
 
-To define the number of infections, we can calculate the change in the "Recovered" compartment:
+To ascertain the quantity of infections, we can deduce this by evaluating the alteration in the "Recovered" compartment:
 ```{r}
 sir$results$R[nrow(sir$results)] - sir$results$R[1]
 ```
 
 # DYNAMIC DISEASE MODEL: RSV
 
-To meet the target incidence of RSV for this CEA, we can assume a high existing immunity level in the population. 
+In order to achieve the desired RSV incidence for this Cost-Effectiveness Analysis, we can posit a considerable existing level of immunity within the population:
 ```{r }
 # set initial immunity levels
-initials['R'] = 0.951
+initials['R'] = 0.95099
 initials['S'] = 1 - sum(initials['I']+initials['R'])
 
 # Solve 
@@ -150,7 +168,7 @@ dynamic_cases_reference = diff(dynamic_rsv_reference$results$R[c(1,nrow(dynamic_
 dynamic_cases_reference # print to terminal
 ```
 
-To include vaccination in the model, we can consider vaccine uptake as transfer from "Suseptible" to "Recovered":
+To incorporate vaccination within the model, we can conceptualize the adoption of the vaccine as a transition from the "Susceptible" to the "Recovered" compartment:
 
 ```{r }
 initials['S'] = initials['S'] * (1-proportion_protected)
@@ -176,135 +194,8 @@ dynamic_icer = dynamic_incr_cost  / dynamic_qaly_gain
 round(c(dynamic_cases_reference=dynamic_cases_reference,
         dynamic_cases_program=dynamic_cases_program,
         dynamic_qaly_gain=dynamic_qaly_gain,
-        dynamic_icer=dynamic_icer / 1e3),digits=2)
+        dynamic_icer=dynamic_icer),digits=2)
 
-```
-
-# DYNAMIC DISEASE MODEL: seasonality
-
-Another option is to include seasonality and less (long-lasting) immunity. To do this, the 'SIRSinusoidalForcing' function can be used, in which the SIR model is extended with sinusoidal forcing of the transmission rate. 
-
-We provide the parameters here:
-
-```{r}
-
-## EpiDynamics PACKAGE: seasonality
-parameters = list(beta0 = 0.358385, 
-                  beta1 = 3, 
-                  gamma = 1 / rsv_recovery_time,
-                  omega = 4 * pi / 365,
-                  mu = 0) # no births/deaths at this stage
-
-initials = c(S = 1 - 2e-5 - 0.8, 
-             I = 2e-5,
-             R = 0.8)
-
-# Solve and plot.
-seasonal_rsv_reference = SIRSinusoidalForcing(pars = parameters,
-                                 init = initials,
-                                 time = 0:time_horizon)
-
-#PlotMods(seasonal_rsv_reference)
-seasonal_cases_reference = diff(seasonal_rsv_reference$results$R[c(1,nrow(seasonal_rsv_reference$results))]) * population_size
-
-```
-
-To include vaccination in the model, we can consider vaccine uptake as transfer from "Suseptible" to "Recovered":
-```{r}
-initials['S'] = initials['S'] * (1-proportion_protected)
-initials['R'] = 1 - sum(initials['S']+initials['I'])
-
-# Solve
-seasonal_rsv = SIRSinusoidalForcing(pars = parameters,
-                                 init = initials,
-                                 time = 0:(1 * 365))
-
-#PlotMods(seasonal_rsv)
-seasonal_cases_program = diff(seasonal_rsv$results$R[c(1,nrow(seasonal_rsv$results))]) * population_size
-
-# prevented cases
-seasonal_cases_prevented = seasonal_cases_reference - seasonal_cases_program
-
-# CEA
-seasonal_incr_cost = program_costs - (seasonal_cases_prevented * cost_per_episode)
-seasonal_qaly_gain = seasonal_cases_prevented * qaly_loss_per_episode
-
-# ICER
-seasonal_icer =  seasonal_incr_cost / seasonal_qaly_gain
-
-# print results
-round(c(seasonal_cases_reference=seasonal_cases_reference,
-        seasonal_cases_program=seasonal_cases_program,
-        seasonal_qaly_gain=seasonal_qaly_gain,
-        seasonal_icer_k=seasonal_icer / 1e3),digits=2)
-
-```
-
-# REPRODUCTON NUMBER
-In an SIR model, the basic reproduction number is defined by the beta and gamma parameter. I.e., R_0 = beta * 1/gamma. We can use this for the seasonal implementation of 'beta' and calculate a theoretical reproduction number over time.
-```{r}
-
-# with the parameters of the "immunity model", the basic reproduction number is:
-dynamic_rsv$pars$beta / dynamic_rsv$pars$gamma
-
-# inspect seasonal RSV model:
-seasonal_rsv$model
-seasonal_rsv$pars
-
-# i.e. the implementation of the seasonality:
-# Please note that this formula assumes a fully susceptible population and 1 infected!!
-# beta <- beta0 * (1 + beta1 * sin(omega * time))
-
-# as such:
-seasonal_beta = seasonal_rsv$pars$beta0 * (1 + seasonal_rsv$pars$beta1 * sin(seasonal_rsv$pars$omega * 0:time_horizon))
-
-# plot "theoretical" basic reproduction number
-plot(0:time_horizon,
-     seasonal_beta * rsv_recovery_time,
-     xlab='time (days)',
-     ylab='reproduction number')
-abline(h=1)
-
-```
-
-
-# SUMMARY
-
-Inspect the cost-effectiveness frontier:
-```{r}
-
-plot(x = c(static_qaly_gain,dynamic_qaly_gain,seasonal_qaly_gain),
-     y = c(static_incr_cost,dynamic_incr_cost,seasonal_incr_cost)/1e6,
-     col = 1:3,
-     xlab= 'QALY gain',
-     ylab = 'incremental cost (euro)',
-     pch=16)
-legend('topright',
-       c('static model',
-         'dynamic model - immunity',
-         'dynamic model - seasonality'),
-       fill = 1:3,
-       )
-```
-
-```{r, echo=F}
-
-data.frame(model = c('static','dynamic - immunity', 'dynamic - seasonal'),
-           reference_infections = c(reference_infections, 
-                                    dynamic_cases_reference, 
-                                    seasonal_cases_reference),
-              program_infections = c(program_infections,
-                                      dynamic_cases_program,
-                                      seasonal_cases_program),
-              qaly_gain = c(static_qaly_gain,dynamic_qaly_gain,seasonal_qaly_gain),
-              program_icer_k = c(static_icer,dynamic_icer,seasonal_icer )/ 1e3) -> db_out
-
-db_out[,-1] <- round(db_out[,-1])
-
-db_out$infections_reduction <- round((db_out$reference_infections - db_out$program_infections) / reference_infections,digits=2)
-
-kable(db_out)
- 
 ```
 
 Inspection of the disease prevalence:
@@ -315,7 +206,7 @@ plot(x = dynamic_rsv_reference$time,
          y = dynamic_rsv_reference$results$I,
         xlab='time (days)',
         ylab='prevalence (infected)',
-     ylim=c(0,max(c(dynamic_rsv_reference$results$I,seasonal_rsv_reference$results$I))),
+     ylim=c(0,max(dynamic_rsv_reference$results$I)),
         col=1,
         lwd=2,
         type='l')
@@ -325,70 +216,76 @@ lines(x = dynamic_rsv$time,
         lwd=2,
       lty=2)
 
-lines(x = seasonal_rsv_reference$time,
-         y = seasonal_rsv_reference$results$I,
-        col=4,
-        lwd=2)
-lines(x = seasonal_rsv$time,
-         y = seasonal_rsv$results$I,
-        col=4,
-        lwd=2,
-      lty=2)
 legend('topright',
-       c('dynamic - immunity: reference',
-         'dynamic - immunity: program',
-         'dynamic - seasonality: reference',
-         'dynamic - seasonality: program'),
+       c('dynamic: reference',
+         'dynamic: program'),
        lwd=2,
        col=c(1,1,4,4),
        lty=c(1,2,1,2),
        cex=0.8)
-# lines(x = seasonal_rsv_reference$time,
-#          y = rep(reference_infections/population_size/time_horizon,time_horizon+1),
-#         col=5,
-#         lwd=2)
 
 ```
 
+# SUMMARY
 
-# What if?
+Inspect the cost-effectiveness frontier:
+```{r}
 
-<n style="color:darkred">
-
-* What happens to the ICERs if you change the vaccine uptake to 0.1 or 0.7? 
-* Does it affect the outcome for all disease models? Why (not)?
-* What happens to the ICERs if we combine RSV and Influenza vaccine uptake? (tip: "admission cost")
-* With which parameter settings of the dynamic model, would you expect the same results as with the static model? 
-* We did not do discounting. Would you recommend adding discounting and why?
-* Adapt the "immunity model" to start with an immunity level of 0.96387 and beta equals 15. What happens to the ICER, and why?
-</n>
-
-# Next...
-
-<n style="color:darkred">
-
-Let us assume the seasonal RSV incidence is 70%, while other model parameters remain unchanged. The following model parameters are aligned with the 70% incidence after one year. What are the corresponding ICERs? Can you explain the (new) differences? What about the reproduction numbers? 
-
-</n>
-
-
-```{r, eval=F}
-# STATIC
-force_of_infection = 0.7
-
-# DYNAMIC: 70% INCIDENCE & NO EXISTING IMMUNITY
-parameters = list(beta = 0.2458, gamma = 1 / rsv_recovery_time)
-initials = c(S = 1 - 2e-5, I = 2e-5, R = 0)
-
-# DYNAMIC: 70% INCIDENCE & EXISTING IMMUNITY
-parameters = list(beta = 3.245, gamma = 1 / rsv_recovery_time)
-initials = c(S = 1 - 2e-5 - 0.2999, I = 2e-5, R = 0.2999)
-
-# DYNAMIC: 70% INCIDENCE & SEASONALITY 
-parameters = list(beta0 = 0.11444, beta1 = 1.4, gamma = 1 / rsv_recovery_time, omega = 2 * pi / 365, mu = 0)
-initials = c(S = 1 - 2e-5 , I = 2e-5, R = 0)
-
+plot(x = c(static_qaly_gain,dynamic_qaly_gain),
+     y = c(static_incr_cost,dynamic_incr_cost),
+     col = 1:2,
+     xlab= 'QALY gain',
+     ylab = 'incremental cost (euro)',
+     pch=16)
+legend('topright',
+       c('static model',
+         'dynamic model'),
+       fill = 1:2,
+       )
 ```
+
+```{r, echo=F}
+
+data.frame(model = c('static','dynamic'),
+           reference_infections = c(reference_infections, 
+                                    dynamic_cases_reference),
+              program_infections = c(program_infections,
+                                      dynamic_cases_program),
+              qaly_gain = c(static_qaly_gain,dynamic_qaly_gain),
+              program_icer = c(static_icer,dynamic_icer)) -> db_out
+
+db_out[,-1] <- round(db_out[,-1])
+
+db_out$infections_reduction <- round((db_out$reference_infections - db_out$program_infections) / reference_infections,digits=2)
+
+kable(db_out)
+ 
+```
+
+# Incremental Net Monetary Benefit (INMB)
+
+The INMB is a crucial measure used in health economic evaluations to assess the cost-effectiveness of different healthcare interventions. It quantifies the net economic gain achieved by adopting one intervention over another. Mathematically, the INMB is calculated as the difference between the incremental benefits and the incremental costs of two competing interventions. It takes into account both the effectiveness and the costs associated with each intervention. The INMB helps decision-makers understand the economic value of an intervention by weighing the additional benefits gained against the extra costs incurred when compared to an alternative.
+
+Compute the Incremental Net Monetary Benefit for the RSV illustration provided, while adhering to a willingness-to-pay threshold of 20,000 euros per Quality-Adjusted Life Year (QALY).
+
+
+# Exploring model behaviour and sensitivity
+
+<n style="color:darkred">
+
+1. **Impact of Vaccine Uptake:** Evaluate the effect of altering vaccine uptake to 0.1 or 0.7 on ICERs and INMB.
+
+2. **Consistency Across Models:** Examine whether changes in vaccine uptake lead to similar outcomes in both disease models. Provide an explanation for the observed results.
+
+3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of admission costs in your analysis.
+
+4. **Matching Static and Dynamic Models:** Identify the parameter settings within the dynamic model that would yield results consistent with the static model. Discuss the significance of these settings.
+
+5. **The Role of Discounting:** Reflect on the decision not to incorporate discounting. Offer your recommendation on whether discounting should be added and provide a rationale.
+
+
+</n>
+
 
 
 <div>
