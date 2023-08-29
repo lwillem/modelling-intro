@@ -70,7 +70,9 @@ rsv_recovery_time         = 7 # days
 
 # health economic input
 cost_per_episode          = 122 # euro
-qaly_loss_per_episode     = 0.002196
+morbidity_per_episode     = 0.002196 # QALY
+proportion_mortality      = 0.006    # assume age-invariant
+average_life_expectancy   = 9        # QALY
 
 # vaccine characteristics
 vaccine_efficacy  = 0.40
@@ -88,12 +90,14 @@ Based on the input above, we can compute the program cost and the proportion of 
 ```{r}
 program_costs = population_size * uptake * (cost_per_dose + admin_cost)
 proportion_protected =  uptake * vaccine_efficacy
+qaly_loss_per_episode = morbidity_per_episode + (proportion_mortality * average_life_expectancy)
+
 ```
 
 
 # STATIC DISEASE MODEL
 
-We commence by delving into the static disease model. The following code delineates the model's intrinsic parameters and conducts ICER computation. The outcomes revolve around the baseline disease impact, portraying anticipated infections. Moreover, we explore infections within the intervention scenario, subsequently estimating the associated QALY improvement. This culmination leads us to the metric of cost-effectiveness: the ICER. This value is expressed in thousands of euros and rounded for clarity.
+We commence by delving into the static disease model. The following code delineates the model's intrinsic parameters and conducts ICER computation. The outcomes revolve around the baseline disease impact, portraying anticipated infections. Moreover, we explore infections within the intervention scenario, subsequently estimating the associated QALY improvement. This culmination leads us to the metric of cost-effectiveness: the ICER.
 
 ```{r }
 # TRANSLATE TO STATIC MODEL SETTING
@@ -266,7 +270,7 @@ kable(db_out)
 
 The INMB is a crucial measure used in health economic evaluations to assess the cost-effectiveness of different healthcare interventions. It quantifies the net economic gain achieved by adopting one intervention over another. Mathematically, the INMB is calculated as the difference between the incremental benefits and the incremental costs of two competing interventions. It takes into account both the effectiveness and the costs associated with each intervention. The INMB helps decision-makers understand the economic value of an intervention by weighing the additional benefits gained against the extra costs incurred when compared to an alternative.
 
-Compute the Incremental Net Monetary Benefit for the RSV illustration provided, while adhering to a willingness-to-pay threshold of 20,000 euros per Quality-Adjusted Life Year (QALY).
+Compute the Incremental Net Monetary Benefit for the RSV illustration provided, while adhering to willingness-to-pay thresholds of 20,000 and 40,0000 euro per Quality-Adjusted Life Year (QALY).
 
 
 # Exploring model behaviour and sensitivity
@@ -283,10 +287,65 @@ Compute the Incremental Net Monetary Benefit for the RSV illustration provided, 
 
 5. **The Role of Discounting:** Reflect on the decision not to incorporate discounting. Offer your recommendation on whether discounting should be added and provide a rationale.
 
+5. **The Role of Uncertainty:** Reflect on the decision when the cost per case is represented by `rgamma(100, shape=(122/50)^2, rate = 122/50^2))` and the vaccine efficacy by `rnorm(100,0.4,0.1)`. Try to reproduce the figure below for 100 samples:
+
 
 </n>
 
 
+```{r, eval=TRUE,echo=F}
+
+num_samples <- 100
+set.seed(1234)
+unc_cost_per_episode <- rgamma(num_samples, shape=(122/50)^2, rate = 122/50^2)
+unc_vaccine_efficacy <- rnorm(num_samples,vaccine_efficacy,0.1)
+
+# static
+unc_static_prevented_cases = population_size * (uptake * unc_vaccine_efficacy) * force_of_infection
+unc_static_incr_qaly       = unc_static_prevented_cases * qaly_loss_per_episode
+unc_static_incr_cost       = program_costs - (unc_static_prevented_cases * unc_cost_per_episode)
+unc_static_icer            = unc_static_incr_cost  / unc_static_incr_qaly
+
+# dynamic
+unc_dynamic_prevented_cases <- vector(length=num_samples)
+initial_prop_R = 0.95099
+for(i in 1:num_samples){
+ unc_proportion_protected = uptake * unc_vaccine_efficacy[i]
+ initials['I'] = 1e-06
+ initials['S'] = (1-initial_prop_R) * (1-unc_proportion_protected)
+ initials['R'] = 1 - sum(initials['S']+initials['I'])
+ dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
+ dynamic_cases_program = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+ unc_dynamic_prevented_cases[i] = dynamic_cases_reference - dynamic_cases_program
+} 
+
+# prevented cases
+unc_dynamic_incr_qaly       = unc_dynamic_prevented_cases * qaly_loss_per_episode
+unc_dynamic_incr_cost       = program_costs - (unc_dynamic_prevented_cases * unc_cost_per_episode)
+unc_dynamic_icer            = unc_dynamic_incr_cost  / unc_dynamic_incr_qaly
+
+
+plot(x=unc_static_incr_qaly,
+     y=unc_static_incr_cost,
+      xlim = range(unc_static_incr_qaly,unc_dynamic_incr_qaly),
+     # ylim = range(unc_static_incr_cost,unc_dynamic_incr_cost),
+     ylim = c(4,6)*1e7,
+     xlab = 'incremental QALY gain',
+     ylab = "incremental cost (euro)",
+     pch=1)
+points(x=unc_dynamic_incr_qaly,
+       y=unc_dynamic_incr_cost,
+     col = 2,
+     pch=20)
+legend('topright',
+       c('static model',
+         'dynamic model'),
+       col = 1:2,
+       pch = c(1,20)
+       )
+ #abline(a=0,b=20000)
+ #abline(a=0,b=30000)
+```
 
 <div>
 # Navigate
