@@ -75,7 +75,7 @@ proportion_mortality      = 0.006    # assume age-invariant
 average_life_expectancy   = 9        # QALY
 
 # vaccine characteristics
-vaccine_efficacy  = 0.40
+vaccine_efficacy  = 0.60
 cost_per_dose     = 10 # euro 
 admin_cost        = 50 # euro
 
@@ -287,7 +287,7 @@ Compute the Incremental Net Monetary Benefit for the RSV illustration provided, 
 
 5. **The Role of Discounting:** Reflect on the decision not to incorporate discounting. Offer your recommendation on whether discounting should be added and provide a rationale.
 
-5. **The Role of Uncertainty:** Reflect on the decision when the cost per case is represented by `rgamma(100, shape=(122/50)^2, rate = 122/50^2))` and the vaccine efficacy by `rnorm(100,0.4,0.1)`. Try to reproduce the figure below for 100 samples:
+5. **The Role of Uncertainty:** Reflect on the decision when the cost per case is represented by `rgamma(100, shape=(122/70)^2, rate = 122/70^2))` and the vaccine efficacy by `rnorm(100,vaccine_efficacy,0.1)`. Try to reproduce the figure below for 100 samples:
 
 
 </n>
@@ -297,7 +297,7 @@ Compute the Incremental Net Monetary Benefit for the RSV illustration provided, 
 
 num_samples <- 100
 set.seed(1234)
-unc_cost_per_episode <- rgamma(num_samples, shape=(122/50)^2, rate = 122/50^2)
+unc_cost_per_episode <- rgamma(num_samples, shape=(122/70)^2, rate = 122/70^2)
 unc_vaccine_efficacy <- rnorm(num_samples,vaccine_efficacy,0.1)
 
 # static
@@ -346,6 +346,8 @@ legend('topright',
  #abline(a=0,b=20000)
  #abline(a=0,b=30000)
 ```
+
+
 
 <div>
 # Navigate
