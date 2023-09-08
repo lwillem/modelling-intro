@@ -1,5 +1,5 @@
 ---
-title: "CEA for RSV with static and dynamic disease models"
+title: "CEA for RSV prevention based on static and dynamic disease models"
 toc: FALSE
 ---
 
@@ -12,6 +12,8 @@ suppressPackageStartupMessages(library('curl'))
 library('knitr')
 library('EpiDynamics')
 set.seed(2020)
+
+boolean_show_results = FALSE
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 4, fig.width = 6)
 ```
@@ -39,10 +41,9 @@ While the ICER serves as a crucial measure of cost-effectiveness, we'll also enc
 
 * Evaluate the cost-effectiveness of an elderly vaccination program against RSV in comparison to a scenario without such a program.
 * Utilize disease transmission models to analyze the dynamics of RSV spread and its interactions within the population.
-* Highlight the primary outcome measure of cost-effectiveness: the Incremental Cost-Effectiveness Ratio (ICER), quantified as the incremental cost per QALY gained.
-* Calculate and interpret the INMB and/or the NL.
+* Obtain and interpret different measures of cost-effectiveness: the Incremental Cost-Effectiveness Ratio (ICER), quantified as the incremental cost per QALY gained, the Incremental Net Monetary Benefit (INMB) and the Net Loss (NL).
 
-As we delve into the topic, we encourage you to explore various scenarios by manipulating input parameters. By doing so, you can gain a nuanced understanding of how altering these factors influences the ICER. This hands-on exploration will empower you to grasp the sensitivity of our analysis and its implications for decision-making.
+As we delve into the topic, we encourage you to explore various scenarios by manipulating input parameters. By doing so, you can gain a nuanced understanding of how altering these factors influences the cost-effectiveness outcome measures. This hands-on exploration will empower you to learn about the sensitivity of our analysis to various input parameters and its implications for decision-making.
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -97,7 +98,7 @@ qaly_loss_per_episode = morbidity_per_episode + (proportion_mortality * average_
 
 # STATIC DISEASE MODEL
 
-We commence by delving into the static disease model. The following code delineates the model's intrinsic parameters and conducts ICER computation. The outcomes revolve around the baseline disease impact, portraying anticipated infections. Moreover, we explore infections within the intervention scenario, subsequently estimating the associated QALY improvement. This culmination leads us to the metric of cost-effectiveness: the ICER.
+We commence by delving into the static disease model. The following code delineates the model's intrinsic parameters and conducts ICER computation. The outcomes revolve around the baseline disease impact, portraying anticipated infections in the absence of a vaccination program. Moreover, we explore averted infections in the case of a vaccination program, subsequently estimating the associated QALY improvement. This culmination leads us to one of the measures of cost-effectiveness: the ICER.
 
 ```{r }
 # TRANSLATE TO STATIC MODEL SETTING
@@ -232,7 +233,7 @@ legend('topright',
 
 # SUMMARY
 
-Inspect the cost-effectiveness frontier:
+Inspect the cost-effectiveness plane:
 ```{r}
 
 plot(x = c(static_qaly_gain,dynamic_qaly_gain),
@@ -256,6 +257,7 @@ data.frame(model = c('static','dynamic'),
               program_infections = c(program_infections,
                                       dynamic_cases_program),
               qaly_gain = c(static_qaly_gain,dynamic_qaly_gain),
+              incr_cost = c(static_incr_cost,dynamic_incr_cost),
               program_icer = c(static_icer,dynamic_icer)) -> db_out
 
 db_out[,-1] <- round(db_out[,-1])
@@ -268,22 +270,236 @@ kable(db_out)
 
 # Incremental Net Monetary Benefit (INMB)
 
-The INMB is a crucial measure used in health economic evaluations to assess the cost-effectiveness of different healthcare interventions. It quantifies the net economic gain achieved by adopting one intervention over another. Mathematically, the INMB is calculated as the difference between the incremental benefits and the incremental costs of two competing interventions. It takes into account both the effectiveness and the costs associated with each intervention. The INMB helps decision-makers understand the economic value of an intervention by weighing the additional benefits gained against the extra costs incurred when compared to an alternative.
-
 Compute the Incremental Net Monetary Benefit for the RSV illustration provided, while adhering to willingness-to-pay thresholds of 20,000 and 40,0000 euro per Quality-Adjusted Life Year (QALY).
+
+```{r, eval=boolean_show_results, echo=boolean_show_results}
+
+# define wtp thresholds
+opt_wtp <- c(20e3,40e3)
+
+# define function to calculate the inmb
+get_inmb <- function(wtp,incr_qaly,incr_cost){
+  return(incr_qaly*wtp-incr_cost)
+}
+
+# static model
+static_inmb <- get_inmb(opt_wtp,static_qaly_gain,static_incr_cost)
+
+# dynamic model
+dynamic_inmb <- dynamic_inmb <- get_inmb(opt_wtp,dynamic_qaly_gain,dynamic_incr_cost)
+
+# aggregate into table
+db_out_inmb <- db_out[c(1,1,2,2),c(1,4,5,6)]
+db_out_inmb$wtp <- rep(opt_wtp,2)
+db_out_inmb$inmb <- c(static_inmb,dynamic_inmb)
+
+kable(db_out_inmb)
+
+```
 
 
 # Exploring model behaviour and sensitivity
 
+```{r, eval = boolean_show_results, echo = boolean_show_results}
+
+# To conduct model explorations, it is convenient to create a function for 
+# the static and dynamic approach
+
+run_static_model <- function(uptake = 0.2,
+                             admin_cost = 50,
+                             wtp = 20e3,
+                             rsv_incidence = 0.03525){
+  # PRE-PROCESSING
+  program_costs = population_size * uptake * (cost_per_dose + admin_cost)
+  proportion_protected =  uptake * vaccine_efficacy
+
+ # TRANSLATE TO STATIC MODEL SETTING
+  force_of_infection  = rsv_incidence
+  
+  # INFECTIONS (prevented)
+  reference_infections = population_size * force_of_infection
+  program_infections   = population_size * (1 - proportion_protected) * force_of_infection
+  prevented_cases      = reference_infections - program_infections
+  
+  # COSTS AND EFFECTS
+  static_incr_cost = program_costs - (prevented_cases * cost_per_episode)
+  static_qaly_gain = prevented_cases * qaly_loss_per_episode
+  
+  # INCREMENTAL COST EFFECTIVENESS RATIO
+  static_icer = static_incr_cost  / static_qaly_gain
+ 
+  # INMB
+  static_inmb = wtp * static_qaly_gain - static_incr_cost
+  
+  # RETURN RESULTS
+  return(c(
+           uptake = uptake,
+           round(c(
+                 admin_cost = admin_cost,
+                 wtp = wtp,
+                 reference_infections = reference_infections,
+                 program_infections = program_infections,
+                 qaly_gain = static_qaly_gain,
+                 incr_cost = static_incr_cost,
+                 icer = static_icer,
+                 inmb_k=static_inmb/1e3),digits=0)))
+}
+
+run_static_model(uptake = 0.1)
+
+run_dynamic_model <- function(uptake = 0.2,
+                              admin_cost = 50,
+                              wtp = 20e3,
+                              initial_R = 0.95099){
+  
+  # pre-processing
+  program_costs = population_size * uptake * (cost_per_dose + admin_cost)
+  proportion_protected =  uptake * vaccine_efficacy
+
+  # Reference
+  initials['I'] = 1e-06
+  initials['R'] = initial_R
+  initials['S'] = 1 - sum(initials['I']+initials['R'])
+  dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
+  dynamic_cases_reference = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+  
+  # Program
+  initials['S'] = initials['S'] * (1-proportion_protected)
+  initials['R'] = 1 - sum(initials['S']+initials['I'])
+  dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
+  dynamic_cases_program = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+  
+  # prevented cases
+  dynamic_cases_prevented = dynamic_cases_reference - dynamic_cases_program
+  
+  # CEA
+  dynamic_incr_cost = program_costs - (dynamic_cases_prevented * cost_per_episode)
+  dynamic_qaly_gain = dynamic_cases_prevented * qaly_loss_per_episode
+  
+  # ICER
+  dynamic_icer = dynamic_incr_cost  / dynamic_qaly_gain
+  
+  # INMB
+  dynamic_inmb = wtp * dynamic_qaly_gain - dynamic_incr_cost
+  
+  # RETURN RESULTS
+  return(c(
+           uptake = uptake,
+           round(c(
+                 admin_cost = admin_cost,
+                 wtp = wtp,
+                 reference_infections = dynamic_cases_reference,
+                 program_infections = dynamic_cases_program,
+                 qaly_gain = dynamic_qaly_gain,
+                 incr_cost = dynamic_incr_cost,
+                 icer = dynamic_icer,
+                 inmb_k=dynamic_inmb/1e3),digits=0)))
+}
+
+```
+
+
 <n style="color:darkred">
 
-1. **Impact of Vaccine Uptake:** Evaluate the effect of altering vaccine uptake to 0.1 or 0.7 on ICERs and INMB.
+1. **Impact of Vaccine Uptake:** Evaluate the effect of altering vaccine uptake to 0.1, 0.2, 0.7 or 0.9 on ICERs and INMB.
+
+```{r, eval = boolean_show_results, echo = boolean_show_results}
+
+static_out <- rbind(run_static_model(uptake = 0.1),
+                    run_static_model(uptake = 0.2),
+                    run_static_model(uptake = 0.7),
+                    run_static_model(uptake = 0.9))
+
+dynamic_out <-rbind(run_dynamic_model(uptake = 0.1),
+                    run_dynamic_model(uptake = 0.2),
+                    run_dynamic_model(uptake = 0.7),
+                    run_dynamic_model(uptake = 0.9))
+
+kable(cbind(model='static',static_out))
+
+kable(cbind(model='dynamic',dynamic_out))
+
+# Dynamic disease models enable herd immunity effects. As such, the 
+# number of prevented cases can outnumber the (effectively) protected 
+# individuals. This reduces the ICER, since the health related gains 
+# increase for the same investment. 
+
+# When the uptake is already high, additional uptake can become less 
+# rewarding. 
+
+# note on INMB:
+inbm_example1 <- c(wtp = 20,
+                   incr_cost = 4,
+                   qaly_gain = 2,
+                   icer = 4 / 2,
+                   inmb = 20*2 - 4)
+inbm_example2 <- c(wtp = 20,
+                   incr_cost = 4*2,
+                   qaly_gain = 2*2,
+                   icer = (4*2) / (2*2) ,
+                   inmb = 20*(2*2) - (4*2))
+kable(rbind(inbm_example1,inbm_example2))
+
+```
+
 
 2. **Consistency Across Models:** Examine whether changes in vaccine uptake lead to similar outcomes in both disease models. Provide an explanation for the observed results.
 
+```{r, eval = boolean_show_results, echo = boolean_show_results}
+
+# Static disease models do not take herd immunity effects into account. Only 
+# personal protection is considered in the economic evaluation. This holds 
+# when the target group has almost no effect on the transmission dynamics. 
+# The ICER does not change when the vaccine uptake varies. 
+
+
+```
+
+
 3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of admission costs in your analysis.
 
+```{r, eval = boolean_show_results, echo = boolean_show_results}
+
+static_out <- rbind(run_static_model(admin_cost = admin_cost),
+                    run_static_model(admin_cost = admin_cost/2))
+
+dynamic_out <-rbind(run_dynamic_model(admin_cost = admin_cost),
+                    run_dynamic_model(admin_cost = admin_cost/2))
+
+kable(cbind(model='static',static_out))
+
+kable(cbind(model='dynamic',dynamic_out))
+
+# Combining the administration of different vaccines, hence reducing the 
+# administration cost, is beneficial for the cost-effectiveness.
+```
+
+
 4. **Matching Static and Dynamic Models:** Identify the parameter settings within the dynamic model that would yield results consistent with the static model. Discuss the significance of these settings.
+
+```{r, eval = boolean_show_results, echo = boolean_show_results}
+# If the (basic) reproduction number is very high, vaccine-related immunization 
+# has limited impact on the effective transmission rate, hence herd immunity 
+# effects are limited. As such, the CEA results are more in line with the CEA 
+# based on the static disease model.
+
+# If the (basic) reproduction number is close to one, vaccine-related immunization 
+# can tip the balance quickly and result in large herd immunity effects, hence more 
+# positive CEA outcomes. 
+
+dynamic_out <-rbind(run_dynamic_model(uptake = 0.1, initial_R = 0),
+                    run_dynamic_model(uptake = 0.2, initial_R = 0))
+
+rsv_incidence_new <- as.numeric(dynamic_out[1,'reference_infections'] / population_size)
+
+static_out <- rbind(run_static_model(uptake = 0.1, rsv_incidence = rsv_incidence_new),
+                    run_static_model(uptake = 0.2, rsv_incidence = rsv_incidence_new))
+
+
+kable(cbind(model='static',static_out))
+kable(cbind(model='dynamic',dynamic_out))
+
+```
 
 5. **The Role of Discounting:** Reflect on the decision not to incorporate discounting. Offer your recommendation on whether discounting should be added and provide a rationale.
 
@@ -292,8 +508,10 @@ Compute the Incremental Net Monetary Benefit for the RSV illustration provided, 
 
 </n>
 
+```{r, eval = TRUE, echo = boolean_show_results}
 
-```{r, eval=TRUE,echo=F}
+# Note: it is also possible to use the summary functions above
+# For illustration purposes, we explicitly include all code here.
 
 num_samples <- 100
 set.seed(1234)
@@ -304,7 +522,7 @@ unc_vaccine_efficacy <- rnorm(num_samples,vaccine_efficacy,0.1)
 unc_static_prevented_cases = population_size * (uptake * unc_vaccine_efficacy) * force_of_infection
 unc_static_incr_qaly       = unc_static_prevented_cases * qaly_loss_per_episode
 unc_static_incr_cost       = program_costs - (unc_static_prevented_cases * unc_cost_per_episode)
-unc_static_icer            = unc_static_incr_cost  / unc_static_incr_qaly
+unc_static_icer            = mean(unc_static_incr_cost)  / mean(unc_static_incr_qaly)
 
 # dynamic
 unc_dynamic_prevented_cases <- vector(length=num_samples)
@@ -322,7 +540,7 @@ for(i in 1:num_samples){
 # prevented cases
 unc_dynamic_incr_qaly       = unc_dynamic_prevented_cases * qaly_loss_per_episode
 unc_dynamic_incr_cost       = program_costs - (unc_dynamic_prevented_cases * unc_cost_per_episode)
-unc_dynamic_icer            = unc_dynamic_incr_cost  / unc_dynamic_incr_qaly
+unc_dynamic_icer            = mean(unc_dynamic_incr_cost)  / mean(unc_dynamic_incr_qaly)
 
 
 plot(x=unc_static_incr_qaly,
