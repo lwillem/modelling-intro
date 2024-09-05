@@ -1,6 +1,6 @@
 ---
 title: "HTA flu (uncertainty)"
-toc: FALSE
+toc: no
 ---
 
 <div style="text-align: right">
@@ -19,11 +19,11 @@ Please make contact if you would like to use this model in any public way.
 In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised 
 within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to 
 influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a 
-core transmitter group of the virus (eg it is unlikely to be suitable to model childhood influenza vaccination). Note 
+core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note 
 that for most applications, practical use of this model would likely entail having separate, though similarly simple 
 decision trees to obtain the unit cost estimates (implying that these cells would be intermediary 
 outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number
-of consultations, the unit costs per consultation, medication use, hospital days etc for cases of pneumonia, and all 
+of consultations, the unit costs per consultation, medication use, hospital days etc. for cases of pneumonia, and all 
 other relevant disease stages)).
 
 Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. 
@@ -109,7 +109,7 @@ QALYslost_per_case        <- QALYslost_per_hospitalised_case * proportion_hospit
 
 life_expectancy_disc <- rep(NA,Nsamples)
 for (i in 1:Nsamples){
-        life_expectancy_disc[i] <- sum(1/((1+discount_rate)^(1:life_expectancy[i])))
+        life_expectancy_disc[i] <- sum(1/((1+discount_rate)^(0:(life_expectancy[i]-1))))
 }
 
 ```
@@ -183,21 +183,19 @@ incr_total_costs            <- incr_vaccination_costs - treatment_costs_averted
 
 ```
 
-Calculate the incremental effectiveness ratios for infections, hospitalizations, and deaths averted. Finally, calculate the incremental effectiveness ratios for life years saved:
-```{r eval = FALSE}
-### Similar to the previous tutorial: "HTA Flu (basic)"
-```
+Calculate the incremental effectiveness ratios for infections, hospitalizations, and deaths averted. 
+Warning, the expected ICER equals the expected incremental cost / average incremental effect. this is NOT the same as the average all ICER$_i$ values!! Finally, calculate the incremental effectiveness ratios for life years saved:
 
-```{r include = FALSE}
+```{r }
 
 # Calculate incremental effectiveness ratios
-incr_cost_per_case_prevented            <- incr_total_costs / infections_averted
-incr_cost_per_hospitalisation_prevented <- incr_total_costs / hospitalisations_averted
-incr_cost_per_death_averted             <- incr_total_costs / deaths_averted
-incr_cost_per_lifeyear_gained           <- incr_total_costs / lifeyearslost_averted
-incr_cost_per_lifeyear_gained_disc      <- incr_total_costs / lifeyearslost_averted_disc
-incr_costs_per_QALY_gained              <- incr_total_costs / QALY_gained
-incr_costs_per_QALY_gained_disc         <- incr_total_costs / QALY_gained_disc
+incr_cost_per_case_prevented            <- mean(incr_total_costs) / mean(infections_averted)
+incr_cost_per_hospitalisation_prevented <- mean(incr_total_costs) / mean(hospitalisations_averted)
+incr_cost_per_death_averted             <- mean(incr_total_costs) / mean(deaths_averted)
+incr_cost_per_lifeyear_gained           <- mean(incr_total_costs) / mean(lifeyearslost_averted)
+incr_cost_per_lifeyear_gained_disc      <- mean(incr_total_costs) / mean(lifeyearslost_averted_disc)
+incr_costs_per_QALY_gained              <- mean(incr_total_costs) / mean(QALY_gained)
+incr_costs_per_QALY_gained_disc         <- mean(incr_total_costs) / mean(QALY_gained_disc)
 
 ```
 
@@ -213,11 +211,9 @@ ICER_values<-cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prev
                incr_costs_per_QALY_gained              = incr_costs_per_QALY_gained,
                incr_costs_per_QALY_gained_disc         = incr_costs_per_QALY_gained_disc)
 
-# print mean results
-round(colMeans(ICER_values))
+# print rounded results
+round(ICER_values)
 
-# print subset of the simulation results
-head(round(ICER_values))
 ```
 Please note that there may be slight variations due to platform and R-version specific differences in random number generation.
 
@@ -241,59 +237,15 @@ par(mfrow = c(1, 1))
 ```{r}
 mean(incr_total_costs/infections_averted)       # mean of ratios
 median(incr_total_costs/infections_averted)     # median of ratios
-mean(incr_total_costs)/mean(infections_averted) # ratio of means
+mean(incr_total_costs)/mean(infections_averted) # ratio of means: ICER!!
 ```
 
 
-```{r include = FALSE, eval=FALSE}
-
-variable_vaccinationcost_perdose<-vaccineprice_perdose+administrationcosts_perdose
-treatment_costs_per_case<-cost_per_hospitalised_case*proportion_hospitalised+(1-proportion_hospitalised)*cost_per_nonhospitalised_case
-QALYslost_per_case<-QALYslost_per_hospitalised_case*proportion_hospitalised+(1-proportion_hospitalised)*QALYslost_per_nonhospitalised_case
-discounted_life_expectancy<-rep(NA,Nsamples)
-for (i in 1:Nsamples)
-{discounted_life_expectancy[i]<-sum(1/((1+discountrate)^(0:(life_expectancy[i]-1))))}
-
-#Program
-program_infections<-targetgroup*uptake_program*force_of_infection*(1-vaccine_efficacy)+targetgroup*(1-uptake_program)*force_of_infection
-program_hospitalisations<-program_infections*proportion_hospitalised
-program_deaths<-program_infections*casefatality_ratio
-program_lifeyearslost<-program_deaths*discounted_life_expectancy
-program_QALYslost<-program_infections*QALYslost_per_case+program_lifeyearslost
-
-program_treatmentcosts<-program_infections*treatment_costs_per_case
-program_vaccinationcosts<-ifelse(uptake_program!=0,targetgroup*uptake_program*variable_vaccinationcost_perdose+fixed_program_costs,targetgroup*uptake_program*varaible_vaccinationcost_perdose)
-program_totaldirectcosts<-program_treatmentcosts+program_vaccinationcosts
-
-#No Program
-noprogram_infections<-targetgroup*force_of_infection
-noprogram_hospitalisations<-noprogram_infections*proportion_hospitalised
-noprogram_deaths<-noprogram_infections*casefatality_ratio
-noprogram_lifeyearslost<-noprogram_deaths*discounted_life_expectancy
-noprogram_QALYslost<-noprogram_infections*QALYslost_per_case+noprogram_lifeyearslost
-
-noprogram_treatmentcosts<-noprogram_infections*treatment_costs_per_case
-noprogram_vaccinationcosts<-0
-noprogram_totaldirectcosts<-noprogram_treatmentcosts+noprogram_vaccinationcosts
-
-#Difference between 'program' and 'no program' (events and costs averted)
-diff_infections1.5<-noprogram_infections-program_infections
-diff_hospitalisations1.5<-noprogram_hospitalisations-program_hospitalisations
-diff_deaths1.5<-noprogram_deaths-program_deaths
-diff_lifeyearslost1.5<-noprogram_lifeyearslost-program_lifeyearslost
-diff_QALYslost1.5<-noprogram_QALYslost-program_QALYslost
-
-diff_treatmentcosts1.5<-noprogram_treatmentcosts-program_treatmentcosts
-diff_vaccinationcosts1.5<-noprogram_vaccinationcosts-program_vaccinationcosts
-diff_totaldirectcosts1.5<--(diff_treatmentcosts1.5+diff_vaccinationcosts1.5)
-
-```
-
-# Cost-effectiveness analysis condidering uncertainty (using BCEA package).
+# Cost-effectiveness analysis considering uncertainty (using BCEA package).
 
 1. Run the `bcea()`function to obtain the cost-effectiveness plane, the expected incremental net monetary benefit (INMB), the cost-effectiveness acceptability curve (CEAC) and the expected value for perfect information (EVPI):
 ```{r }
-# inspect the documenation of the 'bcea()' function
+# inspect the documentation of the 'bcea()' function
 ?bcea
 
 # Specify a matrix containing the clinical effectiveness for each intervention being considered.
@@ -311,7 +263,7 @@ interventions = c("No intervention","Vaccine program")
 # Run the 'bcea()' function
 m <- bcea(eff = ce_effects,
           cost = ce_costs,
-          ref = 2,  # the column of eff and costconsidered to be the reference strategy.
+          ref = 2,  # the column of eff and cost considered to be the reference strategy.
           interventions = interventions,
           plot = T) #ref specifies to compare 'Vaccine program' to 'No intervention'
 
@@ -322,20 +274,8 @@ m <- bcea(eff = ce_effects,
 summary(m)
 ```
 
-To be sure, calculate the ICER manually:
-```{r }
-ICER <- mean(incr_total_costs) / mean(QALY_gained_disc)
-ICER
-```
 
-To be sure, calculate the INMB manually:
-```{r }
-wtp_k <- 25000
-INMB  <- mean((QALY_gained_disc*wtp_k)-incr_total_costs)
-INMB
-```
-
-3. How much evidence is there in favor of the decision, for a range of WTP values? Look also at the CEAC above.
+3. How much evidence is there in favour of the decision, for a range of WTP values? Look also at the CEAC above.
 ```{r }
 m_ceaf <- multi.ce(m)
 ceaf.plot(m_ceaf) # uses base plot 
@@ -346,54 +286,7 @@ abline(h=0.5)
 ```{r }
 
 ```
-       
 
-
-```{r include = FALSE, eval = FALSE}
-#Generate output
-### 1. Cost-effectiveness plane --> see plots
-### 
-        #--> see plots cost-effectiveness plane and expected incremental benefit
-        #--> see summary: 'optimal decision' and 'Vaccination vs Standard care'
-        summary(m)
-        #--> or calculate manually:
-        mean(incr_total_costs)/mean(QALY_gained_disc) #average ICER
-        k=25000
-        mean((QALY_gained_disc*k)-incr_total_costs)#average INMB for k
-        #--> average INMB of vaccination compared to standard care, for the range of WTP values considered
-        m$eib 
-### 3. How much evidence is there in favor of the decision, for a range of WTP values 
-        #--> see plot cost-effectiveness acceptability curve
-        #--> see summary 'Vaccination vs Standard care: CEAC'
-        summary(m)
-        #--> construct a cost-effectiveness acceptability frontier plot
-        m_ceaf<-multi.ce(m)
-        ceaf.plot(m_ceaf,graph='ggplot2') #but no color used?
-        #data needed to construct CEAC and CEAF plots
-        m_ceafceac=cbind(m$k,ints[m$best],m$ceac) 
-        colnames(m_ceafceac)=c('wtp value','optimal decision','probability highest INMB ref')
-        
-### 4. Is there value in further research? 
-        #--> see Expected Value of Information plot
-        #--> see summary 'EVPI'
-        summary(m)
-        #data needed to construct EVPI plot:
-        m_evpi=cbind(m$k,m$evi)
-        colnames(m_evpi)=c('wtp value','evpi')
-
-```
-
-```{r}
-
-hist(force_of_infection)
-hist(population_at_risk)
-
-hist(comparator_infections)
-mean(comparator_infections)
-
-
-
-```
 
 <br>
 <br>
