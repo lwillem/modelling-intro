@@ -64,7 +64,7 @@ The goal is to calculate the cost-effectiveness of a vaccination program for the
 ```{r results = "hide"}
 
 # set number of samples to include in the uncertainty analysis
-Nsamples<-5000
+Nsamples <- 5000
 
 # set the random-number-generator seed to get exactly the same results each time you run the code
 set.seed(698) 
@@ -213,7 +213,11 @@ ICER_values<-cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prev
                incr_costs_per_QALY_gained              = incr_costs_per_QALY_gained,
                incr_costs_per_QALY_gained_disc         = incr_costs_per_QALY_gained_disc)
 
-head(round(ICER_values)) # print
+# print mean
+round(colMeans(ICER_values))
+
+# print part of the individual rusuls
+head(round(ICER_values))
 ```
 Please note that there may be slight variations due to platform and R-version specific differences in random number generation.
 
