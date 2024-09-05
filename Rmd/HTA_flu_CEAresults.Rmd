@@ -213,10 +213,13 @@ ICER_values<-cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prev
                incr_costs_per_QALY_gained              = incr_costs_per_QALY_gained,
                incr_costs_per_QALY_gained_disc         = incr_costs_per_QALY_gained_disc)
 
-# print mean
+# print mean results
 round(colMeans(ICER_values))
 
-# print part of the individual rusuls
+# print median values
+round(apply(ICER_values,2,median))
+
+# print subset of the simulation results
 head(round(ICER_values))
 ```
 Please note that there may be slight variations due to platform and R-version specific differences in random number generation.
