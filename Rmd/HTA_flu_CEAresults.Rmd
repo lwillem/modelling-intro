@@ -252,7 +252,7 @@ treatment_costs_per_case<-cost_per_hospitalised_case*proportion_hospitalised+(1-
 QALYslost_per_case<-QALYslost_per_hospitalised_case*proportion_hospitalised+(1-proportion_hospitalised)*QALYslost_per_nonhospitalised_case
 discounted_life_expectancy<-rep(NA,Nsamples)
 for (i in 1:Nsamples)
-{discounted_life_expectancy[i]<-sum(1/((1+discountrate)^(1:life_expectancy[i])))}
+{discounted_life_expectancy[i]<-sum(1/((1+discountrate)^(0:(life_expectancy[i]-1))))}
 
 #Program
 program_infections<-targetgroup*uptake_program*force_of_infection*(1-vaccine_efficacy)+targetgroup*(1-uptake_program)*force_of_infection

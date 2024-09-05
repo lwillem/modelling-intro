@@ -686,47 +686,109 @@ following QALY values:</p>
 </div>
 <div id="health-technology-assessment-part-iii-discounting" class="section level1">
 <h1>Health Technology Assessment (part III): discounting</h1>
-<p>To account for time preference in health technology assessments, a
-discount factor is included. While all costs are incurred in the current
-year, the effects in terms of life years saved occur partly in the
-future. Therefore, the effects are adjusted using a discount rate.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>discount_rate <span class="ot">&lt;-</span> <span class="fl">0.015</span></span></code></pre></div>
+<p>Health Technology Assessments often involves comparing the costs and
+benefits of healthcare interventions over time. Discounting is a
+critical concept in HTA, reflecting the principle that costs and
+benefits occurring in the future are worth less than those occurring
+today. This is because of the time preference for immediate benefits and
+the opportunity cost of capital. By applying discount rates, HTA
+practitioners can appropriately adjust future costs and health outcomes
+to present values, enabling fair and consistent comparisons between
+different healthcare technologies or interventions. Here’s a small
+example to illustrate how discounting is applied in HTA:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Set the discount rate (e.g., 1.5% or 3%)</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>discount_rate <span class="ot">&lt;-</span> <span class="fl">0.015</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Define a discounting function</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>discount <span class="ot">&lt;-</span> <span class="cf">function</span>(values, rate, years) {</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="co"># Calculate discounted values</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  discounted_values <span class="ot">&lt;-</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate) <span class="sc">^</span> years)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="fu">return</span>(discounted_values)</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>}</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co"># Example data: costs and QALYs over 10 years</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">11</span>  <span class="co"># Time periods from 0 to 9 (10 years)</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co"># fixed</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>costs <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1000</span>, <span class="fu">length</span>(years))  <span class="co"># Example costs per year</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>qalys <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(years))     <span class="co"># Example QALYs per year</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co"># Apply discounting</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>discounted_costs <span class="ot">&lt;-</span> <span class="fu">discount</span>(costs, discount_rate, years)</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>discounted_qalys <span class="ot">&lt;-</span> <span class="fu">discount</span>(qalys, discount_rate, years)</span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a><span class="co"># Display the results</span></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>discounted_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>  <span class="at">Year =</span> years,</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>  <span class="at">Costs =</span> costs,</span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  <span class="at">Discounted_Costs =</span> discounted_costs,</span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>  <span class="at">QALYs =</span> qalys,</span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>  <span class="at">Discounted_QALYs =</span> discounted_qalys</span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>)</span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="co"># print </span></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
+<pre><code>##    Year Costs Discounted_Costs QALYs Discounted_QALYs
+## 1     0  1000        1000.0000     1        1.0000000
+## 2     1  1000         985.2217     1        0.9852217
+## 3     2  1000         970.6617     1        0.9706617
+## 4     3  1000         956.3170     1        0.9563170
+## 5     4  1000         942.1842     1        0.9421842
+## 6     5  1000         928.2603     1        0.9282603
+## 7     6  1000         914.5422     1        0.9145422
+## 8     7  1000         901.0268     1        0.9010268
+## 9     8  1000         887.7111     1        0.8877111
+## 10    9  1000         874.5922     1        0.8745922
+## 11   10  1000         861.6672     1        0.8616672
+## 12   11  1000         848.9332     1        0.8489332</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># print sum</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">colSums</span>(discounted_data))</span></code></pre></div>
+<pre><code>##             Year            Costs Discounted_Costs            QALYs 
+##         66.00000      12000.00000      11071.11779         12.00000 
+## Discounted_QALYs 
+##         11.07112</code></pre>
+<div id="task" class="section level2">
+<h2>Task</h2>
+<p>Incorporate time preference into our health technology assessments
+for flu. Although all costs are incurred in the current year, the
+benefits, measured in life years saved, extend into the future. To
+accurately reflect the value of these future health effects, they should
+be adjusted using a discount rate.</p>
 <br>
 <hr>
 <p><br></p>
+</div>
 <div id="solutions-iii-step-by-step" class="section level2">
 <h2>Solutions III: step-by-step</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># intermediate results</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>life_expectancy_disc <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="dv">1</span><span class="sc">/</span>((<span class="dv">1</span><span class="sc">+</span>discount_rate)<span class="sc">^</span>(<span class="dv">1</span><span class="sc">:</span>life_expectancy)))</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co"># program: effect</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>program_lifeyearslost_disc   <span class="ot">&lt;-</span> program_deaths <span class="sc">*</span> life_expectancy_disc</span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>program_QALYslost_disc       <span class="ot">&lt;-</span> program_infections <span class="sc">*</span> QALYslost_per_case <span class="sc">+</span> program_lifeyearslost_disc</span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co"># comparator: effect</span></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>comparator_lifeyearslost_disc <span class="ot">&lt;-</span> comparator_deaths <span class="sc">*</span> life_expectancy_disc</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>comparator_QALYslost_disc     <span class="ot">&lt;-</span> comparator_infections <span class="sc">*</span> QALYslost_per_case <span class="sc">+</span> comparator_lifeyearslost_disc</span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a></span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co"># incremental effect</span></span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>QALY_gained_disc              <span class="ot">&lt;-</span> comparator_QALYslost_disc <span class="sc">-</span> program_QALYslost_disc</span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a></span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a><span class="co"># incremental cost-effectiveness ratio</span></span>
-<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>incr_costs_per_QALY_gained_disc <span class="ot">&lt;-</span> incr_total_costs <span class="sc">/</span> QALY_gained_disc</span>
-<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a></span>
-<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a><span class="co"># add to output vector</span></span>
-<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>ICER_values <span class="ot">&lt;-</span> <span class="fu">c</span>(ICER_values,</span>
-<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>                 <span class="at">incr_costs_per_QALY_gained_disc =</span> incr_costs_per_QALY_gained_disc)</span>
-<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a></span>
-<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="co"># print</span></span>
-<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="fu">round</span>(ICER_values)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># intermediate results</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>life_expectancy_disc <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="dv">1</span><span class="sc">/</span>((<span class="dv">1</span><span class="sc">+</span>discount_rate)<span class="sc">^</span>(<span class="dv">0</span><span class="sc">:</span>(life_expectancy<span class="dv">-1</span>))))</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co"># program: effect</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>program_lifeyearslost_disc   <span class="ot">&lt;-</span> program_deaths <span class="sc">*</span> life_expectancy_disc</span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>program_QALYslost_disc       <span class="ot">&lt;-</span> program_infections <span class="sc">*</span> QALYslost_per_case <span class="sc">+</span> program_lifeyearslost_disc</span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="co"># comparator: effect</span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>comparator_lifeyearslost_disc <span class="ot">&lt;-</span> comparator_deaths <span class="sc">*</span> life_expectancy_disc</span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>comparator_QALYslost_disc     <span class="ot">&lt;-</span> comparator_infections <span class="sc">*</span> QALYslost_per_case <span class="sc">+</span> comparator_lifeyearslost_disc</span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="co"># incremental effect</span></span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>QALY_gained_disc              <span class="ot">&lt;-</span> comparator_QALYslost_disc <span class="sc">-</span> program_QALYslost_disc</span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co"># incremental cost-effectiveness ratio</span></span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a>incr_costs_per_QALY_gained_disc <span class="ot">&lt;-</span> incr_total_costs <span class="sc">/</span> QALY_gained_disc</span>
+<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a><span class="co"># add to output vector</span></span>
+<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a>ICER_values <span class="ot">&lt;-</span> <span class="fu">c</span>(ICER_values,</span>
+<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a>                 <span class="at">incr_costs_per_QALY_gained_disc =</span> incr_costs_per_QALY_gained_disc)</span>
+<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a><span class="co"># print</span></span>
+<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a><span class="fu">round</span>(ICER_values)</span></code></pre></div>
 <pre><code>##            incr_cost_per_case_prevented incr_cost_per_hospitalisation_prevented 
 ##                                    2210                                   22100 
 ##             incr_cost_per_death_averted           incr_cost_per_lifeyear_gained 
 ##                                   73667                                    6139 
 ##              incr_costs_per_QALY_gained         incr_costs_per_QALY_gained_disc 
-##                                    5986                                    6569</code></pre>
+##                                    5986                                    6475</code></pre>
 </div>
 </div>
 <div id="navigate" class="section level1">

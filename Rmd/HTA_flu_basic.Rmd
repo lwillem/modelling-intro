@@ -235,13 +235,56 @@ round(ICER_values)
 
 # Health Technology Assessment (part III): discounting
 
-To account for time preference in health technology assessments, a discount factor is included. While all costs are incurred in the current year, the effects in terms of life years saved occur partly in the future. Therefore, the effects are adjusted using a discount rate.
+
+
+Health Technology Assessments often involves comparing the costs and benefits of healthcare interventions over time. Discounting is a critical concept in HTA, reflecting the principle that costs and benefits occurring in the future are worth less than those occurring today. This is because of the time preference for immediate benefits and the opportunity cost of capital. By applying discount rates, HTA practitioners can appropriately adjust future costs and health outcomes to present values, enabling fair and consistent comparisons between different healthcare technologies or interventions. Here's a small example to illustrate how discounting is applied in HTA:
 
 ```{r}
 
+# Set the discount rate (e.g., 1.5% or 3%)
 discount_rate <- 0.015
 
 ```
+
+
+```{r}
+# Define a discounting function
+discount <- function(values, rate, years) {
+  # Calculate discounted values
+  discounted_values <- values / ((1 + rate) ^ years)
+  return(discounted_values)
+}
+
+# Example data: costs and QALYs over 10 years
+years <- 0:11  # Time periods from 0 to 9 (10 years)
+
+# fixed
+costs <- rep(1000, length(years))  # Example costs per year
+qalys <- rep(1, length(years))     # Example QALYs per year
+
+# Apply discounting
+discounted_costs <- discount(costs, discount_rate, years)
+discounted_qalys <- discount(qalys, discount_rate, years)
+
+# Display the results
+discounted_data <- data.frame(
+  Year = years,
+  Costs = costs,
+  Discounted_Costs = discounted_costs,
+  QALYs = qalys,
+  Discounted_QALYs = discounted_qalys
+)
+
+# print 
+print(discounted_data)
+
+# print sum
+print(colSums(discounted_data))
+```
+
+## Task
+
+Incorporate time preference into our health technology assessments for flu. Although all costs are incurred in the current year, the benefits, measured in life years saved, extend into the future. To accurately reflect the value of these future health effects, they should be adjusted using a discount rate.
 
 <br>
 <hr>
@@ -250,13 +293,12 @@ discount_rate <- 0.015
 ## Solutions III: step-by-step
 ```{r}
 # intermediate results
-life_expectancy_disc <- sum(1/((1+discount_rate)^(1:life_expectancy)))
+life_expectancy_disc <- sum(1/((1+discount_rate)^(0:(life_expectancy-1))))
 
 
 # program: effect
 program_lifeyearslost_disc   <- program_deaths * life_expectancy_disc
 program_QALYslost_disc       <- program_infections * QALYslost_per_case + program_lifeyearslost_disc
-
 
 # comparator: effect
 comparator_lifeyearslost_disc <- comparator_deaths * life_expectancy_disc
