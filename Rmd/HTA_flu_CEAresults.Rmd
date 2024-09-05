@@ -216,13 +216,34 @@ ICER_values<-cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prev
 # print mean results
 round(colMeans(ICER_values))
 
-# print median values
-round(apply(ICER_values,2,median))
-
 # print subset of the simulation results
 head(round(ICER_values))
 ```
 Please note that there may be slight variations due to platform and R-version specific differences in random number generation.
+
+## Second thoughts on the distributions for costs and cases
+
+Please note that the mean estimate for the incremental total cost per infection averted differs from the value we obtained when not accounting for uncertainty. This discrepancy could be due to extreme values in the ratio. Kindly review the following plots and estimates:
+
+```{r echo=FALSE}
+# Set up the plotting area to have 1 row and 3 columns
+par(mfrow = c(1, 3))
+
+# Plot the histograms
+hist(incr_total_costs, xlab = 'Incremental total cost', main = 'Histogram of Incremental Total Costs')
+hist(infections_averted, xlab = 'Infections averted', main = 'Histogram of Infections Averted')
+hist(incr_total_costs / infections_averted, xlab = 'Incremental total cost per infection averted', main = 'Histogram of Incremental Cost per Infection Averted')
+
+# Reset the plotting layout to default
+par(mfrow = c(1, 1))
+```
+
+```{r}
+mean(incr_total_costs/infections_averted)       # mean of ratios
+median(incr_total_costs/infections_averted)     # median of ratios
+mean(incr_total_costs)/mean(infections_averted) # ratio of means
+```
+
 
 ```{r include = FALSE, eval=FALSE}
 
@@ -359,6 +380,18 @@ abline(h=0.5)
         #data needed to construct EVPI plot:
         m_evpi=cbind(m$k,m$evi)
         colnames(m_evpi)=c('wtp value','evpi')
+
+```
+
+```{r}
+
+hist(force_of_infection)
+hist(population_at_risk)
+
+hist(comparator_infections)
+mean(comparator_infections)
+
+
 
 ```
 

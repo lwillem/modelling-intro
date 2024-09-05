@@ -20,6 +20,8 @@ output:
 * <a href="https://onlinelibrary.wiley.com/doi/10.1002/jrsm.1333" target="_blank">The use of mathematical modeling studies for evidence synthesis and guideline development: A glossary  (Porgo et al. 2017)</a>
 * <a href="https://rdcu.be/cRJVp" target="_blank">The SEIRS model for infectious disease dynamics.  (Bjørnstad et al. 2020)</a>
 * <a href="https://doi.org/10.1002/ece3.6848" target="_blank">An introduction to agent-based models as an accessible surrogate to field-based research and teaching (Murphy et al. 2020)</a>
+* <a href="https://doi.org/10.1016/j.epidem.2024.100784" target="_blank">Inference of epidemic dynamics in the COVID-19 era and beyond (Cori and Kucharski 2024)</a>
+
 
 ### Health Economics
 * <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1393259/" target="_blank">Economic evaluation of integrated care: an introduction (Vondeling 2004)</a>
