@@ -57,8 +57,9 @@ Once installed, you have to load the package(s) at the start of the R file. This
 library(BCEA)
 ```
 
+# Goal and input
 
-# Input
+The goal is to calculate the cost-effectiveness of a vaccination program for the elderly against flu, taking into account parameter uncertainty as specified below:
 
 ```{r results = "hide"}
 
@@ -98,7 +99,7 @@ QALYslost_per_nonhospitalised_case <- rbeta(Nsamples,alpha_qaly_nonhosp,alpha_qa
 
 # Health Technology Assessment: step-by-step
 
-To begin the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, considering the proportion of cases that result in hospitalization, the QALY lost per case and the discounted life expectancy:
+Now, propagate the uncertainty from the input parameters of the flu model into the outcome of your flu model. To start the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, taking into account the proportion of cases that lead to hospitalization, the QALY lost per case, and the discounted life expectancy:
 ```{r }
 vaccine_cost_per_dose     <- vaccine_price_per_dose + admin_cost_per_dose
 treatment_cost_per_case   <- cost_per_hospitalised_case * proportion_hospitalised + 
@@ -260,19 +261,35 @@ diff_totaldirectcosts1.5<--(diff_treatmentcosts1.5+diff_vaccinationcosts1.5)
 
 ```
 
-# Cost-effectiveness analysis when accounting for uncertainty (using BCEA package).
+# Cost-effectiveness analysis condidering uncertainty (using BCEA package).
 
 1. Run the `bcea()`function to obtain the cost-effectiveness plane, the expected incremental net monetary benefit (INMB), the cost-effectiveness acceptability curve (CEAC) and the expected value for perfect information (EVPI):
 ```{r }
-#Prepare and run the 'bcea()' function
-c=cbind(comparator_totaldirectcosts,program_totaldirectcosts)
-e=cbind(-comparator_QALYslost_disc,-program_QALYslost_disc) ##negative sign because input needs to be health gain (and we are loosing health due to flu)
-ints=c("No intervention","Vaccine program")
-m <- bcea(e,c,ref=2,interventions=ints,plot=T) #ref specifies to compare 'Vaccine program' to 'No intervention'
+# inspect the documenation of the 'bcea()' function
+?bcea
+
+# Specify a matrix containing the clinical effectiveness for each intervention being considered.
+# note: this needs to be specified as health gain (i.e. negative health loss)
+ce_effects <- cbind(-comparator_QALYslost_disc,-program_QALYslost_disc)
+
+
+# Specify a matrix containing the cost for each intervention being considered.
+# note: this needs to be specified as health gain (i.e. negative health loss)
+ce_costs   <- cbind(comparator_totaldirectcosts,program_totaldirectcosts)
+
+# Define the labels to be associated with each intervention.
+interventions = c("No intervention","Vaccine program")
+
+# Run the 'bcea()' function
+m <- bcea(eff = ce_effects,
+          cost = ce_costs,
+          ref = 2,  # the column of eff and costconsidered to be the reference strategy.
+          interventions = interventions,
+          plot = T) #ref specifies to compare 'Vaccine program' to 'No intervention'
 
 ```
 
-2. Which decision should I take, given current information and for a range of WTP values? Print the summary of the `bcea()` function:
+2. Which decision should we take, given current information and for a range of WTP values? Print the summary of the `bcea()` function:
 ```{r }
 summary(m)
 ```

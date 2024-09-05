@@ -496,11 +496,19 @@ be an existing folder on your computer. For example</p>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>home <span class="ot">&lt;-</span> <span class="st">&quot;C:</span><span class="sc">\\</span><span class="st">Documents</span><span class="sc">\\</span><span class="st">Modelling_intro</span><span class="sc">\\</span><span class="st">&quot;</span> <span class="co"># on windows</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">setwd</span>(home)</span></code></pre></div>
 </div>
-<div id="input" class="section level1">
-<h1>Input</h1>
-<p>First, we specify the model input parameters based on the population
-characteristics, burden of disease, program characteristics, and
-costs:</p>
+<div id="goal-input-and-assumptions" class="section level1">
+<h1>Goal, input and assumptions</h1>
+<p>The goal is to calculate the cost-effectiveness (cost per flu case
+prevented, per hospitalisation prevented, per death averted, and per
+life-year gained) of a vaccination program in elderly against flu, based
+on the following assumptions and input parameters:</p>
+<ul>
+<li>Evaluation for only one flu season</li>
+<li>Mortality only because of flu</li>
+<li>The estimated probability to die applies to all infections</li>
+<li>Ignore herd immunity</li>
+<li>Death occurs after hospitalization</li>
+</ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># population</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>targetgroup             <span class="ot">&lt;-</span> <span class="dv">2500000</span> <span class="co"># people +65 years</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>life_expectancy         <span class="ot">&lt;-</span> <span class="dv">12</span>      <span class="co"># years</span></span>
@@ -508,7 +516,7 @@ costs:</p>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># burden of disease</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>force_of_infection      <span class="ot">&lt;-</span> <span class="fl">0.04</span>  <span class="co"># static</span></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>proportion_hospitalised <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>casefatality_ratio      <span class="ot">&lt;-</span> <span class="fl">0.03</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>casefatality_ratio      <span class="ot">&lt;-</span> <span class="fl">0.03</span>  <span class="co"># applies to all infections</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># disease-related costs</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>cost_per_hospitalised_case    <span class="ot">&lt;-</span> <span class="dv">2000</span> <span class="co"># dollars</span></span>

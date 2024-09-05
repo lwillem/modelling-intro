@@ -42,10 +42,16 @@ home <- "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
 ```
 
+# Goal, input and assumptions
 
-# Input
+The goal is to calculate the cost-effectiveness (cost per flu case prevented, per hospitalisation prevented, per death averted, and per life-year gained) of a vaccination program in elderly against flu, based on the following assumptions and input parameters:
 
-First, we specify the model input parameters based on the population characteristics, burden of disease, program characteristics, and costs:
+- Evaluation for only one flu season
+- Mortality only because of flu
+- The estimated probability to die applies to all infections
+- Ignore herd immunity
+- Death occurs after hospitalization
+
 ```{r }
 
 # population
@@ -55,7 +61,7 @@ life_expectancy         <- 12      # years
 # burden of disease
 force_of_infection      <- 0.04  # static
 proportion_hospitalised <- 0.10
-casefatality_ratio      <- 0.03
+casefatality_ratio      <- 0.03  # applies to all infections
 
 # disease-related costs
 cost_per_hospitalised_case    <- 2000 # dollars
