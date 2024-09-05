@@ -1,5 +1,5 @@
 ---
-title: "Demo Decision Tree (basic)"
+title: "HTA flu (start)"
 toc: FALSE
 ---
 
@@ -8,18 +8,17 @@ toc: FALSE
 </div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
-library('curl')
 set.seed(2020)
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
 ```
 
-This model was developed by Philippe Beutels and Joke Bilcke, for illustration and teaching purposes only. 
+This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. 
 Please make contact if you would like to use this model in any public way.
 
 In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised 
 within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to 
-influenza, and only if vacccination targets a small proportion of the population that does not at the same time form a 
+influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a 
 core transmitter group of the virus (eg it is unlikely to be suitable to model childhood influenza vaccination). Note 
 that for most applications, practical use of this model would likely entail having separate, though similarly simple 
 decision trees to obtain the unit cost estimates (implying that these cells would be intermediary 
@@ -30,14 +29,7 @@ other relevant disease stages)).
 Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. 
 This is due to the exclusion of herd immunity effects in this model.  
 
-For further information, questions or comments please contact: 
-philippe.beutels@uantwerp.be or joke.bilcke@uantwerp.be
-Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID)
-Vaccine and Infectious Disease Institute (Vaxinfectio)
-University of Antwerp
-Universiteitsplein 1
-2610 Antwerp
-Belgium
+For further information, questions or comments please contact us. 
 
 # Set working directory
 The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
@@ -45,84 +37,238 @@ The first step when creating a new R file is to specify a working directory. You
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_intro/" ## on a OS X
-home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+home <- "~/Documents/Modelling_intro/"     # on OS X
+home <- "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
 ```
 
 
-# INPUT
+# Input
+
+First, we specify the model input parameters based on the population characteristics, burden of disease, program characteristics, and costs:
 ```{r }
 
-targetgroup<-2500000 #people>65 years
-uptake_program<-0.80
-force_of_infection<-0.04
-proportion_hospitalised<-0.10
-casefatality_ratio<-0.03
-life_expectancy<-12 #years
-vaccine_efficacy<-0.60
-vaccineprice_perdose<-10 #dollars
-administrationcosts_perdose<-50 #dollars
-cost_per_hospitalised_case<-2000 #dollars
-cost_per_nonhospitalised_case<-100 #dollars
-fixed_program_costs<-0 #dollars
+# population
+targetgroup             <- 2500000 # people +65 years
+life_expectancy         <- 12      # years
 
-```
-# INTERMEDIARY OUTPUT
-```{r }
-variable_vaccinationcost_perdose<-vaccineprice_perdose+administrationcosts_perdose
-treatment_costs_per_case<-cost_per_hospitalised_case*proportion_hospitalised+(1-proportion_hospitalised)*cost_per_nonhospitalised_case
+# burden of disease
+force_of_infection      <- 0.04  # static
+proportion_hospitalised <- 0.10
+casefatality_ratio      <- 0.03
 
-#Program
-program_infections<-targetgroup*uptake_program*force_of_infection*(1-vaccine_efficacy)+targetgroup*(1-uptake_program)*force_of_infection
-program_hospitalisations<-program_infections*proportion_hospitalised
-program_deaths<-program_infections*casefatality_ratio
-program_lifeyearslost<-program_deaths*life_expectancy
+# disease-related costs
+cost_per_hospitalised_case    <- 2000 # dollars
+cost_per_nonhospitalised_case <- 100  # dollars
 
-program_treatmentcosts<-program_infections*treatment_costs_per_case
-program_vaccinationcosts<-ifelse(uptake_program!=0,targetgroup*uptake_program*variable_vaccinationcost_perdose+fixed_program_costs,targetgroup*uptake_program*variable_vaccinationcost_perdose)
-program_totaldirectcosts<-program_treatmentcosts+program_vaccinationcosts
+# program details
+uptake_program          <- 0.80
+vaccine_efficacy        <- 0.60
+vaccine_price_per_dose  <- 10   # dollars
+admin_cost_per_dose     <- 50   # dollars
+fixed_program_costs     <- 0    # dollars
 
-#No Program
-noprogram_infections<-targetgroup*force_of_infection
-noprogram_hospitalisations<-noprogram_infections*proportion_hospitalised
-noprogram_deaths<-noprogram_infections*casefatality_ratio
-noprogram_lifeyearslost<-noprogram_deaths*life_expectancy
-
-noprogram_treatmentcosts<-noprogram_infections*treatment_costs_per_case
-noprogram_vaccinationcosts<-0
-noprogram_totaldirectcosts<-noprogram_treatmentcosts+noprogram_vaccinationcosts
-
-#Difference between 'program' and 'no program' (events and costs averted)
-diff_infections<-noprogram_infections-program_infections
-diff_hospitalisations<-noprogram_hospitalisations-program_hospitalisations
-diff_deaths<-noprogram_deaths-program_deaths
-diff_lifeyearslost<-noprogram_lifeyearslost-program_lifeyearslost
-
-diff_treatmentcosts<-noprogram_treatmentcosts-program_treatmentcosts
-diff_vaccinationcosts<-noprogram_vaccinationcosts-program_vaccinationcosts
-diff_totaldirectcosts<--(diff_treatmentcosts+diff_vaccinationcosts)
-
-```
-# MAIN OUTPUT OF INTEREST
-```{r }
-
-incremental_costs_per_case_prevented<-diff_totaldirectcosts/diff_infections
-incremental_costs_per_hospitalisation_prevented<-diff_totaldirectcosts/diff_hospitalisations
-incremental_costs_per_death_averted<-diff_totaldirectcosts/diff_deaths
-incremental_costs_per_lifeyear_gained<-diff_totaldirectcosts/diff_lifeyearslost
 
 ```
 
-# OUTPUT TABLE
-```{r }
-ICER_names<-c('incrcosts per case prevented','incrcosts per hospitalisation prevented','incrcosts per death averted','incrcosts per life-year gained')
-ICER_values<-c(incremental_costs_per_case_prevented,incremental_costs_per_hospitalisation_prevented,incremental_costs_per_death_averted,incremental_costs_per_lifeyear_gained)
-names(ICER_values)<-ICER_names
-round(ICER_values) #round for not showing decimals
+
+# Health Technology Assessment (part I)
+
+Here are the tasks you need to complete to run the health technology assessment:
+
+1. **Calculate Vaccine and Treatment Costs:**
+   - To begin, calculate the vaccine cost per dose and the treatment cost per case, considering the proportion of cases that result in hospitalization.
+
+2. **Calculate Burden of Disease with the Program:**
+   - Calculate the burden of disease with the program in place, along with the associated medical and program costs.
+
+3. **Calculate Burden of Disease for the Comparator:**
+   - Calculate the burden of disease for the comparator without the program in place, including the medical costs.
+
+4. **Calculate Differences Between Program and Comparator:**
+   - Calculate the difference between the program and the comparator.
+
+5. **Calculate Incremental Effectiveness Ratios:**
+   - Calculate the incremental effectiveness ratios for infections, hospitalizations, and deaths averted.
+   - Finally, calculate the incremental effectiveness ratios for life years saved.
+
+6. **Show Results:**
+   - Display the results.
+
+
+<br>
+<hr>
+<br>
+
+# Solutions I: step-by-step
+
+To begin the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, considering the proportion of cases that result in hospitalization:
+```{r}
+vaccine_cost_per_dose     <- vaccine_price_per_dose + admin_cost_per_dose
+treatment_cost_per_case   <- cost_per_hospitalised_case * proportion_hospitalised + 
+                              (1-proportion_hospitalised) * cost_per_nonhospitalised_case
 
 ```
 
+
+Calculate the burden of disease with the program in place, along with the associated medical and program costs:
+```{r }
+# Program
+population_at_risk       <- targetgroup * (1-uptake_program) + targetgroup * uptake_program * (1-vaccine_efficacy)
+
+program_infections       <- population_at_risk * force_of_infection 
+program_hospitalisations <- program_infections * proportion_hospitalised
+program_deaths           <- program_infections * casefatality_ratio
+program_lifeyearslost    <- program_deaths * life_expectancy
+
+program_treatmentcosts   <- program_infections * treatment_cost_per_case
+program_vaccinationcosts <- fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
+program_totaldirectcosts <- program_treatmentcosts + program_vaccinationcosts
+
+```
+
+Calculate the burden of disease for the comparator without the program in place, including the medical costs:
+```{r }
+# Comparator
+comparator_infections       <- targetgroup * force_of_infection
+comparator_hospitalisations <- comparator_infections * proportion_hospitalised
+comparator_deaths           <- comparator_infections * casefatality_ratio
+comparator_lifeyearslost    <- comparator_deaths * life_expectancy
+
+comparator_treatmentcosts   <- comparator_infections * treatment_cost_per_case
+comparator_vaccinationcosts <- 0
+comparator_totaldirectcosts <- comparator_treatmentcosts + comparator_vaccinationcosts
+
+```
+
+Calculate the difference between the program and the comparator:
+```{r }
+# To calculate the difference between 'program' and 'comparator' 
+infections_averted       <- comparator_infections - program_infections
+hospitalisations_averted <- comparator_hospitalisations - program_hospitalisations
+deaths_averted           <- comparator_deaths - program_deaths
+lifeyearslost_averted    <- comparator_lifeyearslost - program_lifeyearslost
+
+treatment_costs_averted  <- comparator_treatmentcosts - program_treatmentcosts
+incr_vaccination_costs   <- program_vaccinationcosts - comparator_vaccinationcosts # incremental costs
+incr_total_costs         <- incr_vaccination_costs - treatment_costs_averted
+
+```
+
+Calculate the incremental effectiveness ratios for infections, hospitalizations, and deaths averted. Finally, calculate the incremental effectiveness ratios for life years saved:
+```{r }
+
+# Calculate incremental effectiveness ratios
+incr_cost_per_case_prevented            <- incr_total_costs / infections_averted
+incr_cost_per_hospitalisation_prevented <- incr_total_costs / hospitalisations_averted
+incr_cost_per_death_averted             <- incr_total_costs / deaths_averted
+incr_cost_per_lifeyear_gained           <- incr_total_costs / lifeyearslost_averted
+
+```
+
+Show the results:
+```{r }
+# combine results
+# note: specify column names at once
+ICER_values<-c(incr_cost_per_case_prevented  = incr_cost_per_case_prevented,
+               incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
+               incr_cost_per_death_averted   = incr_cost_per_death_averted,
+               incr_cost_per_lifeyear_gained =incr_cost_per_lifeyear_gained)
+
+round(ICER_values) # print
+```
+
+<br>
+<hr>
+<br>
+
+# Health Technology Assessment (part II): QALY
+
+The burden of disease can also be represented by quality-adjusted life years (QALYs). Please calculate the incremental cost-effectiveness ratio in terms of the incremental cost per QALY gained, using the following QALY values:
+
+```{r}
+
+QALYslost_per_hospitalised_case    <- 0.018
+QALYslost_per_nonhospitalised_case <- 0.0082
+
+```
+
+<br>
+<hr>
+<br>
+
+## Solutions II: step-by-step
+
+```{r}
+
+# intermediate results
+QALYslost_per_case        <- QALYslost_per_hospitalised_case * proportion_hospitalised +        
+                               QALYslost_per_nonhospitalised_case * (1-proportion_hospitalised)
+
+# program: effect
+program_QALYslost          <- program_infections * QALYslost_per_case + program_lifeyearslost
+
+# comparator: effect
+comparator_QALYslost       <- comparator_infections * QALYslost_per_case + comparator_lifeyearslost
+
+# incremental effect
+QALY_gained                <- comparator_QALYslost - program_QALYslost
+
+# incremental cost-effectiveness ratio
+incr_costs_per_QALY_gained <- incr_total_costs / QALY_gained
+
+ICER_values <- c(ICER_values,
+                 incr_costs_per_QALY_gained = incr_costs_per_QALY_gained)
+
+# print
+round(ICER_values)
+```
+<br>
+<hr>
+<br>
+
+# Health Technology Assessment (part III): discounting
+
+To account for time preference in health technology assessments, a discount factor is included. While all costs are incurred in the current year, the effects in terms of life years saved occur partly in the future. Therefore, the effects are adjusted using a discount rate.
+
+```{r}
+
+discount_rate <- 0.015
+
+```
+
+<br>
+<hr>
+<br>
+
+## Solutions III: step-by-step
+```{r}
+# intermediate results
+life_expectancy_disc <- sum(1/((1+discount_rate)^(1:life_expectancy)))
+
+
+# program: effect
+program_lifeyearslost_disc   <- program_deaths * life_expectancy_disc
+program_QALYslost_disc       <- program_infections * QALYslost_per_case + program_lifeyearslost_disc
+
+
+# comparator: effect
+comparator_lifeyearslost_disc <- comparator_deaths * life_expectancy_disc
+comparator_QALYslost_disc     <- comparator_infections * QALYslost_per_case + comparator_lifeyearslost_disc
+
+# incremental effect
+QALY_gained_disc              <- comparator_QALYslost_disc - program_QALYslost_disc
+
+# incremental cost-effectiveness ratio
+incr_costs_per_QALY_gained_disc <- incr_total_costs / QALY_gained_disc
+
+# add to output vector
+ICER_values <- c(ICER_values,
+                 incr_costs_per_QALY_gained_disc = incr_costs_per_QALY_gained_disc)
+
+# print
+round(ICER_values)
+```
 
 <div>
 # Navigate

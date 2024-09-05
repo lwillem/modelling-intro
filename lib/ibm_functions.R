@@ -67,7 +67,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
                                 num_days = 50,    # time horizon
                                 num_infected_seeds = 3, # initial infections
                                 vaccine_coverage = 0.1, # vaccine state
-                                apply_spatial_vaccine_refusal  = FALSE, # is vaccination geographicaly clustered?
+                                apply_spatial_vaccine_refusal  = FALSE, # is vaccination geographically clustered?
                                 
                                 area_size = 20,     # geo-spatial settings
                                 max_velocity = 1,
@@ -572,7 +572,7 @@ geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distan
 
 run_ibm_location <- function(pop_size              = 2000,     # population size                         
                              num_days              = 50,       # number of days to simulate (time step = one day) 
-                             num_infected_seeds    = 3,        # initial number of intected individuals   
+                             num_infected_seeds    = 3,        # initial number of infected individuals   
                              vaccine_coverage      = 0 ,       # vaccine coverage [0,1]                
                              rng_seed              = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
                              
