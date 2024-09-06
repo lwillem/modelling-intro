@@ -279,7 +279,7 @@ summary(m)
 ```{r }
 m_ceaf <- multi.ce(m)
 ceaf.plot(m_ceaf) # uses base plot 
-abline(h=0.5)
+
 ```    
 
 4. Is there value in further research? Look at the EVPI graph and summary above.

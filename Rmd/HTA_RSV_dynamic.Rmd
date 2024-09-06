@@ -51,8 +51,8 @@ The first step when creating a new R file is to specify a working directory. You
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
 
 ```{r results = "hide", eval = FALSE}
-home = "~/Documents/Modelling_intro/" ## on a OS X
-home = "C:\\Documents\\Modelling_intro\\" ## on windows
+home = "~/Documents/Modelling_intro/"     # on OS X
+home = "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
 ```
 
@@ -66,14 +66,14 @@ The disease incidence and economic parameters are loosely based on the work of Z
 
 # population and disease input
 population_size           = 4557901 # NL population +60
-rsv_incidence             = 0.03525 # in the absence of vaccination
+rsv_incidence             = 0.03525 # new infections per year, in the absence of vaccination
 rsv_recovery_time         = 7 # days
 
 # health economic input
 cost_per_episode          = 122 # euro
-morbidity_per_episode     = 0.002196 # QALY
+morbidity_per_episode     = 0.002196 # QALY loss
 proportion_mortality      = 0.006    # assume age-invariant
-average_life_expectancy   = 9        # QALY
+average_life_expectancy   = 9        # years
 
 # vaccine characteristics
 vaccine_efficacy  = 0.60
@@ -427,18 +427,27 @@ kable(cbind(model='dynamic',dynamic_out))
 # When the uptake is already high, additional uptake can become less 
 # rewarding. 
 
+```
+
+```{r, eval = boolean_show_results, echo = boolean_show_results}
+
 # note on INMB:
-inbm_example1 <- c(wtp = 20,
-                   incr_cost = 4,
+inmb_example1 <- c(wtp = 20e3,
+                   incr_cost = 4e3,
                    qaly_gain = 2,
-                   icer = 4 / 2,
-                   inmb = 20*2 - 4)
-inbm_example2 <- c(wtp = 20,
-                   incr_cost = 4*2,
+                   icer = 4e3 / 2,
+                   inmb = 20e3*2 - 4e3)
+inmb_example2 <- c(wtp = 20e3,
+                   incr_cost = 4e3*2,
                    qaly_gain = 2*2,
-                   icer = (4*2) / (2*2) ,
-                   inmb = 20*(2*2) - (4*2))
-kable(rbind(inbm_example1,inbm_example2))
+                   icer = (4e3*2) / (2*2) ,
+                   inmb = 20e3*(2*2) - (4e3*2))
+inmb_example3 <- c(wtp = 20e3,
+                   incr_cost = 4e3*6,
+                   qaly_gain = 2*6,
+                   icer = (4e3*6) / (2*6) ,
+                   inmb = 20e3*(2*6) - (4e3*6))
+kable(rbind(inmb_example1,inmb_example2,inmb_example3))
 
 ```
 
@@ -480,8 +489,14 @@ kable(cbind(model='dynamic',dynamic_out))
 ```{r, eval = boolean_show_results, echo = boolean_show_results}
 # If the (basic) reproduction number is very high, vaccine-related immunization 
 # has limited impact on the effective transmission rate, hence herd immunity 
-# effects are limited. As such, the CEA results are more in line with the CEA 
+# effects are limited. As such, the CEA results are (more) in line with the CEA 
 # based on the static disease model.
+
+# If the target group is mainly a sink for infections, and not driving the 
+# transmission dynamics,vaccine-related immunization has limited impact on 
+# the effective transmission rate, hence herd immunity effects are limited. 
+# As such, the CEA results are (moreà in line with the CEA based on the static 
+# disease model.
 
 # If the (basic) reproduction number is close to one, vaccine-related immunization 
 # can tip the balance quickly and result in large herd immunity effects, hence more 
@@ -503,7 +518,20 @@ kable(cbind(model='dynamic',dynamic_out))
 
 5. **The Role of Discounting:** Reflect on the decision not to incorporate discounting. Offer your recommendation on whether discounting should be added and provide a rationale.
 
-5. **The Role of Uncertainty:** Reflect on the decision when the cost per case is represented by `rgamma(100, shape=(122/70)^2, rate = 122/70^2))` and the vaccine efficacy by `rnorm(100,vaccine_efficacy,0.1)`. Try to reproduce the figure below for 100 samples:
+```{r, eval = TRUE, echo = boolean_show_results}
+
+# Discounting does affect future costs and effects, in this case the life years lost due to disease-related mortality.
+
+```
+
+5. **The Role of Uncertainty:** 
+
+Reflect on the decision when 
+
+* the cost per case is represented by `rgamma(100, shape=(122/70)^2, rate = 122/70^2))` 
+* the vaccine efficacy by `rnorm(100,vaccine_efficacy,0.1)`. 
+
+Try to reproduce the figure below for 100 samples:
 
 
 </n>
@@ -561,8 +589,6 @@ legend('topright',
        col = 1:2,
        pch = c(1,20)
        )
- #abline(a=0,b=20000)
- #abline(a=0,b=30000)
 ```
 
 

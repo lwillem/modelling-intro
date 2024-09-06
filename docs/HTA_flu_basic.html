@@ -791,6 +791,28 @@ be adjusted using a discount rate.</p>
 ##                                    5986                                    6475</code></pre>
 </div>
 </div>
+<div id="total-costs-and-effects" class="section level1">
+<h1>Total costs and effects</h1>
+<p>In addition to the incremental costs and effects per case or disease
+burden type, it is also worthwhile to assess the overall costs and
+effects at the population level. Therefore, consider the total
+investment and revenue of an intervention given the target group.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># impact of comparator strategy</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">comparator_totaldirectcosts=</span>comparator_totaldirectcosts,</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>           <span class="at">comparator_QALYslost_disc=</span>comparator_QALYslost_disc)</span></code></pre></div>
+<pre><code>##   comparator_totaldirectcosts comparator_QALYslost_disc
+## 1                     2.9e+07                  34131.35</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># impact of program           </span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">program_totaldirectcosts=</span>program_totaldirectcosts,</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>           <span class="at">program_QALYslost_disc=</span>program_QALYslost_disc)</span></code></pre></div>
+<pre><code>##   program_totaldirectcosts program_QALYslost_disc
+## 1                135080000                17748.3</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># program vs comparator</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">incr_total_costs=</span>incr_total_costs,</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>           <span class="at">QALY_gained_disc=</span>QALY_gained_disc)</span></code></pre></div>
+<pre><code>##   incr_total_costs QALY_gained_disc
+## 1        106080000         16383.05</code></pre>
+</div>
 <div id="navigate" class="section level1">
 <h1>Navigate</h1>
 <p>Top: <a href="index.html">Index</a></p>
