@@ -85,7 +85,7 @@ run_ibm_location(num_contacts_community_day = 6)
 run_ibm_location(num_school = 6)
 
 # set transmission_prob to 0.15 (and switch off the demographic plots)
-run_ibm_location(transmission_prob =  0.15,
+run_ibm_location(transmission_prob = 0.15,
                  bool_show_demographics = FALSE)
 
 ```

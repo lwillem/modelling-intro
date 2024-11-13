@@ -824,7 +824,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   plot_transmission_matrix(mij = transmission_age_matrix,
                            breaks = plot_breaks,
                            main = plot_title,
-                           num.digits = 0)
+                           num.digits = NA)
   
   # PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
