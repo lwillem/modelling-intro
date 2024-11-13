@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright (C) 2020 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
+# Copyright (C) 2024 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
 ############################################################################ #
 #
 # FUNCTION TO VISUALISE THE POPULATION IN THE RANDOM WALK TUTORIAL
@@ -52,7 +52,13 @@ get_default_parameters <- function(){
               
               num_workplaces = 100,
               
-              rng_seed = 2020
+              rng_seed = 2020,
+              
+              #  visualisation parameters
+              bool_show_demographics  = TRUE,   # option to show the demography figures (location IBM only)
+              add_baseline            = FALSE,  # option to add the prevalence with default param
+              return_prevelance       = FALSE,  # option to return the prevalence (and stop)
+              bool_single_plot        = TRUE    # option to specify the plot layout using sub-panels (or not)
               ))
   
   
@@ -81,8 +87,10 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
                                 
                                 rng_seed = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
                                 
-                                add_baseline = FALSE, # option to add the prevalence with default param
-                                return_prevelance = FALSE        # option to return the prevalence (and stop)
+                                # visualisation parameters
+                                add_baseline        = FALSE, # option to add the prevalence with default param
+                                return_prevelance  = FALSE,  # option to return the prevalence (and stop)
+                                bool_single_plot   = TRUE    # option to specify the plot layout using sub-panels (or not)
                                 ){
   
   ######################################################### #
@@ -217,7 +225,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
     
   } # end for-loop for each day
   
-  ## PLOT RESULTS ----
+  # PLOT RESULTS ----
   # reformat the log matrix with one row per individual and one column per time step
   # 'colSums' = sum per column
   log_s <- colSums(log_pop_data == 'S')  / pop_size
@@ -229,9 +237,11 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
     return(data.frame(log_i=log_i,log_r=log_r))
   }
   
-  # change figure configuration => 3 subplots
-  #par(mfrow=c(1,3))
-  
+  # optional: change figure configuration => 3 sub-plots
+  if(bool_single_plot) {
+    par(mfrow=c(1,3))
+  }
+
   m <- rbind(c(1, 1,1), c(2, 3, 4))
   layout(m)
 
@@ -278,7 +288,7 @@ run_ibm_random_walk <- function(pop_size = 1000,  # population size
           xaxt='n')
   axis(1,seq(0,num_days,5))
 
-  ## PRINT PARAMETERS AND RESULTS ----
+  # PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage','apply_spatial_vaccine_refusal',
                  'rng_seed','area_size','max_velocity','target_num_contacts_day',
@@ -593,11 +603,11 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                              num_days_infected     = 7,        # average number of days individuals are infected/infectious   
                              transmission_prob     = 0.1,      # transmission probability per social contact                  
                              
-                             # visualisation parameter
-                             bool_show_demographics       = TRUE, # option to show the demography figures
-
-                             add_baseline = FALSE, #option to add the prevalence with default param
-                             return_prevelance = FALSE        # option to return the prevalence (and stop)
+                             # visualisation parameters
+                             bool_show_demographics = TRUE,    # option to show the demography figures
+                             add_baseline           = FALSE,   # option to add the prevalence with default param
+                             return_prevelance      = FALSE,   # option to return the prevalence (and stop)
+                             bool_single_plot       = TRUE     # option to specify the plot layout using sub-pabels (or not)
                              ){
   
   ######################################################### #
@@ -737,8 +747,10 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
     return(data.frame(log_i=log_i,log_r=log_r))
   }
   
-  # change figure configuration => 3 subplots
-  par(mfrow=c(2,2))
+  # change figure configuration => 4 sub-plots
+  if(bool_single_plot) {
+    par(mfrow=c(2,2))
+  }
   
   # plot health states over time
   plot(log_s,
@@ -755,7 +767,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
   legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7,bg='white')
   
   if(add_baseline){
-    out_baseline <- run_ibm_location(return_prevelance = T,bool_show_demographics=F)
+    out_baseline <- run_ibm_location(rng_seed=rng_seed, return_prevelance = T, bool_show_demographics=F)
     lines(out_baseline$log_i,  col=2,lwd=2,lty=2)
     legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7,bg='white')
   } else{
@@ -801,32 +813,20 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
                       'p_cnt_school',contact_prob_school,' || ',
                       'p_cnt_workplace',contact_prob_workplace, '\n',
                       'p_transmission',transmission_prob)
-  plot_breaks <- c(0:4,seq(5,25,5),max(c(30,transmission_age_matrix)))
   
+  if(max(transmission_age_matrix)>25){
+    plot_breaks <- c(0:4,seq(5,25,10),max(c(30,transmission_age_matrix)))
+  } else{
+    plot_breaks <- pretty(transmission_age_matrix)
+  }
+    
   # plot the matrix with color coding
-  image(transmission_age_matrix,    # requires the 'field' package
-             axes = F,
-             xlab = 'Age infector',
-             ylab = 'Age contact',
-             #main = plot_title,
-             #legend.lab='number of infections',
-             col = heat.colors(length(plot_breaks)-1),
-             breaks = plot_breaks)
-  title(plot_title,cex.main = 0.7)
+  plot_transmission_matrix(mij = transmission_age_matrix,
+                           breaks = plot_breaks,
+                           main = plot_title,
+                           num.digits = 0)
   
-  axis(side=1,
-       at=seq(0,1,length.out=nrow(transmission_age_matrix)),
-       labels=rownames(transmission_age_matrix),
-       las=2,
-       cex.axis=0.4)
-  
-  axis(side=2,
-       at=seq(0,1,length.out=ncol(transmission_age_matrix)),
-       labels=colnames(transmission_age_matrix),
-       las=2,
-       cex.axis=0.7)
-  
-  ## PRINT PARAMETERS AND RESULTS ----
+  # PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
   all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage',
                  'rng_seed', 'num_days_infected','transmission_prob',
@@ -973,3 +973,105 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
   
 } # end function
 
+
+plot_transmission_matrix <- function(mij,
+                                     breaks = NA,
+                                     main = 'Transmission matrix',
+                                     num.digits = NA){
+  
+  # if no breaks given, use uniform values
+  if(all(is.na(breaks))){
+    breaks <- pretty(mij)
+  } 
+  
+  # add additional starting break, to include the minimum value as starting point (in the legend)
+  breaks <- c(min(breaks)-1,breaks)
+  
+  # set midpoints
+  midpoints <- matrix(
+    breaks[-length(breaks)] + diff(breaks) / 2,
+    nrow = 1, ncol = length(breaks) - 1
+  )
+
+  # set colors
+  num.colors <- length(breaks)-1
+  redc <- heat.colors(num.colors)
+  
+  # get plot region for matrix and legend based on current graphical parameters
+  # note: based on layout from fields::imagePlot
+  char.size     <- par()$cin[1] / par()$din[1] # get text character size
+  offset        <- char.size * par()$mar[4] # space between legend and main plot
+  legend.width  <- 1
+  legend.mar    <- 5.1
+  legend.shrink <- 0.9
+  cex.lab       <- 1.2
+  cex.axis      <- 0.8
+  cex.text      <- 1
+  
+  # set legends' plot region
+  legend_plot_region <- par()$plt
+  legend_plot_region[2] <- 1 - (legend.mar * char.size)
+  legend_plot_region[1] <- legend_plot_region[2] - (legend.width * char.size)
+
+  # account for legend.shrink
+  pr <- (legend_plot_region[4] - legend_plot_region[3]) * ((1 - legend.shrink) / 2)
+  legend_plot_region[4] <- legend_plot_region[4] - pr
+  legend_plot_region[3] <- legend_plot_region[3] + pr
+
+  # set main matrix' plot region
+  main_plot_region    <- par()$plt
+  main_plot_region[2] <- min(main_plot_region[2], legend_plot_region[1] - offset)
+
+  # defensive check for main and legends' plot region
+  dp <- legend_plot_region[2] - legend_plot_region[1]
+  legend_plot_region[1] <- min(main_plot_region[2] + offset, legend_plot_region[1])
+  legend_plot_region[2] <- legend_plot_region[1] + dp
+
+  # store old graphical parameters, and initiate the ones for the main plot
+  old.par <- par(no.readonly = TRUE)
+  par(plt = main_plot_region)
+
+  # add image plot
+  image(mij,
+        xlab = 'Age infector',
+        ylab = 'Age contact',
+        main = plot_title,
+        cex.lab = 1.2,
+        breaks = breaks,
+        col = redc,
+        xaxt = "n",
+        yaxt = "n")
+  
+  # add axis labels
+  plt_ticks <- seq(0, 1, length = nrow(mij))
+  axis(2, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 1)
+  axis(1, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 2)
+
+  # add numeric values if num.digits != NA and cex.text > 0
+  if (!is.na(num.digits) && !is.na(cex.text) && cex.text > 0) {
+    # format results (rounding/scientific)
+    if (any(max(mij, na.rm = TRUE) > 1)) {
+      mij <- round(mij, digits = num.digits)
+    } else {
+      mij <- format(mij, digits = num.digits)
+    }
+    
+    # get grid centers and add values
+    e_grid <- expand.grid(plt_ticks, plt_ticks)
+    text(e_grid, labels = mij, cex = cex.text)
+  }
+  
+  # set graphical parameters for the legend
+  par(new = TRUE, pty = "m", plt = legend_plot_region, err = -1)
+
+  # include legend bar with axis
+  image(x = 1:2, y = 1:length(breaks), z = midpoints,
+        xaxt = "n", yaxt = "n", xlab = "",
+        ylab = "", col = redc,
+        breaks = breaks)
+  axis(side = 4, at = 1:length(breaks[-1]), labels= breaks[-1], mgp = c(3, 1, 0), las = 2)
+
+  # restore original graphical parameters
+  par(old.par)
+  
+}
