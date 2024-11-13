@@ -183,38 +183,18 @@ immunity_out_07 <- run_cea_dynamic(parameters, initials, cea_input_07)
 immunity_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
 ```
 
-## Dynamic model with very high pre-existing immunity
-```{r}
-parameters = list(beta = 15, gamma = 1 / cea_input$rsv_recovery_time)
-initials = c(S = 1 - 2e-5 - 0.96387, I = 2e-5, R = 0.96387)
-immunity_out_02 <- run_cea_dynamic(parameters, initials, cea_input_02)
-immunity_out_01 <- run_cea_dynamic(parameters, initials, cea_input_01)
-immunity_out_07 <- run_cea_dynamic(parameters, initials, cea_input_07)
-immunity_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
-```
-
-## Dynamic model with seasonality
-```{r}
-parameters = list(beta0 = 0.358385, beta1 = 3, gamma = 1 / cea_input$rsv_recovery_time, 
-                  omega = 4 * pi / 365, mu = 0)
-initials = c(S = 1 - 2e-5 - 0.8, I = 2e-5, R = 0.8)
-seasonal_out_02 <- run_cea_dynamic(parameters, initials, cea_input_02)
-seasonal_out_01 <- run_cea_dynamic(parameters, initials, cea_input_01)
-seasonal_out_07 <- run_cea_dynamic(parameters, initials, cea_input_07)
-seasonal_out_adm <- run_cea_dynamic(parameters, initials, cea_input_adm)
-```
-
 \newpage
 ## Graphical exploration:
 
 ```{r, eval=T}
-plot(c(seasonal_out_01$qaly_gain,seasonal_out_02$qaly_gain,seasonal_out_07$qaly_gain),
-     c(seasonal_out_01$incr_cost,seasonal_out_02$incr_cost,seasonal_out_07$incr_cost),
-     xlab='QALY gain',ylab='incremental cost',xlim=c(0,350),ylim=c(0,2e8),pch=1:3,col=1:3,
-     main=paste('SIR with seasonal forcing [incidence:',round(seasonal_out_01$incidence_ref,digits=3),']'))
-lines(c(0,seasonal_out_01$qaly_gain),c(0,seasonal_out_01$incr_cost),col=1,lwd=2)
-lines(c(0,seasonal_out_02$qaly_gain),c(0,seasonal_out_02$incr_cost),col=2,lwd=2)
-lines(c(0,seasonal_out_07$qaly_gain),c(0,seasonal_out_07$incr_cost),col=3,lwd=2)
+plot(c(immunity_out_01$qaly_gain,immunity_out_02$qaly_gain,immunity_out_07$qaly_gain),
+     c(immunity_out_01$incr_cost,immunity_out_02$incr_cost,immunity_out_07$incr_cost),
+     xlab='QALY gain',ylab='incremental cost',
+     xlim=c(0,220),ylim=c(0,2e8),pch=1:3,col=1:3,
+     main=paste('dynamics SIR with high immunity levels [incidence:',round(immunity_out_01$incidence_ref,digits=3),']'))
+lines(c(0,immunity_out_01$qaly_gain),c(0,immunity_out_01$incr_cost),col=1,lwd=2)
+lines(c(0,immunity_out_02$qaly_gain),c(0,immunity_out_02$incr_cost),col=2,lwd=2)
+lines(c(0,immunity_out_07$qaly_gain),c(0,immunity_out_07$incr_cost),col=3,lwd=2)
 legend('topleft',
        c('uptake: 30%', 'uptake: 20%', 'uptake: 10%'),
        pch=3:1,col=3:1)
@@ -243,18 +223,10 @@ initials = c(S = 1 - 2e-5 - 0.2999, I = 2e-5, R = 0.2999)
 immunity_out <- run_cea_dynamic(parameters, initials, cea_input)
 ```
 
-## Dynamic model with seasonality
-```{r}
-parameters = list(beta0 = 0.11444, beta1 = 1.4, gamma = 1 / cea_input$rsv_recovery_time, 
-                  omega = 2 * pi / 365, mu = 0)
-initials = c(S = 1 - 2e-5 , I = 2e-5, R = 0)
-seasonal_out <- run_cea_dynamic(parameters, initials, cea_input)
-```
-
 \newpage
 ```{r}
-plot(x = c(static_out$qaly_gain,dynamic_out$qaly_gain,immunity_out$qaly_gain,seasonal_out$qaly_gain),
-     y = c(static_out$incr_cost,dynamic_out$incr_cost,immunity_out$incr_cost,seasonal_out$incr_cost),
+plot(x = c(static_out$qaly_gain,dynamic_out$qaly_gain,immunity_out$qaly_gain),
+     y = c(static_out$incr_cost,dynamic_out$incr_cost,immunity_out$incr_cost),
      pch=1:4, col=1:4, lwd=3,
      xlab= 'QALY gain',
      ylab = 'incremental cost (euro)')
@@ -262,8 +234,7 @@ abline(h=0,lty=3)
 legend('topright',
        c('static model',
          'dynamic model - no previous immunity',
-         'dynamic model - existing immunity',
-         'dynamic model - seasonality'),
+         'dynamic model - existing immunity'),
        col = 1:4, pch=1:4, lwd=0, cex=0.8
        )
 
