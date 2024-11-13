@@ -31,7 +31,8 @@ Welcome to our introductory material for the Summer School on "Modelling Infecti
 8. [HTA flu (uncertainty](HTA_flu_CEAresults.html)
 <!-- 9. [Demo Uncertainty](HTA_flu_uncertainty.html) -->
 <!-- 10. [Demo EVPPI](HTA_flu_evppi.html) -->
-11. [CEA: RSV](HTA_RSV_dynamic.html)
+9. [CEA: RSV](HTA_RSV_dynamic.html)
+10. [Discounting](example_discounting.html)
 
 We provide some background literature [here](background_literature.html).
 
