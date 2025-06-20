@@ -114,6 +114,31 @@ treatment_cost_per_case   <- cost_hosp_case * p_hospital +
 
 ```
 
+```{r, echo = show_results, eval = show_results}
+
+print(c(treatment_cost_per_case = treatment_cost_per_case, 
+        vaccine_cost_per_dose = vaccine_cost_per_dose))
+
+```
+
+Calculate the burden of disease for the comparator without the program in place, including only medical costs:
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
+# Comparator
+comparator_infections       <- targetgroup * force_of_infection
+comparator_hospitalisations <- comparator_infections * p_hospital
+comparator_deaths           <- comparator_infections * case_fatality_ratio
+comparator_lifeyearslost    <- comparator_deaths * life_expectancy
+
+comparator_treatment_costs   <- comparator_infections * treatment_cost_per_case
+comparator_vaccination_costs <- 0
+comparator_total_costs <- comparator_treatment_costs + comparator_vaccination_costs
+
+```
 
 Calculate the burden of disease with the program in place, along with the associated medical and program costs:
 
@@ -137,22 +162,10 @@ program_total_costs <- program_treatment_costs + program_vaccination_costs
 
 ```
 
-Calculate the burden of disease for the comparator without the program in place, including the medical costs:
-```{r, echo = !show_results, eval = FALSE}
-...
+```{r, echo = show_results, eval = show_results}
 
-```
-
-```{r, echo = show_results}
-# Comparator
-comparator_infections       <- targetgroup * force_of_infection
-comparator_hospitalisations <- comparator_infections * p_hospital
-comparator_deaths           <- comparator_infections * case_fatality_ratio
-comparator_lifeyearslost    <- comparator_deaths * life_expectancy
-
-comparator_treatment_costs   <- comparator_infections * treatment_cost_per_case
-comparator_vaccination_costs <- 0
-comparator_total_costs <- comparator_treatment_costs + comparator_vaccination_costs
+print(c(comparator_treatment_costs = comparator_treatment_costs, 
+        program_treatment_costs = program_treatment_costs))
 
 ```
 
@@ -262,6 +275,9 @@ incr_costs_per_QALY_gained <- incr_total_costs / QALY_gained
 ICER_values <- c(ICER_values,
                  incr_costs_per_QALY_gained = incr_costs_per_QALY_gained)
 
+```
+
+```{r, echo = show_results, eval = show_results}
 # print
 round(ICER_values)
 ```
@@ -355,6 +371,9 @@ incr_costs_per_QALY_gained_disc <- incr_total_costs / QALY_gained_disc
 ICER_values <- c(ICER_values,
                  incr_costs_per_QALY_gained_disc = incr_costs_per_QALY_gained_disc)
 
+```
+
+```{r, echo = show_results, eval = show_results}
 # print
 round(ICER_values)
 ```
@@ -365,7 +384,7 @@ round(ICER_values)
 
 In addition to the incremental costs and effects per case or disease burden type, it is also worthwhile to assess the overall costs and effects at the population level. Therefore, consider the total investment and revenue of an intervention given the target group.
 
-```{r}
+```{r, eval = show_results}
 
 # impact of comparator strategy
 data.frame(comparator_total_costs = comparator_total_costs,
