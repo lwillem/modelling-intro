@@ -11,7 +11,7 @@
 
 
 
-<title>HTA flu</title>
+<title>Cost-effectiveness analysis for influenza vaccination</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -454,7 +454,8 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">HTA flu</h1>
+<h1 class="title toc-ignore">Cost-effectiveness analysis for influenza
+vaccination</h1>
 
 </div>
 
@@ -516,19 +517,19 @@ on the following assumptions and input parameters:</p>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># burden of disease</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>force_of_infection      <span class="ot">&lt;-</span> <span class="fl">0.04</span>  <span class="co"># static</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>proportion_hospitalised <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>casefatality_ratio      <span class="ot">&lt;-</span> <span class="fl">0.03</span>  <span class="co"># applies to all infections</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>p_hospital <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>case_fatality_ratio     <span class="ot">&lt;-</span> <span class="fl">0.03</span>  <span class="co"># applies to all infections</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># disease-related costs</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>cost_per_hospitalised_case    <span class="ot">&lt;-</span> <span class="dv">2000</span> <span class="co"># dollars</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>cost_per_nonhospitalised_case <span class="ot">&lt;-</span> <span class="dv">100</span>  <span class="co"># dollars</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>cost_hosp_case    <span class="ot">&lt;-</span> <span class="dv">2000</span> <span class="co"># euro</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>cost_non_hosp_case <span class="ot">&lt;-</span> <span class="dv">100</span>  <span class="co"># euro</span></span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co"># program details</span></span>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>uptake_program          <span class="ot">&lt;-</span> <span class="fl">0.80</span></span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>vaccine_efficacy        <span class="ot">&lt;-</span> <span class="fl">0.60</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose  <span class="ot">&lt;-</span> <span class="dv">10</span>   <span class="co"># dollars</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose     <span class="ot">&lt;-</span> <span class="dv">50</span>   <span class="co"># dollars</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs     <span class="ot">&lt;-</span> <span class="dv">0</span>    <span class="co"># dollars</span></span></code></pre></div>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose  <span class="ot">&lt;-</span> <span class="dv">10</span>   <span class="co"># euro</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose     <span class="ot">&lt;-</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs     <span class="ot">&lt;-</span> <span class="dv">0</span>    <span class="co"># euro</span></span></code></pre></div>
 <p><br></p>
 </div>
 <div id="health-technology-assessment-part-i" class="section level1">
@@ -604,8 +605,8 @@ effectiveness ratios for life years saved:</p>
 life years (QALYs). Please calculate the incremental cost-effectiveness
 ratio in terms of the incremental cost per QALY gained, using the
 following QALY values:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>QALYslost_per_hospitalised_case    <span class="ot">&lt;-</span> <span class="fl">0.018</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>QALYslost_per_nonhospitalised_case <span class="ot">&lt;-</span> <span class="fl">0.0082</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>QALYloss_hosp_case    <span class="ot">&lt;-</span> <span class="fl">0.018</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>QALYloss_non_hosp_case <span class="ot">&lt;-</span> <span class="fl">0.0082</span></span></code></pre></div>
 <p><br></p>
 <div id="solutions-ii-step-by-step" class="section level2">
 <h2>Solutions II: step-by-step</h2>
@@ -714,15 +715,15 @@ burden type, it is also worthwhile to assess the overall costs and
 effects at the population level. Therefore, consider the total
 investment and revenue of an intervention given the target group.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># impact of comparator strategy</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">comparator_totaldirectcosts =</span> comparator_totaldirectcosts,</span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>           <span class="at">comparator_QALYslost_disc =</span> comparator_QALYslost_disc)</span></code></pre></div>
-<pre><code>##   comparator_totaldirectcosts comparator_QALYslost_disc
-## 1                     2.9e+07                  34131.35</code></pre>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">comparator_total_costs =</span> comparator_total_costs,</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>           <span class="at">comparator_QALYloss_disc =</span> comparator_QALYloss_disc)</span></code></pre></div>
+<pre><code>##   comparator_total_costs comparator_QALYloss_disc
+## 1                2.9e+07                 34131.35</code></pre>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># impact of program           </span></span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">program_totaldirectcosts =</span> program_totaldirectcosts,</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>           <span class="at">program_QALYslost_disc =</span> program_QALYslost_disc)</span></code></pre></div>
-<pre><code>##   program_totaldirectcosts program_QALYslost_disc
-## 1                135080000                17748.3</code></pre>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">program_total_costs =</span> program_total_costs,</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>           <span class="at">program_QALYloss_disc =</span> program_QALYloss_disc)</span></code></pre></div>
+<pre><code>##   program_total_costs program_QALYloss_disc
+## 1           135080000               17748.3</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># program vs comparator</span></span>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">incr_total_costs =</span> incr_total_costs,</span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>           <span class="at">QALY_gained_disc =</span> QALY_gained_disc)</span></code></pre></div>

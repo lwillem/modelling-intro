@@ -1,5 +1,5 @@
 ---
-title: "HTA flu CEA with uncertainty"
+title: "Cost-effectiveness analysis for influenza vaccination with uncertainty"
 toc: no
 ---
 
@@ -208,8 +208,8 @@ incr_cost_per_hospitalisation_prevented <- mean(incr_total_cost) / mean(hospital
 incr_cost_per_death_averted             <- mean(incr_total_cost) / mean(deaths_averted)
 incr_cost_per_lifeyear_gained           <- mean(incr_total_cost) / mean(lifeyearslost_averted)
 incr_cost_per_lifeyear_gained_disc      <- mean(incr_total_cost) / mean(lifeyearslost_averted_disc)
-incr_cost_per_QALY_gained              <- mean(incr_total_cost) / mean(QALY_gained)
-incr_cost_per_QALY_gained_disc         <- mean(incr_total_cost) / mean(QALY_gained_disc)
+incr_cost_per_QALY_gained               <- mean(incr_total_cost) / mean(QALY_gained)
+incr_cost_per_QALY_gained_disc          <- mean(incr_total_cost) / mean(QALY_gained_disc)
 
 ```
 
@@ -222,8 +222,8 @@ ICER_values<-cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prev
                incr_cost_per_death_averted             = incr_cost_per_death_averted,
                incr_cost_per_lifeyear_gained           = incr_cost_per_lifeyear_gained,
                incr_cost_per_lifeyear_gained_disc      = incr_cost_per_lifeyear_gained_disc,
-               incr_cost_per_QALY_gained              = incr_cost_per_QALY_gained,
-               incr_cost_per_QALY_gained_disc         = incr_cost_per_QALY_gained_disc)
+               incr_cost_per_QALY_gained               = incr_cost_per_QALY_gained,
+               incr_cost_per_QALY_gained_disc          = incr_cost_per_QALY_gained_disc)
 
 # print rounded results
 round(ICER_values)
@@ -241,17 +241,17 @@ par(mfrow = c(1, 3))
 
 # Plot the histograms
 hist(incr_total_cost, xlab = 'Incremental total cost', main = 'Histogram of Incremental Total Cost')
-hist(infections_averted, xlab = 'Infections averted', main = 'Histogram of Infections Averted')
-hist(incr_total_cost / infections_averted, xlab = 'Incremental total cost per infection averted', main = 'Histogram of Incremental Cost per Infection Averted')
+hist(QALY_gained_disc, xlab = 'QALY gain', main = 'Histogram of Infections Averted')
+hist(incr_total_cost / QALY_gained_disc, xlab = 'Incremental total cost per infection averted', main = 'Histogram of Incremental Cost per Infection Averted')
 
 # Reset the plotting layout to default
 par(mfrow = c(1, 1))
 ```
 
 ```{r}
-mean(incr_total_cost/infections_averted)       # mean of ratios
-median(incr_total_cost/infections_averted)     # median of ratios
-mean(incr_total_cost)/mean(infections_averted) # ratio of means: ICER!!
+mean(incr_total_cost/QALY_gained_disc)       # mean of ratios
+median(incr_total_cost/QALY_gained_disc)     # median of ratios
+mean(incr_total_cost)/mean(QALY_gained_disc) # ratio of means: ICER!!
 ```
 
 
@@ -289,7 +289,7 @@ summary(m)
 ```
 
 
-3. How much evidence is there in favour of the decision, for a range of WTP values? Look also at the CEAC above.
+3. How much evidence is there in favour of the decision, for a range of WTP values? Look at the CEAC and CEAF.
 ```{r }
 m_ceaf <- multi.ce(m)
 ceaf.plot(m_ceaf) # uses base plot 

@@ -1,5 +1,5 @@
 ---
-title: "HTA flu vaccination"
+title: "Cost-effectiveness analysis for influenza vaccination"
 toc: FALSE
 ---
 
