@@ -1,5 +1,5 @@
 ---
-title: "HTA flu (start)"
+title: "HTA flu vaccination"
 toc: FALSE
 ---
 
@@ -11,23 +11,15 @@ toc: FALSE
 set.seed(2020)
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+
+show_results = FALSE
 ```
 
-This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. 
-Please make contact if you would like to use this model in any public way.
+This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. Please contact us if you would like to use this model in any public way.
 
-In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised 
-within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to 
-influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a 
-core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note 
-that for most applications, practical use of this model would likely entail having separate, though similarly simple 
-decision trees to obtain the unit cost estimates (implying that these cells would be intermediary 
-outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number
-of consultations, the unit costs per consultation, medication use, hospital days etc. for cases of pneumonia, and all 
-other relevant disease stages)).
+In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note that for most applications, practical use of this model would likely entail having separate, though similarly simple  decision trees to obtain the unit cost estimates (implying that these cells would be intermediary outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the numberof consultations, the unit costs per consultation, medication use, hospital days etc. for cases of pneumonia, and all other relevant disease stages)).
 
-Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. 
-This is due to the exclusion of herd immunity effects in this model.  
+Note that the final output is independent of coverage and target group size if fixed administration costs are set to 0. This is due to the exclusion of herd immunity effects in this model.  
 
 For further information, questions or comments please contact us. 
 
@@ -41,6 +33,8 @@ home <- "~/Documents/Modelling_intro/"     # on OS X
 home <- "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
 ```
+
+<br>
 
 # Goal, input and assumptions
 
@@ -60,23 +54,24 @@ life_expectancy         <- 12      # years
 
 # burden of disease
 force_of_infection      <- 0.04  # static
-proportion_hospitalised <- 0.10
-casefatality_ratio      <- 0.03  # applies to all infections
+p_hospital <- 0.10
+case_fatality_ratio     <- 0.03  # applies to all infections
 
 # disease-related costs
-cost_per_hospitalised_case    <- 2000 # dollars
-cost_per_nonhospitalised_case <- 100  # dollars
+cost_hosp_case    <- 2000 # euro
+cost_non_hosp_case <- 100  # euro
 
 # program details
 uptake_program          <- 0.80
 vaccine_efficacy        <- 0.60
-vaccine_price_per_dose  <- 10   # dollars
-admin_cost_per_dose     <- 50   # dollars
-fixed_program_costs     <- 0    # dollars
+vaccine_price_per_dose  <- 10   # euro
+admin_cost_per_dose     <- 50   # euro
+fixed_program_costs     <- 0    # euro
 
 
 ```
 
+<br>
 
 # Health Technology Assessment (part I)
 
@@ -101,68 +96,92 @@ Here are the tasks you need to complete to run the health technology assessment:
 6. **Show Results:**
    - Display the results.
 
-
-<br>
-<hr>
 <br>
 
 # Solutions I: step-by-step
 
 To begin the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, considering the proportion of cases that result in hospitalization:
-```{r}
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+
+```{r, echo = show_results}
 vaccine_cost_per_dose     <- vaccine_price_per_dose + admin_cost_per_dose
-treatment_cost_per_case   <- cost_per_hospitalised_case * proportion_hospitalised + 
-                              (1-proportion_hospitalised) * cost_per_nonhospitalised_case
+treatment_cost_per_case   <- cost_hosp_case * p_hospital + 
+                              (1-p_hospital) * cost_non_hosp_case
 
 ```
 
 
 Calculate the burden of disease with the program in place, along with the associated medical and program costs:
-```{r }
+
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 # Program
 population_at_risk       <- targetgroup * (1-uptake_program) + targetgroup * uptake_program * (1-vaccine_efficacy)
 
 program_infections       <- population_at_risk * force_of_infection 
-program_hospitalisations <- program_infections * proportion_hospitalised
-program_deaths           <- program_infections * casefatality_ratio
+program_hospitalisations <- program_infections * p_hospital
+program_deaths           <- program_infections * case_fatality_ratio
 program_lifeyearslost    <- program_deaths * life_expectancy
 
-program_treatmentcosts   <- program_infections * treatment_cost_per_case
-program_vaccinationcosts <- fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
-program_totaldirectcosts <- program_treatmentcosts + program_vaccinationcosts
+program_treatment_costs   <- program_infections * treatment_cost_per_case
+program_vaccination_costs <- fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
+program_total_costs <- program_treatment_costs + program_vaccination_costs
 
 ```
 
 Calculate the burden of disease for the comparator without the program in place, including the medical costs:
-```{r }
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 # Comparator
 comparator_infections       <- targetgroup * force_of_infection
-comparator_hospitalisations <- comparator_infections * proportion_hospitalised
-comparator_deaths           <- comparator_infections * casefatality_ratio
+comparator_hospitalisations <- comparator_infections * p_hospital
+comparator_deaths           <- comparator_infections * case_fatality_ratio
 comparator_lifeyearslost    <- comparator_deaths * life_expectancy
 
-comparator_treatmentcosts   <- comparator_infections * treatment_cost_per_case
-comparator_vaccinationcosts <- 0
-comparator_totaldirectcosts <- comparator_treatmentcosts + comparator_vaccinationcosts
+comparator_treatment_costs   <- comparator_infections * treatment_cost_per_case
+comparator_vaccination_costs <- 0
+comparator_total_costs <- comparator_treatment_costs + comparator_vaccination_costs
 
 ```
 
 Calculate the difference between the program and the comparator:
-```{r }
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 # To calculate the difference between 'program' and 'comparator' 
 infections_averted       <- comparator_infections - program_infections
 hospitalisations_averted <- comparator_hospitalisations - program_hospitalisations
 deaths_averted           <- comparator_deaths - program_deaths
 lifeyearslost_averted    <- comparator_lifeyearslost - program_lifeyearslost
 
-treatment_costs_averted  <- comparator_treatmentcosts - program_treatmentcosts
-incr_vaccination_costs   <- program_vaccinationcosts - comparator_vaccinationcosts # incremental costs
+treatment_costs_averted  <- comparator_treatment_costs - program_treatment_costs
+incr_vaccination_costs   <- program_vaccination_costs - comparator_vaccination_costs # incremental costs
 incr_total_costs         <- incr_vaccination_costs - treatment_costs_averted
 
 ```
 
 Calculate the incremental effectiveness ratios for infections, hospitalizations, and deaths averted. Finally, calculate the incremental effectiveness ratios for life years saved:
-```{r }
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 
 # Calculate incremental effectiveness ratios
 incr_cost_per_case_prevented            <- incr_total_costs / infections_averted
@@ -173,19 +192,22 @@ incr_cost_per_lifeyear_gained           <- incr_total_costs / lifeyearslost_aver
 ```
 
 Show the results:
-```{r }
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 # combine results
 # note: specify column names at once
 ICER_values<-c(incr_cost_per_case_prevented  = incr_cost_per_case_prevented,
                incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
                incr_cost_per_death_averted   = incr_cost_per_death_averted,
-               incr_cost_per_lifeyear_gained =incr_cost_per_lifeyear_gained)
+               incr_cost_per_lifeyear_gained = incr_cost_per_lifeyear_gained)
 
 round(ICER_values) # print
 ```
 
-<br>
-<hr>
 <br>
 
 # Health Technology Assessment (part II): QALY
@@ -194,31 +216,45 @@ The burden of disease can also be represented by quality-adjusted life years (QA
 
 ```{r}
 
-QALYslost_per_hospitalised_case    <- 0.018
-QALYslost_per_nonhospitalised_case <- 0.0082
+QALYloss_hosp_case    <- 0.018
+QALYloss_non_hosp_case <- 0.0082
 
 ```
 
 <br>
-<hr>
-<br>
 
 ## Solutions II: step-by-step
 
-```{r}
+Calculate the effect per average case and the total burden of disease for the comparator and program. 
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 
 # intermediate results
-QALYslost_per_case        <- QALYslost_per_hospitalised_case * proportion_hospitalised +        
-                               QALYslost_per_nonhospitalised_case * (1-proportion_hospitalised)
+QALYloss_per_case        <- QALYloss_hosp_case * p_hospital +        
+                               QALYloss_non_hosp_case * (1-p_hospital)
 
 # program: effect
-program_QALYslost          <- program_infections * QALYslost_per_case + program_lifeyearslost
+program_QALYloss          <- program_infections * QALYloss_per_case + program_lifeyearslost
 
 # comparator: effect
-comparator_QALYslost       <- comparator_infections * QALYslost_per_case + comparator_lifeyearslost
+comparator_QALYloss       <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost
 
+
+```
+
+Time to calculate the incremental effect, and ICER:
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 # incremental effect
-QALY_gained                <- comparator_QALYslost - program_QALYslost
+QALY_gained                <- comparator_QALYloss - program_QALYloss
 
 # incremental cost-effectiveness ratio
 incr_costs_per_QALY_gained <- incr_total_costs / QALY_gained
@@ -229,12 +265,10 @@ ICER_values <- c(ICER_values,
 # print
 round(ICER_values)
 ```
-<br>
-<hr>
+
 <br>
 
 # Health Technology Assessment (part III): discounting
-
 
 
 Health Technology Assessments often involves comparing the costs and benefits of healthcare interventions over time. Discounting is a critical concept in HTA, reflecting the principle that costs and benefits occurring in the future are worth less than those occurring today. This is because of the time preference for immediate benefits and the opportunity cost of capital. By applying discount rates, HTA practitioners can appropriately adjust future costs and health outcomes to present values, enabling fair and consistent comparisons between different healthcare technologies or interventions. Here's a small example to illustrate how discounting is applied in HTA:
@@ -255,8 +289,8 @@ discount <- function(values, rate, years) {
   return(discounted_values)
 }
 
-# Example data: costs and QALYs over 10 years
-years <- 0:11  # Time periods from 0 to 9 (10 years)
+# Example data: costs and QALYs over 12 years
+years <- 0:11  # Time periods from 0 to 11 (12 years)
 
 # fixed
 costs <- rep(1000, length(years))  # Example costs per year
@@ -279,33 +313,40 @@ discounted_data <- data.frame(
 print(discounted_data)
 
 # print sum
-print(colSums(discounted_data))
+print(colSums(discounted_data)[-1])
 ```
+
+<br>
 
 ## Task
 
 Incorporate time preference into our health technology assessments for flu. Although all costs are incurred in the current year, the benefits, measured in life years saved, extend into the future. To accurately reflect the value of these future health effects, they should be adjusted using a discount rate.
 
 <br>
-<hr>
-<br>
 
 ## Solutions III: step-by-step
-```{r}
+
+Calculate the discounted life expectancy to include in the effect calculation, and continue to obtain the discounted ICER:
+```{r, echo = !show_results, eval = FALSE}
+...
+
+```
+
+```{r, echo = show_results}
 # intermediate results
 life_expectancy_disc <- sum(1/((1+discount_rate)^(0:(life_expectancy-1))))
 
 
 # program: effect
 program_lifeyearslost_disc   <- program_deaths * life_expectancy_disc
-program_QALYslost_disc       <- program_infections * QALYslost_per_case + program_lifeyearslost_disc
+program_QALYloss_disc       <- program_infections * QALYloss_per_case + program_lifeyearslost_disc
 
 # comparator: effect
 comparator_lifeyearslost_disc <- comparator_deaths * life_expectancy_disc
-comparator_QALYslost_disc     <- comparator_infections * QALYslost_per_case + comparator_lifeyearslost_disc
+comparator_QALYloss_disc     <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
 
 # incremental effect
-QALY_gained_disc              <- comparator_QALYslost_disc - program_QALYslost_disc
+QALY_gained_disc              <- comparator_QALYloss_disc - program_QALYloss_disc
 
 # incremental cost-effectiveness ratio
 incr_costs_per_QALY_gained_disc <- incr_total_costs / QALY_gained_disc
@@ -318,6 +359,8 @@ ICER_values <- c(ICER_values,
 round(ICER_values)
 ```
 
+<br>
+
 # Total costs and effects
 
 In addition to the incremental costs and effects per case or disease burden type, it is also worthwhile to assess the overall costs and effects at the population level. Therefore, consider the total investment and revenue of an intervention given the target group.
@@ -325,22 +368,27 @@ In addition to the incremental costs and effects per case or disease burden type
 ```{r}
 
 # impact of comparator strategy
-data.frame(comparator_totaldirectcosts=comparator_totaldirectcosts,
-           comparator_QALYslost_disc=comparator_QALYslost_disc)
+data.frame(comparator_total_costs = comparator_total_costs,
+           comparator_QALYloss_disc = comparator_QALYloss_disc)
 
 # impact of program           
-data.frame(program_totaldirectcosts=program_totaldirectcosts,
-           program_QALYslost_disc=program_QALYslost_disc)
+data.frame(program_total_costs = program_total_costs,
+           program_QALYloss_disc = program_QALYloss_disc)
            
 # program vs comparator
-data.frame(incr_total_costs=incr_total_costs,
-           QALY_gained_disc=QALY_gained_disc)
+data.frame(incr_total_costs = incr_total_costs,
+           QALY_gained_disc = QALY_gained_disc)
 ```
-
 
 
 <div>
 # Navigate
-Top: [Index](index.html)
+Top: [Index](index.html) ---
+`r if (!show_results) {
+    '<a href="HTA_flu_basic_results.html"> Results</a>'
+  } else {
+    '<a href="HTA_flu_basic.html"> Back</a>'
+  }
+`
 </div>
 

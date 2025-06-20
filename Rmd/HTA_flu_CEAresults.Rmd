@@ -1,5 +1,5 @@
 ---
-title: "HTA flu (uncertainty)"
+title: "HTA flu CEA with uncertainty"
 toc: no
 ---
 
@@ -13,21 +13,11 @@ set.seed(2020)
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
 ```
 
-This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. 
-Please make contact if you would like to use this model in any public way.
+This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
 
-In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised 
-within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to 
-influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a 
-core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note 
-that for most applications, practical use of this model would likely entail having separate, though similarly simple 
-decision trees to obtain the unit cost estimates (implying that these cells would be intermediary 
-outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number
-of consultations, the unit costs per consultation, medication use, hospital days etc. for cases of pneumonia, and all 
-other relevant disease stages)).
+In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note that for most applications, practical use of this model would likely entail having separate, though similarly simple decision trees to obtain the unit cost estimates (implying that these cells would be intermediary outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number of consultations, the unit cost per consultation, medication use, hospital days etc. for cases of pneumonia, and all other relevant disease stages)).
 
-Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. 
-This is due to the exclusion of herd immunity effects in this model.  
+Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. This is due to the exclusion of herd immunity effects in this model.  
 
 For further information, questions or comments please contact us.
 
@@ -57,6 +47,25 @@ Once installed, you have to load the package(s) at the start of the R file. This
 library(BCEA)
 ```
 
+# Specific uncertainty distributions
+For some parameters, the sample size is rather small or they should be strictly positive, hence other distribution might be preferred. Let's first define some help functions to facilitate sampling using a given mean, se, proportion, samples size or confidence interval:
+
+```{r}
+sample_gamma <- function(nsamples, mean, se){
+  rgamma(nsamples, shape = mean^2 / se^2, rate = mean / se^2)
+}
+
+sample_beta_event <- function(nsamples, events, sample_size){
+  return(rbeta(nsamples, shape1 = events, shape2 = sample_size - events))
+}
+
+sample_beta_mean <- function(nsamples, mean, se){
+  alpha = mean^2 * (1 - mean) / se^2 
+  beta  = alpha * (1 - mean) / mean
+  return(rbeta(nsamples, shape1 = alpha, shape2 = beta))
+}
+```
+
 # Goal and input
 
 The goal is to calculate the cost-effectiveness of a vaccination program for the elderly against flu, taking into account parameter uncertainty as specified below:
@@ -64,36 +73,41 @@ The goal is to calculate the cost-effectiveness of a vaccination program for the
 ```{r results = "hide"}
 
 # set number of samples to include in the uncertainty analysis
-Nsamples <- 5000
+nsamples <- 5000
 
 # set the random-number-generator seed to get exactly the same results each time you run the code
-set.seed(698) 
+set.seed(5698) 
 
 # population details
-targetgroup     <- 2500000 								#people>65 years
-life_expectancy <- rnorm(Nsamples,mean=12,sd=2) 				#in years
+targetgroup     <- 2500000 								# people>65 years
+life_expectancy <- sample_gamma(nsamples,12,2)		# in years
 discount_rate   <- 0.015
 
+set.seed(5698) 
+xx <- rbeta(10,4,96)
+set.seed(5698) 
+yy <- sample_beta_event(10,4,100) 	
+
+?rbeta
 # disease burden
-force_of_infection      <- rbeta(Nsamples,4,96) 	#draw Nsamples randomly from a beta distribution with parameters 4 and 96
-proportion_hospitalised <- rbeta(Nsamples,10,90)
-casefatality_ratio      <- rbeta(Nsamples,30,970)
+force_of_infection      <- rbeta(nsamples,4,96) #sample_beta_event(nsamples,4,100) 	
+p_hosp <- rbeta(nsamples,10,90) #sample_beta_event(nsamples,10,100)
+case_fatality_ratio      <- rbeta(nsamples,30,970) # sample_beta_event(nsamples,30,1000)
 
 # disease-related costs
-cost_per_hospitalised_case    <- rnorm(Nsamples,2000,100)  #dollars
-cost_per_nonhospitalised_case <- rnorm(Nsamples,100,5) 	   #dollars
+cost_per_hosp_case     <- rnorm(nsamples,2000,100) # sample_gamma(nsamples, 2000, 100)  # euro
+cost_per_non_hosp_case <- rnorm(nsamples,100,5) #sample_gamma(nsamples, 100, 5) 	  # euro
 
 # program details
 uptake_program                <- 0.80
-vaccine_efficacy              <- rnorm(Nsamples,mean=0.6,sd=(0.7-0.5)/(2*1.96))
-vaccine_price_per_dose        <- 10 			   #dollars
-admin_cost_per_dose           <- rnorm(Nsamples,50,4) 	   #dollars
-fixed_program_costs           <- 0 			   #dollars
+vaccine_efficacy              <- rnorm(nsamples,mean=0.6,sd=(0.7-0.5)/(2*1.96)) # sample_beta_mean(nsamples, mean = 0.6, se = (0.7-0.5)/(2*1.96))
+vaccine_price_per_dose        <- 10 			                       # euro
+admin_cost_per_dose           <- rnorm(nsamples,50,4) #sample_gamma(nsamples, 50, 4)   # euro
+fixed_program_cost           <- 0 			                         # euro
 
 # QALY
-QALYslost_per_hospitalised_case    <- rnorm(Nsamples,mean=0.018,sd=0.0018)
-alpha_qaly_nonhosp                 <- (0.0082^2*(1-0.0082)/0.0018^2)-0.0082
-QALYslost_per_nonhospitalised_case <- rbeta(Nsamples,alpha_qaly_nonhosp,alpha_qaly_nonhosp*(1-0.0082)/0.0082)
+QALYloss_hosp_case    <- sample_beta_mean(nsamples, 0.018, 0.0018)
+QALYloss_non_hosp_case <- sample_beta_mean(nsamples, 0.0082, 0.0018)
 
 ```
 
@@ -102,13 +116,13 @@ QALYslost_per_nonhospitalised_case <- rbeta(Nsamples,alpha_qaly_nonhosp,alpha_qa
 Now, propagate the uncertainty from the input parameters of the flu model into the outcome of your flu model. To start the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, taking into account the proportion of cases that lead to hospitalization, the QALY lost per case, and the discounted life expectancy:
 ```{r }
 vaccine_cost_per_dose     <- vaccine_price_per_dose + admin_cost_per_dose
-treatment_cost_per_case   <- cost_per_hospitalised_case * proportion_hospitalised + 
-                              (1-proportion_hospitalised) * cost_per_nonhospitalised_case
-QALYslost_per_case        <- QALYslost_per_hospitalised_case * proportion_hospitalised +        
-                               QALYslost_per_nonhospitalised_case * (1-proportion_hospitalised)
+treatment_cost_per_case   <- cost_per_hosp_case * p_hosp + 
+                              (1-p_hosp) * cost_per_non_hosp_case
+QALYloss_per_case        <- QALYloss_hosp_case * p_hosp +        
+                               QALYloss_non_hosp_case * (1-p_hosp)
 
-life_expectancy_disc <- rep(NA,Nsamples)
-for (i in 1:Nsamples){
+life_expectancy_disc <- rep(NA,nsamples)
+for (i in 1:nsamples){
         life_expectancy_disc[i] <- sum(1/((1+discount_rate)^(0:(life_expectancy[i]-1))))
 }
 
@@ -125,17 +139,17 @@ Calculate the burden of disease with the program in place, along with the associ
 population_at_risk         <- targetgroup * (1-uptake_program) + targetgroup * uptake_program * (1-vaccine_efficacy)
 
 program_infections         <- population_at_risk * force_of_infection 
-program_hospitalisations   <- program_infections * proportion_hospitalised
-program_deaths             <- program_infections * casefatality_ratio
+program_hospitalisations   <- program_infections * p_hosp
+program_deaths             <- program_infections * case_fatality_ratio
 program_lifeyearslost      <- program_deaths * life_expectancy
 program_lifeyearslost_disc <- program_deaths * life_expectancy
 
-program_treatmentcosts     <- program_infections * treatment_cost_per_case
-program_vaccinationcosts   <- fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
-program_totaldirectcosts   <- program_treatmentcosts + program_vaccinationcosts
+program_treatment_cost     <- program_infections * treatment_cost_per_case
+program_vaccination_cost   <- fixed_program_cost + targetgroup * uptake_program * vaccine_cost_per_dose
+program_total_cost   <- program_treatment_cost + program_vaccination_cost
 
-program_QALYslost          <- program_infections * QALYslost_per_case + program_lifeyearslost
-program_QALYslost_disc     <- program_infections * QALYslost_per_case + program_lifeyearslost_disc
+program_QALYloss          <- program_infections * QALYloss_per_case + program_lifeyearslost
+program_QALYloss_disc     <- program_infections * QALYloss_per_case + program_lifeyearslost_disc
 
 ```
 
@@ -147,17 +161,17 @@ Calculate the burden of disease for the comparator without the program in place,
 ```{r include = FALSE}
 # Comparator
 comparator_infections         <- targetgroup * force_of_infection
-comparator_hospitalisations   <- comparator_infections * proportion_hospitalised
-comparator_deaths             <- comparator_infections * casefatality_ratio
+comparator_hospitalisations   <- comparator_infections * p_hosp
+comparator_deaths             <- comparator_infections * case_fatality_ratio
 comparator_lifeyearslost      <- comparator_deaths * life_expectancy
 comparator_lifeyearslost_disc <- comparator_deaths * life_expectancy_disc
         
-comparator_treatmentcosts     <- comparator_infections * treatment_cost_per_case
-comparator_vaccinationcosts   <- 0
-comparator_totaldirectcosts   <- comparator_treatmentcosts + comparator_vaccinationcosts
+comparator_treatment_cost     <- comparator_infections * treatment_cost_per_case
+comparator_vaccination_cost   <- 0
+comparator_total_cost   <- comparator_treatment_cost + comparator_vaccination_cost
 
-comparator_QALYslost       <- comparator_infections * QALYslost_per_case + comparator_lifeyearslost
-comparator_QALYslost_disc  <- comparator_infections * QALYslost_per_case + comparator_lifeyearslost_disc
+comparator_QALYloss       <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost
+comparator_QALYloss_disc  <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
 
 ```
 
@@ -174,12 +188,12 @@ deaths_averted              <- comparator_deaths - program_deaths
 lifeyearslost_averted       <- comparator_lifeyearslost - program_lifeyearslost
 lifeyearslost_averted_disc  <- comparator_lifeyearslost_disc - program_lifeyearslost_disc
 
-QALY_gained                 <- comparator_QALYslost - program_QALYslost
-QALY_gained_disc            <- comparator_QALYslost_disc - program_QALYslost_disc
+QALY_gained                 <- comparator_QALYloss - program_QALYloss
+QALY_gained_disc            <- comparator_QALYloss_disc - program_QALYloss_disc
 
-treatment_costs_averted     <- comparator_treatmentcosts - program_treatmentcosts
-incr_vaccination_costs      <- program_vaccinationcosts - comparator_vaccinationcosts # incremental costs
-incr_total_costs            <- incr_vaccination_costs - treatment_costs_averted
+treatment_cost_averted     <- comparator_treatment_cost - program_treatment_cost
+incr_vaccination_cost      <- program_vaccination_cost - comparator_vaccination_cost # incremental cost
+incr_total_cost            <- incr_vaccination_cost - treatment_cost_averted
 
 ```
 
@@ -189,13 +203,13 @@ Warning, the expected ICER equals the expected incremental cost / average increm
 ```{r }
 
 # Calculate incremental effectiveness ratios
-incr_cost_per_case_prevented            <- mean(incr_total_costs) / mean(infections_averted)
-incr_cost_per_hospitalisation_prevented <- mean(incr_total_costs) / mean(hospitalisations_averted)
-incr_cost_per_death_averted             <- mean(incr_total_costs) / mean(deaths_averted)
-incr_cost_per_lifeyear_gained           <- mean(incr_total_costs) / mean(lifeyearslost_averted)
-incr_cost_per_lifeyear_gained_disc      <- mean(incr_total_costs) / mean(lifeyearslost_averted_disc)
-incr_costs_per_QALY_gained              <- mean(incr_total_costs) / mean(QALY_gained)
-incr_costs_per_QALY_gained_disc         <- mean(incr_total_costs) / mean(QALY_gained_disc)
+incr_cost_per_case_prevented            <- mean(incr_total_cost) / mean(infections_averted)
+incr_cost_per_hospitalisation_prevented <- mean(incr_total_cost) / mean(hospitalisations_averted)
+incr_cost_per_death_averted             <- mean(incr_total_cost) / mean(deaths_averted)
+incr_cost_per_lifeyear_gained           <- mean(incr_total_cost) / mean(lifeyearslost_averted)
+incr_cost_per_lifeyear_gained_disc      <- mean(incr_total_cost) / mean(lifeyearslost_averted_disc)
+incr_cost_per_QALY_gained              <- mean(incr_total_cost) / mean(QALY_gained)
+incr_cost_per_QALY_gained_disc         <- mean(incr_total_cost) / mean(QALY_gained_disc)
 
 ```
 
@@ -208,8 +222,8 @@ ICER_values<-cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prev
                incr_cost_per_death_averted             = incr_cost_per_death_averted,
                incr_cost_per_lifeyear_gained           = incr_cost_per_lifeyear_gained,
                incr_cost_per_lifeyear_gained_disc      = incr_cost_per_lifeyear_gained_disc,
-               incr_costs_per_QALY_gained              = incr_costs_per_QALY_gained,
-               incr_costs_per_QALY_gained_disc         = incr_costs_per_QALY_gained_disc)
+               incr_cost_per_QALY_gained              = incr_cost_per_QALY_gained,
+               incr_cost_per_QALY_gained_disc         = incr_cost_per_QALY_gained_disc)
 
 # print rounded results
 round(ICER_values)
@@ -226,18 +240,18 @@ Please note that the mean estimate for the incremental total cost per infection 
 par(mfrow = c(1, 3))
 
 # Plot the histograms
-hist(incr_total_costs, xlab = 'Incremental total cost', main = 'Histogram of Incremental Total Costs')
+hist(incr_total_cost, xlab = 'Incremental total cost', main = 'Histogram of Incremental Total Cost')
 hist(infections_averted, xlab = 'Infections averted', main = 'Histogram of Infections Averted')
-hist(incr_total_costs / infections_averted, xlab = 'Incremental total cost per infection averted', main = 'Histogram of Incremental Cost per Infection Averted')
+hist(incr_total_cost / infections_averted, xlab = 'Incremental total cost per infection averted', main = 'Histogram of Incremental Cost per Infection Averted')
 
 # Reset the plotting layout to default
 par(mfrow = c(1, 1))
 ```
 
 ```{r}
-mean(incr_total_costs/infections_averted)       # mean of ratios
-median(incr_total_costs/infections_averted)     # median of ratios
-mean(incr_total_costs)/mean(infections_averted) # ratio of means: ICER!!
+mean(incr_total_cost/infections_averted)       # mean of ratios
+median(incr_total_cost/infections_averted)     # median of ratios
+mean(incr_total_cost)/mean(infections_averted) # ratio of means: ICER!!
 ```
 
 
@@ -250,19 +264,19 @@ mean(incr_total_costs)/mean(infections_averted) # ratio of means: ICER!!
 
 # Specify a matrix containing the clinical effectiveness for each intervention being considered.
 # note: this needs to be specified as health gain (i.e. negative health loss)
-ce_effects <- cbind(-comparator_QALYslost_disc,-program_QALYslost_disc)
+ce_effects <- cbind(-comparator_QALYloss_disc,-program_QALYloss_disc)
 
 
 # Specify a matrix containing the cost for each intervention being considered.
 # note: this needs to be specified as health gain (i.e. negative health loss)
-ce_costs   <- cbind(comparator_totaldirectcosts,program_totaldirectcosts)
+ce_cost   <- cbind(comparator_total_cost,program_total_cost)
 
 # Define the labels to be associated with each intervention.
 interventions = c("No intervention","Vaccine program")
 
 # Run the 'bcea()' function
 m <- bcea(eff = ce_effects,
-          cost = ce_costs,
+          cost = ce_cost,
           ref = 2,  # the column of eff and cost considered to be the reference strategy.
           interventions = interventions,
           plot = T) #ref specifies to compare 'Vaccine program' to 'No intervention'

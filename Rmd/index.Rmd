@@ -1,5 +1,5 @@
 ---
-title: "Introduction to infectious disease modelling and health economic research in R"
+title: "Introduction to modelling infectious disease and health economics in R"
 author: by Lander Willem and colleagues from the University of Antwerp and Hasselt University as part of the SIMID consortium
 output:
   html_document:
@@ -7,13 +7,11 @@ output:
 ---
 
 <hr>
-<img src="ext_fig/logo_chermid.png" height="50px"> &nbsp; &nbsp;
-<img src="ext_fig/logo_dsi.png" height="80px"> &nbsp; &nbsp;
+<img src="ext_fig/logo_chermid.png" height="50px"> &nbsp; &nbsp;&nbsp;&nbsp;
+<img src="ext_fig/logo_dsi.png" height="80px"> &nbsp; &nbsp;&nbsp;&nbsp;
 <img src="ext_fig/logo_simid_yellow.png" height="80px">
 <hr>
 
-
-Welcome to our introductory material for the Summer School on "Modelling Infectious Diseases and Health Economics".
 
 ## Required software
 * [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-4.0.0.
@@ -27,12 +25,13 @@ Welcome to our introductory material for the Summer School on "Modelling Infecti
 4. [Introduction to Individual-Based Models (IBMs) using R](intro_to_IBM_coding.html)
 5. [IBM with random walks](intro_to_IBM_walk.html)
 6. [IBM with location-specific mixing](intro_to_IBM_location.html)
-7. [HTA flu (start)](HTA_flu_basic.html)
-8. [HTA flu (uncertainty](HTA_flu_CEAresults.html)
+7. [HTA flu CEA](HTA_flu_basic.html)
+8. [HTA flu parameters: uncertainty](HTA_flu_basic.html)
+9. [HTA flu CEA with uncertainty](HTA_flu_CEAresults.html)
 <!-- 9. [Demo Uncertainty](HTA_flu_uncertainty.html) -->
 <!-- 10. [Demo EVPPI](HTA_flu_evppi.html) -->
-9. [CEA: RSV](HTA_RSV_dynamic.html)
-10. [Discounting](example_discounting.html)
+10. [CEA: RSV](HTA_RSV_dynamic.html)
+11. [Discounting](example_discounting.html)
 
 We provide some background literature [here](background_literature.html).
 
