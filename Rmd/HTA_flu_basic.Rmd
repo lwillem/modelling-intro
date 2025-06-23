@@ -73,7 +73,7 @@ fixed_program_costs     <- 0    # euro
 
 <br>
 
-# Health Technology Assessment (part I)
+# Part I: costs and burden of disease
 
 Here are the tasks you need to complete to run the health technology assessment:
 
@@ -223,7 +223,7 @@ round(ICER_values) # print
 
 <br>
 
-# Health Technology Assessment (part II): QALY
+# Part II: QALY
 
 The burden of disease can also be represented by quality-adjusted life years (QALYs). Please calculate the incremental cost-effectiveness ratio in terms of the incremental cost per QALY gained, using the following QALY values:
 
@@ -284,8 +284,29 @@ round(ICER_values)
 
 <br>
 
-# Health Technology Assessment (part III): discounting
+# Part III: Total cost
 
+In addition to the incremental costs and effects per case or disease burden type, it is also worthwhile to assess the overall costs and effects at the population level. Therefore, consider the total investment and revenue of an intervention given the target group.
+
+```{r, eval = show_results}
+
+# treatment costs (in million)
+data.frame(comparator_treatment_costs = comparator_treatment_costs,
+           program_treatment_costs    = program_treatment_costs,
+           treatment_costs_averted    = treatment_costs_averted) / 1e6
+
+# investment costs (in million)           
+data.frame(incr_vaccination_costs = incr_vaccination_costs) / 1e6
+           
+# program vs comparator (in million)
+data.frame(comparator_total_costs = comparator_total_costs,
+           program_total_costs = program_total_costs,
+           incr_total_costs = incr_total_costs) / 1e6
+```
+
+
+
+# Part VI: Discounting
 
 Health Technology Assessments often involves comparing the costs and benefits of healthcare interventions over time. Discounting is a critical concept in HTA, reflecting the principle that costs and benefits occurring in the future are worth less than those occurring today. This is because of the time preference for immediate benefits and the opportunity cost of capital. By applying discount rates, HTA practitioners can appropriately adjust future costs and health outcomes to present values, enabling fair and consistent comparisons between different healthcare technologies or interventions. Here's a small example to illustrate how discounting is applied in HTA:
 
@@ -338,9 +359,7 @@ print(colSums(discounted_data)[-1])
 
 Incorporate time preference into our health technology assessments for flu. Although all costs are incurred in the current year, the benefits, measured in life years saved, extend into the future. To accurately reflect the value of these future health effects, they should be adjusted using a discount rate.
 
-<br>
-
-## Solutions III: step-by-step
+## Solutions VI: step-by-step
 
 Calculate the discounted life expectancy to include in the effect calculation, and continue to obtain the discounted ICER:
 ```{r, echo = !show_results, eval = FALSE}
@@ -379,25 +398,6 @@ round(ICER_values)
 ```
 
 <br>
-
-# Total costs and effects
-
-In addition to the incremental costs and effects per case or disease burden type, it is also worthwhile to assess the overall costs and effects at the population level. Therefore, consider the total investment and revenue of an intervention given the target group.
-
-```{r, eval = show_results}
-
-# impact of comparator strategy
-data.frame(comparator_total_costs = comparator_total_costs,
-           comparator_QALYloss_disc = comparator_QALYloss_disc)
-
-# impact of program           
-data.frame(program_total_costs = program_total_costs,
-           program_QALYloss_disc = program_QALYloss_disc)
-           
-# program vs comparator
-data.frame(incr_total_costs = incr_total_costs,
-           QALY_gained_disc = QALY_gained_disc)
-```
 
 
 <div>
