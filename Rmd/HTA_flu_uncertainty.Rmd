@@ -128,7 +128,7 @@ force_of_infection_beta    = sample_beta_event(nsamples,4,100) # = rbeta(nsample
 # probability
 force_of_infection_beta    = sample_beta_event(nsamples,4,100)
 p_hospital_beta            = sample_beta_event(nsamples,10,100)
-case_fatality_ratio_beta   = sample_beta_event(nsamples,30,100)
+case_fatality_ratio_beta   = sample_beta_event(nsamples,30,1000)
 
 # count data
 life_expectancy_gamma =  sample_gamma(nsamples,12,2)

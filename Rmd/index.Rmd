@@ -26,12 +26,16 @@ output:
 5. [IBM with random walks](intro_to_IBM_walk.html)
 6. [IBM with location-specific mixing](intro_to_IBM_location.html)
 7. [CEA: influenza](HTA_flu_basic.html)
-8. [CEA: parametric uncertainty](HTA_flu_basic.html)
+8. [CEA: parametric uncertainty](HTA_flu_uncertainty.html)
 9. [CEA: influenza with uncertainty](HTA_flu_CEAresults.html)
 <!-- 9. [Demo Uncertainty](HTA_flu_uncertainty.html) -->
 <!-- 10. [Demo EVPPI](HTA_flu_evppi.html) -->
 10. [CEA: RSV](HTA_RSV_dynamic.html)
-11. [Discounting](example_discounting.html)
+
+Extra:
+
+- [Discounting](example_discounting.html)
+- [CEA: PSA](HTA_flu_PSA.html)
 
 We provide some background literature [here](background_literature.html).
 
