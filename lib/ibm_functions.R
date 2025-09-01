@@ -1002,7 +1002,7 @@ plot_transmission_matrix <- function(mij,
   char.size     <- par()$cin[1] / par()$din[1] # get text character size
   offset        <- char.size * par()$mar[4] # space between legend and main plot
   legend.width  <- 1
-  legend.mar    <- 5.1
+  legend.mar    <- 8.1
   legend.shrink <- 0.9
   cex.lab       <- 1.2
   cex.axis      <- 0.8
@@ -1044,8 +1044,8 @@ plot_transmission_matrix <- function(mij,
   
   # add axis labels
   plt_ticks <- seq(0, 1, length = nrow(mij))
-  axis(2, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 1)
-  axis(1, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 2)
+  axis(2, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 1, mgp = c(3, 0.3, 0))
+  axis(1, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 2, mgp = c(3, 0.3, 0))
 
   # add numeric values if num.digits != NA and cex.text > 0
   if (!is.na(num.digits) && !is.na(cex.text) && cex.text > 0) {
@@ -1069,8 +1069,17 @@ plot_transmission_matrix <- function(mij,
         xaxt = "n", yaxt = "n", xlab = "",
         ylab = "", col = redc,
         breaks = breaks)
-  axis(side = 4, at = 1:length(breaks[-1]), labels= breaks[-1], mgp = c(3, 1, 0), las = 2)
-
+  #axis(side = 4, at = 1:length(breaks[-1]), labels= breaks[-1], mgp = c(3, 1, 0), las = 2)
+  mtext("count", side = 2, cex = 0.8)  
+  breaks_label <- breaks
+  if(any(diff(breaks)>1)){
+    sel_bin <- c(FALSE,diff(breaks) > 1)
+    breaks_label_bin <- breaks_label
+    breaks_label_bin[-1] <- paste(breaks_label[-length(breaks_label)], breaks_label[-1], sep=' - ')
+    breaks_label[sel_bin] <- breaks_label_bin[sel_bin]
+  }
+  axis(side = 4, at = 1:length(breaks[-1])+0.5, labels = breaks_label[-1], cex.axis = cex.axis, mgp = c(3, 0.3, 0), las = 2, tick = FALSE)
+  
   # restore original graphical parameters
   par(old.par)
   

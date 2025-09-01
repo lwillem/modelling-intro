@@ -75,10 +75,26 @@ run_ibm_location()
 What can you learn from these graphs?
 </n>
 
-# Change some parameters
+
+```{r}
+
+# The location-specific IBM uses the create_population_matrix(...) function to obtain a population.
+# Inspect the initial lines of this function to determine the rules governing the stochastic setup of the population.
+head(create_population_matrix,9)
+
+```
+
+<n style="color:darkred">
+Can you confirm these population rules based on the graphs above?
+</n>
+
+# Explore some parameters
+
+The "model parameters" from the model printout above can be used as function arguments to modify the default settings. For example, you can change the number of community contacts per day by adjusting `num_contacts_community_day`.
+
 ```{r eval=FALSE}
 
-# increase num_contacts_community_day to 6
+# increase the number of contacts in the community per day to 6 (= 'num_contacts_community_day')
 run_ibm_location(num_contacts_community_day = 6)
 
 # set num_schools to 5
