@@ -865,13 +865,13 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
 #pop_size <- 1e4
 create_population_matrix <- function(pop_size, num_schools, target_school_ages, num_workplaces,bool_show_demographics = TRUE)
 {
-  # demographic parameters
+  ## demographic parameters
   ages_adult <- 19:60
   ages_child <- 1:18
   adult_age_tolerance     <- 0:5    # age tolerance between adults
   child_age_tolerance     <- 1:4    # age tolerance between children
-  household_age_gap_min   <- 22     # min age gap between adults and children
-  household_age_gap_max   <- 35     # max age gap age between adults and children
+  household_age_gap_min   <- 22     # min age gap between adults and youngest child
+  household_age_gap_max   <- 35     # max age gap age between adults and youngest child
   
   # create the population
   pop_data         <- NULL  # start from empty matrix
@@ -927,32 +927,17 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
                          health              = 'S',           # column to store the health state
                          infector            = NA,            # column to store the source of infection
                          time_of_infection   = NA,            # column to store the time of infection
-                         generation_interval = 0,            # column to store the generation interval
+                         generation_interval = 0,             # column to store the generation interval
                          secondary_cases     = 0,             # column to store the number of secondary cases
-                         stringsAsFactors = F)
+                         stringsAsFactors    = FALSE)
   
-  # initiate school classes by age and number of schools
-  if(num_schools>0){
-    # eg. 'class3_1' is the 1th classroom with 3-year olds children
-    pop_data$classroom_id <- paste0('class',pop_data$age,'_',sample(num_schools,pop_size,replace =T))
-    
-    # set 'classroom_id' for infants and adults outside the target ages to 'NA' (=none)
-    boolean_school_pop    <- pop_data$age %in% target_school_ages
-    pop_data$classroom_id[!boolean_school_pop] <- NA
-  } else {
-    pop_data$classroom_id <- NA
-  }
-
+  # set school classes by age and number of schools
+  pop_data <- set_schools(pop_data, num_schools, target_school_ages)
   
-  # initiate workplaces
-  if(num_workplaces > 0){
-    pop_data$workplace_id <- sample(num_workplaces,pop_size,replace =T)
-    boolean_workplace_pop    <- pop_data$age > max(target_school_ages)
-    pop_data$workplace_id[!boolean_workplace_pop] <- NA    
-  } else {
-    pop_data$workplace_id <- NA
-  }
-
+  # set workplace 
+  pop_data <- set_workplaces(pop_data, num_workplaces, target_school_ages)
+  
+  # option to plot demographics
   if(bool_show_demographics){
     # create a figure with 8 subplots
     par(mfrow=c(2,4))
@@ -973,6 +958,36 @@ create_population_matrix <- function(pop_size, num_schools, target_school_ages, 
   
 } # end function
 
+set_schools <- function(pop_data, num_schools, target_school_ages){
+  if(num_schools > 0){
+    # eg. 'class3_1' is the 1th classroom with 3-year olds children
+    pop_data$classroom_id <- paste0('class', pop_data$age, '_', sample(num_schools, nrow(pop_data), replace = TRUE))
+    
+    # set 'classroom_id' for infants and adults outside the target ages to 'NA' (=none)
+    boolean_school_pop    <- pop_data$age %in% target_school_ages
+    pop_data$classroom_id[!boolean_school_pop] <- NA
+  } else {
+    pop_data$classroom_id <- NA
+  }
+  # return the result
+  return(pop_data)
+}
+
+## workplaces
+set_workplaces <- function(pop_data, num_workplaces, target_school_ages){
+  if(num_workplaces > 0){
+    # sample a workplace for each individual
+    pop_data$workplace_id <- sample(num_workplaces, nrow(pop_data), replace = TRUE)
+    
+    # set 'workplace_id' for children to 'NA' (= no workplace)
+    boolean_workplace_pop <- pop_data$age <= max(target_school_ages)
+    pop_data$workplace_id[!boolean_workplace_pop] <- NA    
+  } else {
+    pop_data$workplace_id <- NA
+  }
+  # return the result
+  return(pop_data)
+}
 
 plot_transmission_matrix <- function(mij,
                                      breaks = NA,

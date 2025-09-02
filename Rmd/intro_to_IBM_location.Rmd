@@ -59,6 +59,28 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_fun
 source('ibm_functions.R')
 ```
 
+# Household setup
+
+In our simulation model, we include households composed of two adults, as well as households with two adults and two children. Ages within a household are not randomly distributed. Typically, there is a limited age gap between partners, and if children are present, there is also a fertility-based age gap between the children and their parents. In addition, households tend to have specific age gaps between siblings. The location-specific IBM uses the `create_population_matrix(...)` function to generate a population. Inspect the initial lines of this function to determine the rules that govern the stochastic setup of the population:
+
+
+```{r}
+head(create_population_matrix,9)
+```
+
+# School and workplace setup
+
+In daily life, we visit locations suited to our tasks, which are age-specific. In our model, we assume age-based school classes but no age-specific selection of workplaces. We provide options to specify the number of schools (`set_schools(...)`) and the number of workplaces (`set_workplaces(...)`). Assignment to a specific school or workplace is carried out randomly using the `sample()` function. Inspect the functions for school classes and workplaces that govern the stochastic setup of the population:
+
+
+```{r}
+# inspect the set_schools function (by omitting the brackets = function call)
+set_schools
+
+# inspect the set_workplaces function (by omitting the brackets = function call)
+set_workplaces
+
+```
 # Base case scenario
 
 <n style="color:darkred">
@@ -72,20 +94,7 @@ run_ibm_location()
 ```
 
 <n style="color:darkred">
-What can you learn from these graphs?
-</n>
-
-
-```{r}
-
-# The location-specific IBM uses the create_population_matrix(...) function to obtain a population.
-# Inspect the initial lines of this function to determine the rules governing the stochastic setup of the population.
-head(create_population_matrix,9)
-
-```
-
-<n style="color:darkred">
-Can you confirm these population rules based on the graphs above?
+What can you learn from these graphs and output? Can you confirm the population rules based on the graphs above?
 </n>
 
 # Explore some parameters
@@ -98,7 +107,7 @@ The "model parameters" from the model printout above can be used as function arg
 run_ibm_location(num_contacts_community_day = 6)
 
 # set num_schools to 5
-run_ibm_location(num_school = 6)
+run_ibm_location(num_schools = 5)
 
 # set transmission_prob to 0.15 (and switch off the demographic plots)
 run_ibm_location(transmission_prob = 0.15,
