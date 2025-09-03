@@ -79,14 +79,14 @@ nsamples = 5000
 set.seed(5698) 
 
 # population details
-targetgroup     = 2500000 								# people>65 years
-life_expectancy = sample_gamma(nsamples,12,2)		# in years
+targetgroup     = 2500000 								     # people>65 years
+life_expectancy = sample_gamma(nsamples,12,2)	 # in years
 discount_rate   = 0.015
 
 # disease burden
-force_of_infection      = sample_beta_event(nsamples,4,100)  	
-p_hosp = sample_beta_event(nsamples,10,100) 
-case_fatality_ratio      = sample_beta_event(nsamples,30,1000) 
+force_of_infection        = sample_beta_event(nsamples,4,100)  	
+p_hosp                    = sample_beta_event(nsamples,10,100) 
+hosp_case_fatality_ratio  = sample_beta_event(nsamples,30,100) 
 
 # disease-related costs
 cost_per_hosp_case     = sample_gamma(nsamples, 2000, 100)  # euro
@@ -96,8 +96,8 @@ cost_per_non_hosp_case = sample_gamma(nsamples, 100, 5) 	  # euro
 uptake_program                = 0.80
 vaccine_efficacy              = sample_beta_mean(nsamples, mean = 0.6, se = (0.7-0.5)/(2*1.96))
 vaccine_price_per_dose        = 10 			                       # euro
-admin_cost_per_dose           = sample_gamma(nsamples, 50, 4)   # euro
-fixed_program_cost            = 0 			                         # euro
+admin_cost_per_dose           = sample_gamma(nsamples, 50, 4)  # euro
+fixed_program_cost            = 0 			                       # euro
 
 # QALY
 QALYloss_hosp_case     = sample_beta_mean(nsamples, 0.018, 0.0018)
@@ -134,7 +134,7 @@ population_at_risk         = targetgroup * (1-uptake_program) + targetgroup * up
 
 program_infections         = population_at_risk * force_of_infection 
 program_hospitalisations   = program_infections * p_hosp
-program_deaths             = program_infections * case_fatality_ratio
+program_deaths             = program_hospitalisations * hosp_case_fatality_ratio
 program_lifeyearslost      = program_deaths * life_expectancy
 program_lifeyearslost_disc = program_deaths * life_expectancy
 
@@ -156,7 +156,7 @@ Calculate the burden of disease for the comparator without the program in place,
 # Comparator
 comparator_infections         = targetgroup * force_of_infection
 comparator_hospitalisations   = comparator_infections * p_hosp
-comparator_deaths             = comparator_infections * case_fatality_ratio
+comparator_deaths             = comparator_hospitalisations * hosp_case_fatality_ratio
 comparator_lifeyearslost      = comparator_deaths * life_expectancy
 comparator_lifeyearslost_disc = comparator_deaths * life_expectancy_disc
         
@@ -346,14 +346,14 @@ library(mgcv)
 opt_wtp = seq(0,50000,500)
 
 # combine input parameters with uncertainty
-model_param = data.frame(life_expectancy = life_expectancy,
-                         force_of_infection= force_of_infection,
-                         p_hosp= p_hosp,
-                         case_fatality_ratio= case_fatality_ratio,
-                         cost_per_hosp_case= cost_per_hosp_case,
-                         cost_per_non_hosp_case= cost_per_non_hosp_case,
-                         vaccine_efficacy= vaccine_efficacy,
-                         admin_cost_per_dose= admin_cost_per_dose,
+model_param = data.frame(force_of_infection = force_of_infection,
+                         p_hosp = p_hosp,
+                         life_expectancy = life_expectancy,
+                         hosp_case_fatality_ratio = hosp_case_fatality_ratio,
+                         cost_per_hosp_case = cost_per_hosp_case,
+                         cost_per_non_hosp_case = cost_per_non_hosp_case,
+                         vaccine_efficacy = vaccine_efficacy,
+                         admin_cost_per_dose = admin_cost_per_dose,
                          QALYloss_hosp_case = QALYloss_hosp_case,
                          QALYloss_non_hosp_case = QALYloss_non_hosp_case
                          )

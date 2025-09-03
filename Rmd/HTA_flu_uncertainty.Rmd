@@ -25,7 +25,7 @@ Define the uncertainty distributions the following parameters of our flu model:
 
 * Force of Infection: 4% (n=100)
 * Proportion hospitalised: 10% (n=100)
-* Case fatality ratio: 3% (n=1000)
+* Hospital case fatality ratio: 30% (n=1000)
 * Life expectancy: 12 + 2 (mean + se)
 * Vaccine efficacy: 60% [50%-70%]
 * Administration costs per dose: 50 + 4 (mean + se)
@@ -76,7 +76,7 @@ set.seed(5698) # use this to get exactly the same results each time you run the 
 # if probability (p) and sample size (n) given: se = sqrt(p*(1-p)/n
 force_of_infection_norm      = rnorm(nsamples,0.04, sqrt(0.04 * (1-0.04) / 100))	
 p_hospital_norm   = rnorm(nsamples,0.1, sqrt(0.1 * (1-0.1) / 100))		  
-case_fatality_ratio_norm      = rnorm(nsamples,0.03, sqrt(0.03 * (1-0.03) / 1000)) 
+hosp_case_fatality_ratio_norm   = rnorm(nsamples,0.3, sqrt(0.3 * (1-0.3) / 1000)) 
 
 # if mean and se given (and n unknown)
 life_expectancy_norm = rnorm(nsamples,12,2)	
@@ -126,9 +126,9 @@ force_of_infection_beta    = sample_beta_event(nsamples,4,100) # = rbeta(nsample
 ```{r , echo = show_results}
 
 # probability
-force_of_infection_beta    = sample_beta_event(nsamples,4,100)
-p_hospital_beta            = sample_beta_event(nsamples,10,100)
-case_fatality_ratio_beta   = sample_beta_event(nsamples,30,1000)
+force_of_infection_beta       = sample_beta_event(nsamples,4,100)
+p_hospital_beta               = sample_beta_event(nsamples,10,100)
+hosp_case_fatality_ratio_beta = sample_beta_event(nsamples,300,1000)
 
 # count data
 life_expectancy_gamma =  sample_gamma(nsamples,12,2)
@@ -182,9 +182,9 @@ legend('topright',
       lwd=1)
 
 
-plot(density(case_fatality_ratio_norm), main = 'case fatality ratio')
-lines(density(case_fatality_ratio_beta),col = 2)
-abline(v = mean(case_fatality_ratio_norm), lty = 2)
+plot(density(hosp_case_fatality_ratio_norm), main = 'hospital case fatality ratio')
+lines(density(hosp_case_fatality_ratio_beta),col = 2)
+abline(v = mean(hosp_case_fatality_ratio_norm), lty = 2)
 grid()
 legend('topright',
       c('Norm()','Beta()', 'mean'),

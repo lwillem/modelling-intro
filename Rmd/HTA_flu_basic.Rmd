@@ -49,16 +49,16 @@ The goal is to calculate the cost-effectiveness (cost per flu case prevented, pe
 ```{r }
 
 # population
-targetgroup             <- 2500000 # people +65 years
-life_expectancy         <- 12      # years
+targetgroup     <- 2500000 # people +65 years
+life_expectancy <- 12      # years
 
 # burden of disease
-force_of_infection      <- 0.04  # static
-p_hospital <- 0.10
-case_fatality_ratio     <- 0.03  # applies to all infections
+force_of_infection       <- 0.04  # static
+p_hospital               <- 0.10
+hosp_case_fatality_ratio <- 0.30  # applies to all hospital cases
 
 # disease-related costs
-cost_hosp_case    <- 2000 # euro
+cost_hosp_case     <- 2000 # euro
 cost_non_hosp_case <- 100  # euro
 
 # program details
@@ -109,8 +109,7 @@ To begin the health technology assessment, we calculate the vaccine cost per dos
 
 ```{r, echo = show_results}
 vaccine_cost_per_dose     <- vaccine_price_per_dose + admin_cost_per_dose
-treatment_cost_per_case   <- cost_hosp_case * p_hospital + 
-                              (1-p_hospital) * cost_non_hosp_case
+treatment_cost_per_case   <- cost_hosp_case * p_hospital + (1 - p_hospital) * cost_non_hosp_case
 
 ```
 
@@ -129,14 +128,14 @@ Calculate the burden of disease for the comparator without the program in place,
 
 ```{r, echo = show_results}
 # Comparator
-comparator_infections       <- targetgroup * force_of_infection
-comparator_hospitalisations <- comparator_infections * p_hospital
-comparator_deaths           <- comparator_infections * case_fatality_ratio
-comparator_lifeyearslost    <- comparator_deaths * life_expectancy
+comparator_infections        <- targetgroup * force_of_infection
+comparator_hospitalisations  <- comparator_infections * p_hospital
+comparator_deaths            <- comparator_hospitalisations * hosp_case_fatality_ratio
+comparator_lifeyearslost     <- comparator_deaths * life_expectancy
 
 comparator_treatment_costs   <- comparator_infections * treatment_cost_per_case
 comparator_vaccination_costs <- 0
-comparator_total_costs <- comparator_treatment_costs + comparator_vaccination_costs
+comparator_total_costs       <- comparator_treatment_costs + comparator_vaccination_costs
 
 ```
 
@@ -149,16 +148,16 @@ Calculate the burden of disease with the program in place, along with the associ
 
 ```{r, echo = show_results}
 # Program
-population_at_risk       <- targetgroup * (1-uptake_program) + targetgroup * uptake_program * (1-vaccine_efficacy)
+population_at_risk        <- targetgroup * ((1 - uptake_program) + uptake_program * (1 - vaccine_efficacy))
 
-program_infections       <- population_at_risk * force_of_infection 
-program_hospitalisations <- program_infections * p_hospital
-program_deaths           <- program_infections * case_fatality_ratio
-program_lifeyearslost    <- program_deaths * life_expectancy
+program_infections        <- population_at_risk * force_of_infection 
+program_hospitalisations  <- program_infections * p_hospital
+program_deaths            <- program_hospitalisations * hosp_case_fatality_ratio
+program_lifeyearslost     <- program_deaths * life_expectancy
 
 program_treatment_costs   <- program_infections * treatment_cost_per_case
 program_vaccination_costs <- fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
-program_total_costs <- program_treatment_costs + program_vaccination_costs
+program_total_costs       <- program_treatment_costs + program_vaccination_costs
 
 ```
 
@@ -229,7 +228,7 @@ The burden of disease can also be represented by quality-adjusted life years (QA
 
 ```{r}
 
-QALYloss_hosp_case    <- 0.018
+QALYloss_hosp_case     <- 0.0180
 QALYloss_non_hosp_case <- 0.0082
 
 ```
@@ -247,14 +246,13 @@ Calculate the effect per average case and the total burden of disease for the co
 ```{r, echo = show_results}
 
 # intermediate results
-QALYloss_per_case        <- QALYloss_hosp_case * p_hospital +        
-                               QALYloss_non_hosp_case * (1-p_hospital)
+QALYloss_per_case    <- QALYloss_hosp_case * p_hospital + QALYloss_non_hosp_case * (1 - p_hospital)
 
 # program: effect
-program_QALYloss          <- program_infections * QALYloss_per_case + program_lifeyearslost
+program_QALYloss     <- program_infections * QALYloss_per_case + program_lifeyearslost
 
 # comparator: effect
-comparator_QALYloss       <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost
+comparator_QALYloss  <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost
 
 
 ```

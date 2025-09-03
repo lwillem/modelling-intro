@@ -473,7 +473,7 @@ flu model:</p>
 <ul>
 <li>Force of Infection: 4% (n=100)</li>
 <li>Proportion hospitalised: 10% (n=100)</li>
-<li>Case fatality ratio: 3% (n=1000)</li>
+<li>Hospital case fatality ratio: 30% (n=1000)</li>
 <li>Life expectancy: 12 + 2 (mean + se)</li>
 <li>Vaccine efficacy: 60% [50%-70%]</li>
 <li>Administration costs per dose: 50 + 4 (mean + se)</li>
@@ -525,7 +525,7 @@ uncertainty for the mean.</p>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co"># if probability (p) and sample size (n) given: se = sqrt(p*(1-p)/n</span></span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>force_of_infection_norm      <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.04</span>, <span class="fu">sqrt</span>(<span class="fl">0.04</span> <span class="sc">*</span> (<span class="dv">1</span><span class="fl">-0.04</span>) <span class="sc">/</span> <span class="dv">100</span>))    </span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>p_hospital_norm   <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.1</span>, <span class="fu">sqrt</span>(<span class="fl">0.1</span> <span class="sc">*</span> (<span class="dv">1</span><span class="fl">-0.1</span>) <span class="sc">/</span> <span class="dv">100</span>))        </span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>case_fatality_ratio_norm      <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.03</span>, <span class="fu">sqrt</span>(<span class="fl">0.03</span> <span class="sc">*</span> (<span class="dv">1</span><span class="fl">-0.03</span>) <span class="sc">/</span> <span class="dv">1000</span>)) </span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>hosp_case_fatality_ratio_norm   <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.3</span>, <span class="fu">sqrt</span>(<span class="fl">0.3</span> <span class="sc">*</span> (<span class="dv">1</span><span class="fl">-0.3</span>) <span class="sc">/</span> <span class="dv">1000</span>)) </span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a></span>
 <span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co"># if mean and se given (and n unknown)</span></span>
 <span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>life_expectancy_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="dv">12</span>,<span class="dv">2</span>) </span>

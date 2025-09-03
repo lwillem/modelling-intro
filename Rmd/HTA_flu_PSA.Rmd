@@ -284,7 +284,7 @@ For illustrative purposes, assume a fixed program cost of 100,000 euro and WTP o
 incr_cost_adj = incr_cost + 100000
 
 # set WTP threshold
-k = seq(0,5000,50)
+k = seq(0,5000,500)
 
 inmb_wtp = mean(incr_QALY_gain) * k - mean(incr_cost_adj)
 inmb_pos = as.numeric(inmb_wtp > 0)

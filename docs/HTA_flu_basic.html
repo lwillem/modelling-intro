@@ -512,16 +512,16 @@ on the following assumptions and input parameters:</p>
 <li>Death occurs after hospitalization</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># population</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>targetgroup             <span class="ot">&lt;-</span> <span class="dv">2500000</span> <span class="co"># people +65 years</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>life_expectancy         <span class="ot">&lt;-</span> <span class="dv">12</span>      <span class="co"># years</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>targetgroup     <span class="ot">&lt;-</span> <span class="dv">2500000</span> <span class="co"># people +65 years</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>life_expectancy <span class="ot">&lt;-</span> <span class="dv">12</span>      <span class="co"># years</span></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># burden of disease</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>force_of_infection      <span class="ot">&lt;-</span> <span class="fl">0.04</span>  <span class="co"># static</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>p_hospital <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>case_fatality_ratio     <span class="ot">&lt;-</span> <span class="fl">0.03</span>  <span class="co"># applies to all infections</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>force_of_infection       <span class="ot">&lt;-</span> <span class="fl">0.04</span>  <span class="co"># static</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>p_hospital               <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>hosp_case_fatality_ratio <span class="ot">&lt;-</span> <span class="fl">0.30</span>  <span class="co"># applies to all hospital cases</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># disease-related costs</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>cost_hosp_case    <span class="ot">&lt;-</span> <span class="dv">2000</span> <span class="co"># euro</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>cost_hosp_case     <span class="ot">&lt;-</span> <span class="dv">2000</span> <span class="co"># euro</span></span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>cost_non_hosp_case <span class="ot">&lt;-</span> <span class="dv">100</span>  <span class="co"># euro</span></span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co"># program details</span></span>
@@ -605,7 +605,7 @@ effectiveness ratios for life years saved:</p>
 life years (QALYs). Please calculate the incremental cost-effectiveness
 ratio in terms of the incremental cost per QALY gained, using the
 following QALY values:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>QALYloss_hosp_case    <span class="ot">&lt;-</span> <span class="fl">0.018</span></span>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>QALYloss_hosp_case     <span class="ot">&lt;-</span> <span class="fl">0.0180</span></span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>QALYloss_non_hosp_case <span class="ot">&lt;-</span> <span class="fl">0.0082</span></span></code></pre></div>
 <p><br></p>
 <div id="solutions-ii-step-by-step" class="section level2">
