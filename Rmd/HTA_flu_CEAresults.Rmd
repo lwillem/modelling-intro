@@ -253,6 +253,9 @@ k = 8000
 mean(QALY_gained_disc * k - incr_total_cost)
 mean(QALY_gained_disc) * k - mean(incr_total_cost)
 
+k = 7000
+mean(QALY_gained_disc * k - incr_total_cost)
+
 ```
 
 # Cost-effectiveness plane

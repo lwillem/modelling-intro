@@ -61,9 +61,9 @@ run_ibm_location(pop_size = 100,
 ```
 
 \clearpage
-# Population size 2000
+# Population size 3000
 ```{r pop_size_large, eval=TRUE}
-run_ibm_location(pop_size = 2000,
+run_ibm_location(pop_size = 3000,
                  rng_seed = 20,
                  bool_show_demographics = FALSE,
                  add_baseline = T)

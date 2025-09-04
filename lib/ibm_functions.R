@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright (C) 2024 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
+# Copyright (C) 2025 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
 ############################################################################ #
 #
 # FUNCTION TO VISUALISE THE POPULATION IN THE RANDOM WALK TUTORIAL
@@ -863,7 +863,7 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
 #' @keywords external
 #' @export
 #pop_size <- 1e4
-create_population_matrix <- function(pop_size, num_schools, target_school_ages, num_workplaces,bool_show_demographics = TRUE)
+create_population_matrix <- function(pop_size, num_schools, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
 {
   ## demographic parameters
   ages_adult <- 19:60
@@ -981,7 +981,7 @@ set_workplaces <- function(pop_data, num_workplaces, target_school_ages){
     
     # set 'workplace_id' for children to 'NA' (= no workplace)
     boolean_workplace_pop <- pop_data$age <= max(target_school_ages)
-    pop_data$workplace_id[!boolean_workplace_pop] <- NA    
+    pop_data$workplace_id[boolean_workplace_pop] <- NA    
   } else {
     pop_data$workplace_id <- NA
   }
