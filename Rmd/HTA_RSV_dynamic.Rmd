@@ -465,7 +465,7 @@ kable(rbind(inmb_example1,inmb_example2,inmb_example3))
 ```
 
 
-3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of admission costs in your analysis.
+3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of administration costs in your analysis.
 
 ```{r, eval = boolean_show_results, echo = boolean_show_results}
 

@@ -162,7 +162,6 @@ Explore CEA results from the online tutorial with default and adjusted parameter
 cea_input_02 = cea_input_01 = cea_input_07 = cea_input_adm = cea_input
 cea_input_01$uptake = 0.1 # 10% uptake
 cea_input_07$uptake = 0.7 # 70% uptake
-cea_input_adm$admin_cost = 0 # no (extra) admission costs
 ```
 
 ## Static model
