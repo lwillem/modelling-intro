@@ -32,21 +32,6 @@ home = "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
 ```
 
-# Package(s)
-
-If BCEA package is not installed yet, you can do so by
-```{r results = "hide", eval=FALSE}
-if(!"BCEA" %in% installed.packages()){
-        install.packages('BCEA')
-}
-```
-
-Once installed, you have to load the package(s) at the start of the R file. This is done using 
-
-```{r results = "hide"}
-library(BCEA)
-```
-
 # Specific uncertainty distributions
 For some parameters, the sample size is rather small or they should be strictly positive, hence other distribution might be preferred. Let's first define some help functions to facilitate sampling using a given mean, se, proportion, samples size or confidence interval:
 
@@ -227,7 +212,7 @@ Please note that there may be slight variations due to platform and R-version sp
 
 ## Second thoughts on the distributions for costs and cases
 
-Please note that the mean estimate for the incremental total cost per infection averted differs from the value we obtained when not accounting for uncertainty. This discrepancy could be due to extreme values in the ratio. Kindly review the following plots and estimates:
+Kindly review the following plots and estimates:
 
 ```{r echo=FALSE}
 # Set up the plotting area to have 1 row and 3 columns
@@ -238,7 +223,7 @@ hist(incr_total_cost, xlab = 'Incremental total cost', main = 'Histogram of Incr
 abline(v=mean(incr_total_cost),col=2)
 hist(QALY_gained_disc, xlab = 'QALY gain', main = 'Histogram of Infections Averted')
 abline(v=mean(QALY_gained_disc),col=2)
-hist(incr_total_cost / QALY_gained_disc, xlab = 'Incremental total cost per infection averted', main = 'Histogram of Incremental Cost per Infection Averted')
+hist(incr_total_cost / QALY_gained_disc, xlab = 'point-wise incremental total cost per infection averted', main = 'Histogram of Pointwise Incremental Cost per Infection Averted')
 
 # Reset the plotting layout to default
 par(mfrow = c(1, 1))
@@ -246,7 +231,6 @@ par(mfrow = c(1, 1))
 
 ```{r}
 mean(incr_total_cost/QALY_gained_disc)       # mean of ratios
-median(incr_total_cost/QALY_gained_disc)     # median of ratios
 mean(incr_total_cost)/mean(QALY_gained_disc) # ratio of means: ICER!!
 
 k = 8000
@@ -269,9 +253,153 @@ plot(QALY_gained_disc, incr_total_cost, xlab = 'Incremental effect',
 
 ```
 
+# Present CEA (w/o R package).
+
+```{r}
+
+# set WTP range, and step size
+opt_wtp <- seq(0,40000,2000)
+
+# initialise matrix 
+inmb_wtp_summary <- data.frame(wtp = opt_wtp,
+                               inmb = NA,
+                               ceac = NA,
+                               ceaf = NA,
+                               inmb_perfect_info = NA)
+
+# loop over all WTP levels
+for(i in 1:length(opt_wtp)){
+  # calculate the inmb per sample with the current WTP threshold
+  inmb_sample <- (QALY_gained_disc * opt_wtp[i]) - incr_total_cost
+  
+  # get the expected INMB 
+  inmb_wtp_summary$inmb[i] <- mean(inmb_sample)
+  
+  # inspect the number of samples with a positive INMB
+  inmb_wtp_summary$ceac[i] <- sum(inmb_sample >= 0) / nsamples
+  
+  # to calculate INMB with perfect information, set all non-preferred options to zero
+  if(inmb_wtp_summary$inmb[i] >= 0){
+    inmb_sample[inmb_sample < 0] <- 0
+  } else{
+    inmb_sample[inmb_sample > 0] <- 0
+  }
+  # get the expected INMB with perfect information
+  inmb_wtp_summary$inmb_perfect_info[i] <- mean(inmb_sample)
+
+}
+
+# get preferred strategy by wtp, in this case, when INMB is positive
+inmb_wtp_summary$ceaf[inmb_wtp_summary$inmb > 0] = inmb_wtp_summary$ceac[inmb_wtp_summary$inmb > 0]
+
+# net-loss: difference between expected INMB and INMB with perfect information by sample
+inmb_wtp_summary$net_loss <- abs(inmb_wtp_summary$inmb_perfect_info - inmb_wtp_summary$inmb)
+
+```
+
+Inspect the CEA outcomes if the WTP threshold is 10000.
+
+```{r}
+inmb_wtp_summary[inmb_wtp_summary$wtp == 10000,]
+
+```
 
 
-# Cost-effectiveness analysis considering uncertainty (using BCEA package).
+Inspect the included WTP for which the intervention becomes cost-effective. Compare this with the ICER. 
+
+```{r}
+# summary statistics
+ce_threshold <- min(inmb_wtp_summary$wtp[inmb_wtp_summary$inmb > 0])
+icer = mean(incr_total_cost) / mean(QALY_gained_disc)
+
+data.frame(ce_threshold=ce_threshold,
+  icer=icer)
+```
+
+
+
+## Cost-effectiveness acceptability curve (CEAC)
+
+```{r}
+
+# CEAC
+plot(x = inmb_wtp_summary$wtp,
+     y = inmb_wtp_summary$ceac,
+     type= 'b',
+     xlab = 'Willingness To Pay',
+     ylab = 'Probability cost effective',
+     main = 'Cost-Effectiveness Acceptibility Curve',
+     ylim = 0:1)
+
+```
+
+
+## Cost-effectiveness acceptability frontier (CEAF)
+
+```{r}
+
+plot(x = inmb_wtp_summary$wtp,
+     y = inmb_wtp_summary$ceaf,
+     type = 'b',
+     xlab = 'Willingness to pay',
+     ylab = 'Probability to be cost-effective',
+     main = 'Cost-Effectiveness Acceptibility Frontier',
+     ylim = 0:1)
+
+```
+
+Or you can combine the CEAC and CEAF
+
+```{r}
+
+# Combination CEAC & CEAF
+plot(x = inmb_wtp_summary$wtp,
+     y = inmb_wtp_summary$ceac,
+     type = 'b',
+     lty = 3,
+     xlab = 'Willingness To Pay',
+     ylab = 'Probability to be cost-effective',
+     main = 'Cost-Effectiveness Acceptibility',
+     ylim = 0:1)
+lines(x = inmb_wtp_summary$wtp,
+      y = inmb_wtp_summary$ceaf,
+      type = 'l',
+      lty = 1,
+      lwd = 3)
+legend('topleft',
+       c('CEAC', 'CEAF'),
+       lty = c(3,1),
+       lwd = c(1,3))
+```
+
+
+## EVPI
+```{r}
+
+plot(x = inmb_wtp_summary$wtp,
+     y = inmb_wtp_summary$net_loss,
+     type = 'b',
+     xlab = 'Willingness To Pay',
+     ylab = 'Expected net-loss',
+     main = "Expected Value of Perfect Information")
+
+
+```
+
+# Present CEA (using the `BCEA` package).
+
+If `BCEA` package is not installed yet, you can do so by
+```{r results = "hide", eval=FALSE}
+if(!"BCEA" %in% installed.packages()){
+        install.packages('BCEA')
+}
+```
+
+Once installed, you have to load the package(s) using 
+
+```{r results = "hide"}
+library('BCEA')
+```
 
 1. Run the `bcea()`function to obtain the cost-effectiveness plane, the expected incremental net monetary benefit (INMB), the cost-effectiveness acceptability curve (CEAC) and the expected value for perfect information (EVPI):
 ```{r }
@@ -301,7 +429,7 @@ m = bcea(eff = ce_effects,
 
 2. Which decision should we take, given current information and for a range of WTP values? Print the summary of the `bcea()` function:
 ```{r }
-summary(m)
+summary(m, wtp = 10000)
 ```
 
 
