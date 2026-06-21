@@ -254,6 +254,9 @@ program_QALYloss     <- program_infections * QALYloss_per_case + program_lifeyea
 # comparator: effect
 comparator_QALYloss  <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost
 
+print(c(QALYloss_per_case = QALYloss_per_case, 
+        program_QALYloss = program_QALYloss, 
+        comparator_QALYloss = comparator_QALYloss))
 
 ```
 
@@ -380,6 +383,12 @@ comparator_QALYloss_disc     <- comparator_infections * QALYloss_per_case + comp
 
 # incremental effect
 QALY_gained_disc              <- comparator_QALYloss_disc - program_QALYloss_disc
+
+# print
+print(c(life_expectancy_disc = life_expectancy_disc,
+        program_QALYloss_disc = program_QALYloss_disc,
+        comparator_QALYloss_disc = comparator_QALYloss_disc,
+        QALY_gained_disc = QALY_gained_disc))
 
 # incremental cost-effectiveness ratio
 incr_costs_per_QALY_gained_disc <- incr_total_costs / QALY_gained_disc
