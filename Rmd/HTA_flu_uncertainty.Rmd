@@ -12,7 +12,7 @@ set.seed(2020)
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
 
-show_results = FALSE
+show_results = TRUE
 
 ```
 
@@ -21,7 +21,7 @@ For further information, questions or comments please contact us.
 
 # Goal
 
-Define the uncertainty distributions the following parameters of our flu model:
+Define the uncertainty distributions of the following parameters of our flu model:
 
 * Force of Infection: 4% (n=100)
 * Proportion hospitalised: 10% (n=100)
@@ -29,8 +29,8 @@ Define the uncertainty distributions the following parameters of our flu model:
 * Life expectancy: 12 + 2 (mean + se)
 * Vaccine efficacy: 60% [50%-70%]
 * Administration costs per dose: 50 + 4 (mean + se)
-* Cost per hospitalised case: $2000 + 100 (mean + se)
-* Cost per non-hospitalised case: $100 + 5 (mean + se)
+* Cost per hospitalised case: €2000 + 100 (mean + se)
+* Cost per non-hospitalised case: €100 + 5 (mean + se)
 * QALY loss per hospitalised case: 0.018 + 0.0018 (mean + se)
 * QALY loss per non-hospitalised case: 0.0082 + 0.0018 (mean + se)
 
@@ -270,13 +270,13 @@ legend('topright',
 # Summary
 
 ```{r, echo = !show_results}
-# over to you...
+# over to you... define and visualise the uncertainty distributions of the parameters of our flu model.
 ```
 
 ```{r, echo = show_results}
 
  
-# * force of infection: sample size rather small for Normal distribution, use Beta
+# * force of infection: sample size rather small for Normal distribution, use Beta (= strict positive!)
 # * probability of hospitalisation: sample size rather small for Normal distribution, use Beta
 # * case fatality ratio: sample size rather small for Normal distribution, use Beta
 # 
@@ -286,8 +286,7 @@ legend('topright',
 # * cost per hospital case: Normal and Gamma distributions OK
 # * cost per non-hospital case: Normal and Gamma distribution OK
 # * QALY loss per hospital case: Normal and Beta distribution OK
-# 
-# * QALY loss per non-hospital case: sample size rather small for normal distribution, use Beta
+# * QALY loss per non-hospital case: absolute values rather small for normal distribution, use Beta
 ```
 
 

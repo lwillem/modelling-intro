@@ -190,6 +190,36 @@ knitr::kable(round(data_out), caption = "Summary Table of Costs and QALY Values"
            
 ```
 
+# Calculate ICER per sample: don't!
+
+For illustrative purposes, assume a fixed program cost of 100,000 euro and WTP of 4000 euro per QALY gain. Calculate the ratio of means and mean of ratios with respect to the incremental costs and effects.
+
+```{r}
+
+# adjust program cost
+incr_cost_adj = incr_cost + 100000
+
+# willingness to pay
+k = 4000
+
+# calculate ratio of means and mean of ratios
+mean_of_ratios = mean(incr_cost_adj / incr_QALY_gain)
+ratio_of_means =  mean(incr_cost_adj) / mean(incr_QALY_gain)
+
+# calcualte also INMB
+inmb_mean    = mean(incr_QALY_gain * k) - mean(incr_cost_adj)
+
+# show table
+data_out = data.frame(mean_of_ratios = mean_of_ratios,
+                      ratio_of_means = ratio_of_means,
+                      inmb_mean = inmb_mean)
+
+# print table
+knitr::kable(data_out, caption = "Summary Table (k = 4000)")
+
+```
+
+Is the intervention cost-effective when the WTP is 4000 euro per QALY gain.
 
 # Calculate INMB per sample
 
@@ -235,7 +265,7 @@ knitr::kable(data_out, caption = "Summary Table (k = 5000)")
 
 # What if WTP = 3500 euro/QALY
 
-Repeat the calculation above, with a WTP of 4100 euro per QALY gain.
+Repeat the calculation above, with a WTP of 3500 euro per QALY gain.
 
 ```{r}
 
