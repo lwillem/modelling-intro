@@ -386,83 +386,9 @@ plot(x = inmb_wtp_summary$wtp,
 
 ```
 
-# Present CEA (using the `BCEA` package).
+## EVPPI
 
-If `BCEA` package is not installed yet, you can do so by
-```{r results = "hide", eval=FALSE}
-if(!"BCEA" %in% installed.packages()){
-        install.packages('BCEA')
-}
-```
-
-Once installed, you have to load the package(s) using 
-
-```{r results = "hide"}
-library('BCEA')
-```
-
-1. Run the `bcea()`function to obtain the cost-effectiveness plane, the expected incremental net monetary benefit (INMB), the cost-effectiveness acceptability curve (CEAC) and the expected value for perfect information (EVPI):
-```{r }
-# inspect the documentation of the 'bcea()' function
-?bcea
-
-# Specify a matrix containing the clinical effectiveness for each intervention being considered.
-# note: this needs to be specified as health gain (i.e. negative health loss)
-ce_effects = cbind(-comparator_QALYloss_disc,-program_QALYloss_disc)
-
-
-# Specify a matrix containing the cost for each intervention being considered.
-# note: this needs to be specified as health gain (i.e. negative health loss)
-ce_cost   = cbind(comparator_total_cost,program_total_cost)
-
-# Define the labels to be associated with each intervention.
-interventions = c("No intervention","Vaccine program")
-
-# Run the 'bcea()' function
-m = bcea(eff = ce_effects,
-          cost = ce_cost,
-          ref = 2,  # the column of eff and cost considered to be the reference strategy.
-          interventions = interventions,
-          plot = T) #ref specifies to compare 'Vaccine program' to 'No intervention'
-
-```
-
-2. Which decision should we take, given current information and for a range of WTP values? Print the summary of the `bcea()` function:
-```{r }
-summary(m, wtp = 10000)
-```
-
-
-3. How much evidence is there in favour of the decision, for a range of WTP values? Look at the CEAC and CEAF.
-```{r }
-m_ceaf = multi.ce(m)
-ceaf.plot(m_ceaf) # uses base plot 
-
-```    
-
-4. Is there value in further research? Look at the EVPI graph and summary above.
-
-# EVPPI
-
-The BCEA package allows to calculate the expected value of partially perfect information for parameter subsets. 
-
-
-```{r}
-
-# combine input parameters with uncertainty
-model_param = data.frame(force_of_infection= force_of_infection,
-                         QALYloss_non_hosp_case = QALYloss_non_hosp_case)
-
-inp = createInputs(model_param)
-
-# explicitly use BCEA package namespace to avoid package conflict
-evppi_bcea = BCEA::evppi(m, inp$parameters, inp$mat)
-
-plot(evppi_bcea,col=1:2,pos = c(1,1))
-
-```
-
-However, if are now interested in the EVPPI per individual parameter of the influenza model above, we can adopt the GAM approximation using the calculated incremental cost and benefit with all sampled parameter values.
+If we are interested in the EVPPI, hence per individual parameter of the influenza model above, we can adopt the GAM approximation using the calculated incremental cost and benefit with all sampled parameter values.
 
 ```{r}
 
@@ -547,19 +473,82 @@ legend('topright',
 <br>
 <br>
 
-# Compare with EVPPI from BCEA
+
+# Present CEA (using the `BCEA` package).
+
+If `BCEA` package is not installed yet, you can do so by
+```{r results = "hide", eval=FALSE}
+if(!"BCEA" %in% installed.packages()){
+        install.packages('BCEA')
+}
+```
+
+Once installed, you have to load the package(s) using 
+
+```{r results = "hide"}
+library('BCEA')
+```
+
+1. Run the `bcea()`function to obtain the cost-effectiveness plane, the expected incremental net monetary benefit (INMB), the cost-effectiveness acceptability curve (CEAC) and the expected value for perfect information (EVPI):
+```{r }
+# inspect the documentation of the 'bcea()' function
+?bcea
+
+# Specify a matrix containing the clinical effectiveness for each intervention being considered.
+# note: this needs to be specified as health gain (i.e. negative health loss)
+ce_effects = cbind(-comparator_QALYloss_disc,-program_QALYloss_disc)
+
+
+# Specify a matrix containing the cost for each intervention being considered.
+# note: this needs to be specified as health gain (i.e. negative health loss)
+ce_cost   = cbind(comparator_total_cost,program_total_cost)
+
+# Define the labels to be associated with each intervention.
+interventions = c("No intervention","Vaccine program")
+
+# Run the 'bcea()' function
+m = bcea(eff = ce_effects,
+          cost = ce_cost,
+          ref = 2,  # the column of eff and cost considered to be the reference strategy.
+          interventions = interventions,
+          plot = T) #ref specifies to compare 'Vaccine program' to 'No intervention'
+
+```
+
+2. Which decision should we take, given current information and for a range of WTP values? Print the summary of the `bcea()` function:
+```{r }
+summary(m, wtp = 10000)
+```
+
+
+3. How much evidence is there in favour of the decision, for a range of WTP values? Look at the CEAC and CEAF.
+```{r }
+m_ceaf = multi.ce(m)
+ceaf.plot(m_ceaf) # uses base plot 
+
+```    
+
+4. Is there value in further research? Look at the EVPI graph and summary above.
+
+# EVPPI
+
+The BCEA package allows to calculate the expected value of partially perfect information for parameter subsets. 
+
 
 ```{r}
 
-plot(evppi_bcea,col=1:2,pos = c(1,1))
-lines(opt_wtp, evppi_edit[,2],col=3)
-legend('right',
-       c('manual: EVPPI FoI'),
-       col=3,
-       lwd=1,
-       cex = 0.7)
-```
+# combine input parameters with uncertainty
+model_param = data.frame(force_of_infection = force_of_infection,
+                         QALYloss_non_hosp_case = QALYloss_non_hosp_case)
 
+inp = createInputs(model_param)
+
+# explicitly use BCEA package namespace to avoid package conflict
+evppi_bcea = BCEA::evppi(m, inp$parameters, inp$mat)
+
+plot(evppi_bcea,col=1:2,pos = c(1,1))
+
+```
 
 
 <div>
