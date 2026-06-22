@@ -9,6 +9,7 @@ title: "Introduction to IBMs for infectious diseases"
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 library('curl')
 set.seed(2020)
+options(width = 80)
 ```
 
 ```{r setup, echo=FALSE}

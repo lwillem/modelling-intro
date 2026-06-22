@@ -9,6 +9,7 @@ title: "Scenario Analyses with a random walk IBM"
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 suppressPackageStartupMessages(library('curl'))
 set.seed(2020)
+options(width = 80)
 source('../lib/ibm_functions.R')
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)

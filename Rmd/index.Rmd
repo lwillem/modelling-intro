@@ -6,6 +6,11 @@ output:
     toc: false  
 ---
 
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
+suppressPackageStartupMessages(library('curl'))
+options(width = 80)
+```
+
 <hr>
 <img src="ext_fig/logo_chermid.png" height="50px"> &nbsp; &nbsp;&nbsp;&nbsp;
 <img src="ext_fig/logo_dsi.png" height="80px"> &nbsp; &nbsp;&nbsp;&nbsp;
@@ -38,8 +43,8 @@ output:
 Extra:
 
 - [Discounting](example_discounting.html)
-- [Parametric sensitity analysis, parameters](PSA_parameters.html)
-- [Parametric sensitity analysis, methods](PSA_methods.html)
+- [Parametric sensitity analysis: parameters](PSA_parameters.html)
+- [Parametric sensitity analysis: methods](PSA_methods.html)
 
 We provide some background literature [here](background_literature.html).
 

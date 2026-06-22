@@ -8,6 +8,7 @@ title: "Introduction to RStudio"
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 suppressPackageStartupMessages(library('curl'))
+options(width = 80)
 ```
 
 ```{r setup, echo=FALSE}

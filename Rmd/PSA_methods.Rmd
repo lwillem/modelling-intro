@@ -9,6 +9,7 @@ toc: no
 
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 set.seed(2020)
+options(width = 80)
 
 knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
 ```
@@ -87,7 +88,8 @@ force_of_infection   = sample_beta_event(nsamples, foi_mean, foi_sample_size)
 cost_per_case        = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
 interv_infections    = force_of_infection * targetgroup * (1 - vaccine_efficacy * uptake_program)
 interv_QALY_loss     = interv_infections * QALYloss_case
-interv_total_cost    = interv_infections * cost_per_case + (targetgroup * vaccine_price_per_dose * uptake_program)
+interv_total_cost    = interv_infections * cost_per_case + 
+                          (targetgroup * vaccine_price_per_dose * uptake_program)
 
 # calculate incremental cost and effect
 incr_QALY_gain = comp_QALY_loss - interv_QALY_loss
@@ -158,18 +160,19 @@ Include uncertainty from the input parameters of the influenza model:
 set.seed(345698) 
 
 # comparator
-force_of_infection   = sample_beta_event(nsamples, foi_mean, foi_sample_size)  
-cost_per_case        = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
-comp_infections      = force_of_infection * targetgroup
-comp_QALY_loss       = comp_infections * QALYloss_case
-comp_total_cost      = comp_infections * cost_per_case
+force_of_infection = sample_beta_event(nsamples, foi_mean, foi_sample_size)  
+cost_per_case      = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
+comp_infections    = force_of_infection * targetgroup
+comp_QALY_loss     = comp_infections * QALYloss_case
+comp_total_cost    = comp_infections * cost_per_case
 
 # intervention
 ####force_of_infection   = sample_beta_event(nsamples,foi_mean,foi_sample_size)  
 ####cost_per_case        = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
-interv_infections    = comp_infections * (1 - vaccine_efficacy * uptake_program)
-interv_QALY_loss     = interv_infections * QALYloss_case
-interv_total_cost    = interv_infections * cost_per_case + (targetgroup * vaccine_price_per_dose * uptake_program)
+interv_infections = comp_infections * (1 - vaccine_efficacy * uptake_program)
+interv_QALY_loss  = interv_infections * QALYloss_case
+interv_total_cost = interv_infections * cost_per_case + 
+                     (targetgroup * vaccine_price_per_dose * uptake_program)
 
 # calculate incremental cost and effect
 incr_QALY_gain = comp_QALY_loss - interv_QALY_loss

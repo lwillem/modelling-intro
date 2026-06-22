@@ -5,6 +5,10 @@ output:
     toc: false  
 ---
 
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
+options(width = 80)
+```
+
 <div style="text-align: right">
 [Home page](index.html)
 </div>
