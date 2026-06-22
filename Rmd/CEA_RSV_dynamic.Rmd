@@ -13,21 +13,14 @@ library('knitr')
 library('EpiDynamics')
 set.seed(2020)
 
-boolean_show_results = FALSE
+show_results = FALSE
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 4, fig.width = 6)
 ```
 
 This tutorial has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. 
 Please make contact if you would like to use this model in any public way.
-For further information, questions or comments please contact: 
-joke.bilcke@uantwerp.be or lander.willem@uantwerp.be from the 
-Centre for Health Economics Research and Modeling of Infectious Diseases (CHERMID),
-Vaccine and Infectious Disease Institute (Vaxinfectio),
-University of Antwerp,
-Universiteitsplein 1,
-2610 Antwerp,
-Belgium.
+
 
 # Research question 
 
@@ -272,7 +265,7 @@ kable(db_out)
 
 Compute the Incremental Net Monetary Benefit for the RSV illustration provided, while adhering to willingness-to-pay thresholds of 20,000 and 40,0000 euro per Quality-Adjusted Life Year (QALY).
 
-```{r, eval=boolean_show_results, echo=boolean_show_results}
+```{r, eval=show_results, echo=show_results}
 
 # define wtp thresholds
 opt_wtp <- c(20e3,40e3)
@@ -300,7 +293,7 @@ kable(db_out_inmb)
 
 # Exploring model behaviour and sensitivity
 
-```{r, eval = boolean_show_results, echo = boolean_show_results}
+```{r, eval = show_results, echo = show_results}
 
 # To conduct model explorations, it is convenient to create a function for 
 # the static and dynamic approach
@@ -403,7 +396,7 @@ run_dynamic_model <- function(uptake = 0.2,
 
 1. **Impact of Vaccine Uptake:** Evaluate the effect of altering vaccine uptake to 0.1, 0.2, 0.7 or 0.9 on ICERs and INMB.
 
-```{r, eval = boolean_show_results, echo = boolean_show_results}
+```{r, eval = show_results, echo = show_results}
 
 static_out <- rbind(run_static_model(uptake = 0.1),
                     run_static_model(uptake = 0.2),
@@ -429,7 +422,7 @@ kable(cbind(model='dynamic',dynamic_out))
 
 ```
 
-```{r, eval = boolean_show_results, echo = boolean_show_results}
+```{r, eval = show_results, echo = show_results}
 
 # note on INMB:
 inmb_example1 <- c(wtp = 20e3,
@@ -454,7 +447,7 @@ kable(rbind(inmb_example1,inmb_example2,inmb_example3))
 
 2. **Consistency Across Models:** Examine whether changes in vaccine uptake lead to similar outcomes in both disease models. Provide an explanation for the observed results.
 
-```{r, eval = boolean_show_results, echo = boolean_show_results}
+```{r, eval = show_results, echo = show_results}
 
 # Static disease models do not take herd immunity effects into account. Only 
 # personal protection is considered in the economic evaluation. This holds 
@@ -467,7 +460,7 @@ kable(rbind(inmb_example1,inmb_example2,inmb_example3))
 
 3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of administration costs in your analysis.
 
-```{r, eval = boolean_show_results, echo = boolean_show_results}
+```{r, eval = show_results, echo = show_results}
 
 static_out <- rbind(run_static_model(admin_cost = admin_cost),
                     run_static_model(admin_cost = admin_cost/2))
@@ -486,7 +479,7 @@ kable(cbind(model='dynamic',dynamic_out))
 
 4. **Matching Static and Dynamic Models:** Identify the parameter settings within the dynamic model that would yield results consistent with the static model. Discuss the significance of these settings.
 
-```{r, eval = boolean_show_results, echo = boolean_show_results}
+```{r, eval = show_results, echo = show_results}
 # If the (basic) reproduction number is very high, vaccine-related immunization 
 # has limited impact on the effective transmission rate, hence herd immunity 
 # effects are limited. As such, the CEA results are (more) in line with the CEA 
@@ -518,7 +511,7 @@ kable(cbind(model='dynamic',dynamic_out))
 
 5. **The Role of Discounting:** Reflect on the decision not to incorporate discounting. Offer your recommendation on whether discounting should be added and provide a rationale.
 
-```{r, eval = TRUE, echo = boolean_show_results}
+```{r, eval = TRUE, echo = show_results}
 
 # Discounting does affect future costs and effects, in this case the life years lost due to disease-related mortality.
 
@@ -536,7 +529,7 @@ Try to reproduce the figure below for 100 samples:
 
 </n>
 
-```{r, eval = TRUE, echo = boolean_show_results}
+```{r, eval = TRUE, echo = show_results}
 
 # Note: it is also possible to use the summary functions above
 # For illustration purposes, we explicitly include all code here.
@@ -595,7 +588,12 @@ legend('topright',
 
 <div>
 # Navigate
-Top: [Index](index.html)
---- [Results](HTA_RSV_dynamic_results.html)
+Top: [Index](index.html) ---
+`r if (!show_results) {
+    '<a href="CEA_RSV_dynamic_results.html"> Results</a>'
+  } else {
+    '<a href="CEA_RSV_dynamic.html"> Back</a>'
+  }
+`
 </div>
 

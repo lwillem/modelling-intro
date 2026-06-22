@@ -411,9 +411,9 @@ round(ICER_values)
 # Navigate
 Top: [Index](index.html) ---
 `r if (!show_results) {
-    '<a href="HTA_flu_basic_results.html"> Results</a>'
+    '<a href="CEA_flu_basic_results.html"> Results</a>'
   } else {
-    '<a href="HTA_flu_basic.html"> Back</a>'
+    '<a href="CEA_flu_basic.html"> Back</a>'
   }
 `
 </div>

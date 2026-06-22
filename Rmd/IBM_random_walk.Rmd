@@ -1,5 +1,5 @@
 ---
-title: "Scenario Analyses with the random walk IBM"
+title: "Scenario Analyses with a random walk IBM"
 ---
 
 <div style="text-align: right">
@@ -19,7 +19,7 @@ The aim of this tutorial is to perform scenario analyses with an individual-base
 
 In this session, you will
 
-1. Run the IBM with different model parameters
+1. Run an IBM with different model parameters
 2. Discuss the impact of transmission parameters and model features
 
 The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. <n style="color:darkred"> Hands-on questions are indicated in **red** </n>

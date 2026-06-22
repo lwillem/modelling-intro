@@ -17,34 +17,32 @@ output:
 * [R](http://cran.r-project.org) is used as the main programming language. Please install at least version: R-4.0.0.
 * [RStudio](http://www.rstudio.com/products/rstudio/download/) (recommended) is a popular graphic user interface (GUI).
 
-## Tutorials
+## Tutorials: general introduction to R and SIR modelling
 
 1. [Introduction to RStudio](intro_to_RStudio.html)
 2. [Introduction to R](intro_to_r.html)
 3. [Introduction to infectious disease modelling with R](intro_to_SIR.html)
+
+## Tutorials: Individual-Based Models (IBM)
+
 4. [Introduction to Individual-Based Models (IBMs) using R](intro_to_IBM_coding.html)
-5. [IBM with random walks](intro_to_IBM_walk.html)
-6. [IBM with location-specific mixing](intro_to_IBM_location.html)
-7. [CEA: influenza](HTA_flu_basic.html)
-8. [CEA: parametric uncertainty](HTA_flu_uncertainty.html)
-9. [CEA: influenza with uncertainty](HTA_flu_CEAresults.html)
-<!-- 9. [Demo Uncertainty](HTA_flu_uncertainty.html) -->
-<!-- 10. [Demo EVPPI](HTA_flu_evppi.html) -->
-10. [CEA: RSV](HTA_RSV_dynamic.html)
+5. [IBM with random walks](IBM_random_walk.html)
+6. [IBM with location-specific mixing](IBM_location.html)
+
+## Tutorials: Cost-effectiveness Analysis (CEA)
+
+7. [CEA: influenza](CEA_flu_basic.html)
+8. [CEA: influenza with uncertainty](CEA_flu_uncertainty.html)
+9. [CEA: RSV](CEA_RSV_dynamic.html)
 
 Extra:
 
 - [Discounting](example_discounting.html)
-- [CEA: PSA](HTA_flu_PSA.html)
+- [Parametric sensitity analysis, parameters](PSA_parameters.html)
+- [Parametric sensitity analysis, methods](PSA_methods.html)
 
 We provide some background literature [here](background_literature.html).
 
 ---
-<!-- ## Lecture Slides -->
 
-<!-- * [An introduction to infectious disease modelling and its applications](intro_modelling_chennai.pdf) -->
-<!-- * [Introduction to stochastic modelling](intro_sto_modelling.pdf) -->
-<!-- * [Why do we model infectious diseases? Policy and practicalities](interventions.pdf) -->
-<!-- * [Model fitting and inference for infectious disease dynamics](intro_inference_chennai_slides.pdf) -->
-
-<font size="1"> The R and SIR tutorials are based on work from Sebastian Funk, Gwen Knight and Anton Camacho from the London School of Hygiene & Tropical Medicine. We fully acknowledge their work and are thankfull for making them open-source via [GitHub](https://github.com/sbfnk/modelling).</font> 
+<font size="1"> The R and SIR tutorials are based on work from Sebastian Funk, Gwen Knight and Anton Camacho from the London School of Hygiene & Tropical Medicine. We fully acknowledge their work and are thankful for making them open-source via [GitHub](https://github.com/sbfnk/modelling).</font> 
