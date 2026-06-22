@@ -8,9 +8,7 @@ toc: no
 </div>
 
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
-set.seed(2020)
-
-knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
 ```
 
 This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
@@ -53,7 +51,7 @@ sample_beta_mean = function(nsamples, mean, se){
 
 # Goal and input
 
-The goal is to calculate the cost-effectiveness of a vaccination program for the elderly against flu, taking into account parameter uncertainty as specified below:
+The goal is to calculate the cost-effectiveness of a vaccination program for the elderly against flu, taking into account disease burden, discounting, QALYs and parameter uncertainty as specified below:
 
 ```{r results = "hide"}
 
@@ -64,25 +62,25 @@ nsamples = 5000
 set.seed(5698) 
 
 # population details
-targetgroup     = 2500000 								     # people>65 years
-life_expectancy = sample_gamma(nsamples,12,2)	 # in years
+targetgroup     = 2500000 # people>65 years
+life_expectancy = sample_gamma(nsamples, 12, 2)	# in years
 discount_rate   = 0.015
 
 # disease burden
-force_of_infection        = sample_beta_event(nsamples,4,100)  	
-p_hosp                    = sample_beta_event(nsamples,10,100) 
-hosp_case_fatality_ratio  = sample_beta_event(nsamples,30,100) 
+force_of_infection       = sample_beta_event(nsamples, 4, 100) 	
+p_hosp                   = sample_beta_event(nsamples, 10, 100) 
+hosp_case_fatality_ratio = sample_beta_event(nsamples, 30, 100) 
 
 # disease-related costs
-cost_per_hosp_case     = sample_gamma(nsamples, 2000, 100)  # euro
-cost_per_non_hosp_case = sample_gamma(nsamples, 100, 5) 	  # euro
+cost_per_hosp_case     = sample_gamma(nsamples, 2000, 100) # euro
+cost_per_non_hosp_case = sample_gamma(nsamples, 100, 5) # euro
 
 # program details
-uptake_program                = 0.80
-vaccine_efficacy              = sample_beta_mean(nsamples, mean = 0.6, se = (0.7-0.5)/(2*1.96))
-vaccine_price_per_dose        = 10 			                       # euro
-admin_cost_per_dose           = sample_gamma(nsamples, 50, 4)  # euro
-fixed_program_cost            = 0 			                       # euro
+uptake_program         = 0.80
+vaccine_efficacy       = sample_beta_mean(nsamples, mean = 0.6, se = (0.7 - 0.5) / (2 * 1.96))
+vaccine_price_per_dose = 10 # euro
+admin_cost_per_dose    = sample_gamma(nsamples, 50, 4) # euro
+fixed_program_cost     = 0 # euro
 
 # QALY
 QALYloss_hosp_case     = sample_beta_mean(nsamples, 0.018, 0.0018)
@@ -94,17 +92,14 @@ QALYloss_non_hosp_case = sample_beta_mean(nsamples, 0.0082, 0.0018)
 
 Now, propagate the uncertainty from the input parameters of the flu model into the outcome of your flu model. To start the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, taking into account the proportion of cases that lead to hospitalization, the QALY lost per case, and the discounted life expectancy:
 ```{r }
-vaccine_cost_per_dose     = vaccine_price_per_dose + admin_cost_per_dose
-treatment_cost_per_case   = cost_per_hosp_case * p_hosp + 
-                              (1-p_hosp) * cost_per_non_hosp_case
-QALYloss_per_case        = QALYloss_hosp_case * p_hosp +        
-                               QALYloss_non_hosp_case * (1-p_hosp)
+vaccine_cost_per_dose   = vaccine_price_per_dose + admin_cost_per_dose
+treatment_cost_per_case = cost_per_hosp_case * p_hosp + (1 - p_hosp) * cost_per_non_hosp_case
+QALYloss_per_case       = QALYloss_hosp_case * p_hosp + QALYloss_non_hosp_case * (1 - p_hosp)
 
-life_expectancy_disc = rep(NA,nsamples)
+life_expectancy_disc = rep(NA, nsamples)
 for (i in 1:nsamples){
-        life_expectancy_disc[i] = sum(1/((1+discount_rate)^(0:(life_expectancy[i]-1))))
+        life_expectancy_disc[i] = sum(1 / ((1 + discount_rate)^(0:(life_expectancy[i] - 1))))
 }
-
 ```
 
 
@@ -115,20 +110,21 @@ Calculate the burden of disease with the program in place, along with the associ
 
 ```{r include = FALSE}
 # Program
-population_at_risk         = targetgroup * (1-uptake_program) + targetgroup * uptake_program * (1-vaccine_efficacy)
+population_at_risk = targetgroup * (1 - uptake_program) + 
+                      targetgroup * uptake_program * (1 - vaccine_efficacy)
 
 program_infections         = population_at_risk * force_of_infection 
 program_hospitalisations   = program_infections * p_hosp
 program_deaths             = program_hospitalisations * hosp_case_fatality_ratio
 program_lifeyearslost      = program_deaths * life_expectancy
-program_lifeyearslost_disc = program_deaths * life_expectancy
+program_lifeyearslost_disc = program_deaths * life_expectancy_disc
 
 program_treatment_cost     = program_infections * treatment_cost_per_case
 program_vaccination_cost   = fixed_program_cost + targetgroup * uptake_program * vaccine_cost_per_dose
-program_total_cost   = program_treatment_cost + program_vaccination_cost
+program_total_cost         = program_treatment_cost + program_vaccination_cost
 
-program_QALYloss          = program_infections * QALYloss_per_case + program_lifeyearslost
-program_QALYloss_disc     = program_infections * QALYloss_per_case + program_lifeyearslost_disc
+program_QALYloss           = program_infections * QALYloss_per_case + program_lifeyearslost
+program_QALYloss_disc      = program_infections * QALYloss_per_case + program_lifeyearslost_disc
 
 ```
 
@@ -146,11 +142,11 @@ comparator_lifeyearslost      = comparator_deaths * life_expectancy
 comparator_lifeyearslost_disc = comparator_deaths * life_expectancy_disc
         
 comparator_treatment_cost     = comparator_infections * treatment_cost_per_case
-comparator_vaccination_cost   = 0
-comparator_total_cost   = comparator_treatment_cost + comparator_vaccination_cost
+comparator_vaccination_cost   = 0 # for ilustration purpose, no vaccine in the comparator
+comparator_total_cost         = comparator_treatment_cost + comparator_vaccination_cost
 
-comparator_QALYloss       = comparator_infections * QALYloss_per_case + comparator_lifeyearslost
-comparator_QALYloss_disc  = comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
+comparator_QALYloss           = comparator_infections * QALYloss_per_case + comparator_lifeyearslost
+comparator_QALYloss_disc      = comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
 
 ```
 
@@ -160,18 +156,18 @@ Calculate the difference between the program and the comparator:
 ```
 
 ```{r include = FALSE}
-# To calculate the difference between 'program' and 'comparator' 
-infections_averted          = comparator_infections - program_infections
-hospitalisations_averted    = comparator_hospitalisations - program_hospitalisations
-deaths_averted              = comparator_deaths - program_deaths
-lifeyearslost_averted       = comparator_lifeyearslost - program_lifeyearslost
-lifeyearslost_averted_disc  = comparator_lifeyearslost_disc - program_lifeyearslost_disc
+# To calculate the difference between 'program' and 'comparator'
+infections_averted         = comparator_infections - program_infections
+hospitalisations_averted   = comparator_hospitalisations - program_hospitalisations
+deaths_averted             = comparator_deaths - program_deaths
+lifeyearslost_averted      = comparator_lifeyearslost - program_lifeyearslost
+lifeyearslost_averted_disc = comparator_lifeyearslost_disc - program_lifeyearslost_disc
 
-QALY_gained                 = comparator_QALYloss - program_QALYloss
-QALY_gained_disc            = comparator_QALYloss_disc - program_QALYloss_disc
+QALY_gained                = comparator_QALYloss - program_QALYloss
+QALY_gained_disc           = comparator_QALYloss_disc - program_QALYloss_disc
 
 treatment_cost_averted     = comparator_treatment_cost - program_treatment_cost
-incr_vaccination_cost      = program_vaccination_cost - comparator_vaccination_cost # incremental cost
+incr_vaccination_cost      = program_vaccination_cost - comparator_vaccination_cost # incremental vaccine cost
 incr_total_cost            = incr_vaccination_cost - treatment_cost_averted
 
 ```
@@ -196,13 +192,13 @@ Show the results:
 ```{r }
 # combine results
 # note: specify column names at once
-ICER_values=cbind(incr_cost_per_case_prevented        = incr_cost_per_case_prevented,
-               incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
-               incr_cost_per_death_averted             = incr_cost_per_death_averted,
-               incr_cost_per_lifeyear_gained           = incr_cost_per_lifeyear_gained,
-               incr_cost_per_lifeyear_gained_disc      = incr_cost_per_lifeyear_gained_disc,
-               incr_cost_per_QALY_gained               = incr_cost_per_QALY_gained,
-               incr_cost_per_QALY_gained_disc          = incr_cost_per_QALY_gained_disc)
+ICER_values = cbind(incr_cost_per_case_prevented            = incr_cost_per_case_prevented, 
+                    incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented, 
+                    incr_cost_per_death_averted             = incr_cost_per_death_averted, 
+                    incr_cost_per_lifeyear_gained           = incr_cost_per_lifeyear_gained, 
+                    incr_cost_per_lifeyear_gained_disc      = incr_cost_per_lifeyear_gained_disc, 
+                    incr_cost_per_QALY_gained               = incr_cost_per_QALY_gained, 
+                    incr_cost_per_QALY_gained_disc          = incr_cost_per_QALY_gained_disc)
 
 # print rounded results
 round(ICER_values)
@@ -219,25 +215,36 @@ Kindly review the following plots and estimates:
 par(mfrow = c(1, 3))
 
 # Plot the histograms
-hist(incr_total_cost, xlab = 'Incremental total cost', main = 'Histogram of Incremental Total Cost')
-abline(v=mean(incr_total_cost),col=2)
-hist(QALY_gained_disc, xlab = 'QALY gain', main = 'Histogram of Infections Averted')
-abline(v=mean(QALY_gained_disc),col=2)
-hist(incr_total_cost / QALY_gained_disc, xlab = 'point-wise incremental total cost per infection averted', main = 'Histogram of Pointwise Incremental Cost per Infection Averted')
+hist(incr_total_cost, 
+     xlab = 'Incremental total cost', 
+     main = 'Histogram of Incremental Total Cost')
+abline(v = mean(incr_total_cost), col = 2)
+hist(QALY_gained_disc, 
+     xlab = 'QALY gain (discounted)', 
+     main = 'Histogram of QALY Gain (discounted)')
+abline(v = mean(QALY_gained_disc), col = 2)
+hist(incr_total_cost / QALY_gained_disc, 
+     xlab = 'point - wise incremental total cost per infection averted', 
+     main = 'Histogram of Pointwise Incremental Cost per Infection Averted')
 
 # Reset the plotting layout to default
 par(mfrow = c(1, 1))
 ```
 
 ```{r}
-mean(incr_total_cost/QALY_gained_disc)       # mean of ratios
-mean(incr_total_cost)/mean(QALY_gained_disc) # ratio of means: ICER!!
+mean(incr_total_cost / QALY_gained_disc) # mean of ratios
+mean(incr_total_cost) / mean(QALY_gained_disc) # ratio of means: ICER!!
 
-k = 8000
+# Try WTP values bracketing the ICER to find where the expected INMB changes sign.
+# At the ICER, the expected INMB is exactly 0. Values above the ICER yield positive
+# expected INMB (intervention is cost-effective); values below yield negative INMB.
+k = 8000 # above the ICER: expected INMB should be positive
 mean(QALY_gained_disc * k - incr_total_cost)
+
+# the INMB is not affected by the order of the operations
 mean(QALY_gained_disc) * k - mean(incr_total_cost)
 
-k = 7000
+k = 6000 # below the ICER: expected INMB should be negative
 mean(QALY_gained_disc * k - incr_total_cost)
 
 ```
@@ -247,10 +254,11 @@ mean(QALY_gained_disc * k - incr_total_cost)
 ```{r}
 
 # plot CE plane
-plot(QALY_gained_disc, incr_total_cost, xlab = 'Incremental effect', 
-     ylab = 'Incremental cost', main = 'CE plane')
-
-
+plot(x = QALY_gained_disc, 
+     y = incr_total_cost, 
+     xlab = 'Incremental effect (QALY gain)', 
+     ylab = 'Incremental cost (euro)', 
+     main = 'CE plane')
 ```
 
 # Present CEA (w/o R package).
@@ -258,50 +266,50 @@ plot(QALY_gained_disc, incr_total_cost, xlab = 'Incremental effect',
 ```{r}
 
 # set WTP range, and step size
-opt_wtp <- seq(0,40000,2000)
+opt_wtp = seq(0, 40000, 500)
 
 # initialise matrix 
-inmb_wtp_summary <- data.frame(wtp = opt_wtp,
-                               inmb = NA,
-                               ceac = NA,
-                               ceaf = NA,
-                               inmb_perfect_info = NA)
+inmb_wtp_summary = data.frame(wtp = opt_wtp, 
+                              inmb = NA, 
+                              ceac = NA, 
+                              ceaf = NA, 
+                              inmb_perfect_info = NA)
 
 # loop over all WTP levels
 for(i in 1:length(opt_wtp)){
   # calculate the inmb per sample with the current WTP threshold
-  inmb_sample <- (QALY_gained_disc * opt_wtp[i]) - incr_total_cost
+  inmb_sample = (QALY_gained_disc * opt_wtp[i]) - incr_total_cost
   
   # get the expected INMB 
-  inmb_wtp_summary$inmb[i] <- mean(inmb_sample)
+  inmb_wtp_summary$inmb[i] = mean(inmb_sample)
   
   # inspect the number of samples with a positive INMB
-  inmb_wtp_summary$ceac[i] <- sum(inmb_sample >= 0) / nsamples
+  inmb_wtp_summary$ceac[i] = sum(inmb_sample >= 0) / nsamples
   
   # to calculate INMB with perfect information, set all non-preferred options to zero
+  # note: if there are more than 2 options, other code is needed
   if(inmb_wtp_summary$inmb[i] >= 0){
-    inmb_sample[inmb_sample < 0] <- 0
+    inmb_sample[inmb_sample < 0] = 0
   } else{
-    inmb_sample[inmb_sample > 0] <- 0
+    inmb_sample[inmb_sample > 0] = 0
   }
   # get the expected INMB with perfect information
-  inmb_wtp_summary$inmb_perfect_info[i] <- mean(inmb_sample)
-
+  inmb_wtp_summary$inmb_perfect_info[i] = mean(inmb_sample)
 }
 
 # get preferred strategy by wtp, in this case, when INMB is positive
 inmb_wtp_summary$ceaf[inmb_wtp_summary$inmb > 0] = inmb_wtp_summary$ceac[inmb_wtp_summary$inmb > 0]
 
-# net-loss: difference between expected INMB and INMB with perfect information by sample
-inmb_wtp_summary$net_loss <- abs(inmb_wtp_summary$inmb_perfect_info - inmb_wtp_summary$inmb)
-
+# net-loss: difference between INMB under perfect information and expected INMB.
+# This equals the per-patient EVPI: the maximum a decision maker should pay to
+# eliminate all parameter uncertainty before choosing between strategies.
+inmb_wtp_summary$net_loss = abs(inmb_wtp_summary$inmb_perfect_info - inmb_wtp_summary$inmb)
 ```
 
 Inspect the CEA outcomes if the WTP threshold is 10000.
 
 ```{r}
-inmb_wtp_summary[inmb_wtp_summary$wtp == 10000,]
-
+inmb_wtp_summary[inmb_wtp_summary$wtp == 10000, ]
 ```
 
 
@@ -309,11 +317,11 @@ Inspect the included WTP for which the intervention becomes cost-effective. Comp
 
 ```{r}
 # summary statistics
-ce_threshold <- min(inmb_wtp_summary$wtp[inmb_wtp_summary$inmb > 0])
-icer = mean(incr_total_cost) / mean(QALY_gained_disc)
+ce_threshold = min(inmb_wtp_summary$wtp[inmb_wtp_summary$inmb > 0])
+icer         = mean(incr_total_cost) / mean(QALY_gained_disc)
 
-data.frame(ce_threshold=ce_threshold,
-  icer=icer)
+data.frame(ce_threshold = ce_threshold, 
+           icer = icer)
 ```
 
 
@@ -323,67 +331,60 @@ data.frame(ce_threshold=ce_threshold,
 ```{r}
 
 # CEAC
-plot(x = inmb_wtp_summary$wtp,
-     y = inmb_wtp_summary$ceac,
-     type= 'b',
-     xlab = 'Willingness To Pay',
-     ylab = 'Probability cost effective',
-     main = 'Cost-Effectiveness Acceptibility Curve',
+plot(x = inmb_wtp_summary$wtp, 
+     y = inmb_wtp_summary$ceac, 
+     type = 'b', 
+     xlab = 'Willingness To Pay (euro)', 
+     ylab = 'Probability to be cost-effective', 
+     main = 'Cost-Effectiveness Acceptability Curve', 
      ylim = 0:1)
-
 ```
 
 
 ## Cost-effectiveness acceptability frontier (CEAF)
 
 ```{r}
-
-plot(x = inmb_wtp_summary$wtp,
-     y = inmb_wtp_summary$ceaf,
-     type = 'b',
-     xlab = 'Willingness to pay',
-     ylab = 'Probability to be cost-effective',
-     main = 'Cost-Effectiveness Acceptibility Frontier',
+plot(x = inmb_wtp_summary$wtp, 
+     y = inmb_wtp_summary$ceaf, 
+     type = 'b', 
+     xlab = 'Willingness to pay (euro)', 
+     ylab = 'Probability to be cost-effective', 
+     main = 'Cost-Effectiveness Acceptability Frontier', 
      ylim = 0:1)
-
 ```
 
 Or you can combine the CEAC and CEAF
 
 ```{r}
-
-# Combination CEAC & CEAF
-plot(x = inmb_wtp_summary$wtp,
-     y = inmb_wtp_summary$ceac,
-     type = 'b',
-     lty = 3,
-     xlab = 'Willingness To Pay',
-     ylab = 'Probability to be cost-effective',
-     main = 'Cost-Effectiveness Acceptibility',
+# Combination of CEAC & CEAF
+plot(x = inmb_wtp_summary$wtp, 
+     y = inmb_wtp_summary$ceac, 
+     type = 'b', 
+     lty = 3, 
+     xlab = 'Willingness to pay (euro)', 
+     ylab = 'Probability to be cost-effective', 
+     main = '', 
      ylim = 0:1)
-lines(x = inmb_wtp_summary$wtp,
-      y = inmb_wtp_summary$ceaf,
-      type = 'l',
-      lty = 1,
+lines(x = inmb_wtp_summary$wtp, 
+      y = inmb_wtp_summary$ceaf, 
+      type = 'l', 
+      lty = 1, 
       lwd = 3)
-legend('topleft',
-       c('CEAC', 'CEAF'),
-       lty = c(3,1),
-       lwd = c(1,3))
+legend('topleft', 
+       c('CEAC', 'CEAF'), 
+       lty = c(3, 1), 
+       lwd = c(1, 3))
 ```
 
 
 ## EVPI
 ```{r}
-
-plot(x = inmb_wtp_summary$wtp,
-     y = inmb_wtp_summary$net_loss,
-     type = 'b',
-     xlab = 'Willingness To Pay',
-     ylab = 'Expected net-loss',
+plot(x = inmb_wtp_summary$wtp, 
+     y = inmb_wtp_summary$net_loss, 
+     type = 'b', 
+     xlab = 'Willingness to pay (euro)', 
+     ylab = 'Expected net-loss (euro)', 
      main = "Expected Value of Perfect Information")
-
-
 ```
 
 ## EVPPI
@@ -391,7 +392,6 @@ plot(x = inmb_wtp_summary$wtp,
 If we are interested in the EVPPI, hence per individual parameter of the influenza model above, we can adopt the GAM approximation using the calculated incremental cost and benefit with all sampled parameter values.
 
 ```{r}
-
 # load package for GAM
 library(mgcv)
 
@@ -399,32 +399,29 @@ library(mgcv)
 # QALY_gained_disc
 # incr_total_cost
 
-# specify WTP
-opt_wtp = seq(0,50000,500)
-
 # combine input parameters with uncertainty
-model_param = data.frame(force_of_infection = force_of_infection,
-                         p_hosp = p_hosp,
-                         life_expectancy = life_expectancy,
-                         hosp_case_fatality_ratio = hosp_case_fatality_ratio,
-                         cost_per_hosp_case = cost_per_hosp_case,
-                         cost_per_non_hosp_case = cost_per_non_hosp_case,
-                         vaccine_efficacy = vaccine_efficacy,
-                         admin_cost_per_dose = admin_cost_per_dose,
-                         QALYloss_hosp_case = QALYloss_hosp_case,
-                         QALYloss_non_hosp_case = QALYloss_non_hosp_case
+model_param = data.frame(force_of_infection       = force_of_infection, 
+                         p_hosp                   = p_hosp, 
+                         life_expectancy          = life_expectancy, 
+                         hosp_case_fatality_ratio = hosp_case_fatality_ratio, 
+                         cost_per_hosp_case       = cost_per_hosp_case, 
+                         cost_per_non_hosp_case   = cost_per_non_hosp_case, 
+                         vaccine_efficacy         = vaccine_efficacy, 
+                         admin_cost_per_dose      = admin_cost_per_dose, 
+                         QALYloss_hosp_case       = QALYloss_hosp_case, 
+                         QALYloss_non_hosp_case   = QALYloss_non_hosp_case
                          )
 
 # specify the number of WTP and parameter values
 num_param = ncol(model_param)
-num_wtp = length(opt_wtp)
+num_wtp   = length(opt_wtp)
 
 # initiate matrix to store EVPPI values
-evppi = matrix(0,num_wtp,num_param)  
+evppi = matrix(0, num_wtp, num_param)
 
 # run over all WTP levels
 for(j in 1:length(opt_wtp)){
-  
+
   # set WTP threshold
   k = opt_wtp[j]
   
@@ -434,20 +431,19 @@ for(j in 1:length(opt_wtp)){
   # approximate NL for each parameter value
   for(i in 1:num_param){
     
-    model     = gam(inmb_sample ~ model_param[,i])
+    model     = gam(inmb_sample ~ model_param[, i])
     g.hat_new = model$fitted
 
-    perfect.info  = mean(pmax(g.hat_new,0))
-    baseline      = pmax(mean(g.hat_new),0)
+    perfect.info = mean(pmax(g.hat_new, 0))
+    baseline     = pmax(mean(g.hat_new), 0)
     
     ## estimate EVPPI 
-    evppi[j,i]  = round(perfect.info - baseline, digits=4) 
+    evppi[j, i] = round(perfect.info - baseline, digits = 4) 
   }
-}  
+} 
 
 # add column names
 colnames(evppi) = colnames(model_param)
-
 ```
 
 Explore EVPPI
@@ -455,24 +451,30 @@ Explore EVPPI
 ```{r}
 
 # if all EVPPI values are 0, exclude parameter
-evppi_edit = evppi[,colSums(evppi,na.rm=T) > 0]
+evppi_edit = evppi[, colSums(evppi, na.rm = T) > 0]
 
 # start with empty plot, and add EVPPI one by one
-plot(range(opt_wtp),range(evppi_edit),col=0, xlab = "WTP",ylab="EVPPI (euro)")
+plot(x = range(opt_wtp), 
+     y = range(evppi_edit), 
+     col = 0, 
+     xlab = "WTP", 
+     ylab = "EVPPI (euro)")
 for(i in 1:ncol(evppi_edit)){
-  lines(opt_wtp,evppi_edit[,i],type='b',lwd=2,col=i,pch=i)
+  lines(x = opt_wtp, 
+        y = evppi_edit[, i], 
+        type = 'b', 
+        lwd = 2, 
+        col = i, 
+        pch = i)
 }
-legend('topright',
-       colnames(model_param),
-       col=1:num_param,
-       pch=1:num_param,
-       lwd=2,
-       cex=0.7)
+legend('topright', 
+       colnames(model_param), 
+       col = 1:num_param, 
+       pch = 1:num_param, 
+       lwd = 2, 
+       cex = 0.7)
 
 ```
-<br>
-<br>
-
 
 # Present CEA (using the `BCEA` package).
 
@@ -491,26 +493,25 @@ library('BCEA')
 
 1. Run the `bcea()`function to obtain the cost-effectiveness plane, the expected incremental net monetary benefit (INMB), the cost-effectiveness acceptability curve (CEAC) and the expected value for perfect information (EVPI):
 ```{r }
-# inspect the documentation of the 'bcea()' function
-?bcea
+# inspect the documentation of the 'bcea()' function: ?bcea
 
 # Specify a matrix containing the clinical effectiveness for each intervention being considered.
 # note: this needs to be specified as health gain (i.e. negative health loss)
-ce_effects = cbind(-comparator_QALYloss_disc,-program_QALYloss_disc)
+ce_effects = cbind(-comparator_QALYloss_disc, -program_QALYloss_disc)
 
 
 # Specify a matrix containing the cost for each intervention being considered.
 # note: this needs to be specified as health gain (i.e. negative health loss)
-ce_cost   = cbind(comparator_total_cost,program_total_cost)
+ce_cost = cbind(comparator_total_cost, program_total_cost)
 
 # Define the labels to be associated with each intervention.
-interventions = c("No intervention","Vaccine program")
+interventions = c("No intervention", "Vaccine program")
 
 # Run the 'bcea()' function
-m = bcea(eff = ce_effects,
-          cost = ce_cost,
-          ref = 2,  # the column of eff and cost considered to be the reference strategy.
-          interventions = interventions,
+m = bcea(eff = ce_effects, 
+          cost = ce_cost, 
+          ref = 2, # the column of eff and cost considered to be the reference strategy.
+          interventions = interventions, 
           plot = T) #ref specifies to compare 'Vaccine program' to 'No intervention'
 
 ```
@@ -538,7 +539,7 @@ The BCEA package allows to calculate the expected value of partially perfect inf
 ```{r}
 
 # combine input parameters with uncertainty
-model_param = data.frame(force_of_infection = force_of_infection,
+model_param = data.frame(force_of_infection = force_of_infection, 
                          QALYloss_non_hosp_case = QALYloss_non_hosp_case)
 
 inp = createInputs(model_param)
@@ -546,8 +547,7 @@ inp = createInputs(model_param)
 # explicitly use BCEA package namespace to avoid package conflict
 evppi_bcea = BCEA::evppi(m, inp$parameters, inp$mat)
 
-plot(evppi_bcea,col=1:2,pos = c(1,1))
-
+plot(evppi_bcea, col = 1:2, pos = c(1, 1))
 ```
 
 
