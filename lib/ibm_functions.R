@@ -21,328 +21,328 @@
 #
 ############################################################################ #
 
-get_default_parameters <- function(){
-  
+get_default_parameters = function(){
+
   attach(list(pop_size = 1000,  # population size
               num_days = 50,    # time horizon
               num_infected_seeds = 3, # initial infections
               vaccine_coverage = 0.1, # vaccine state
               apply_spatial_vaccine_refusal  = TRUE, # are vaccine states randomly distributed
-              
+
               area_size = 20,     # geo-spatial settings
               max_velocity = 0,
-              
+
               num_days_infected  = 7, # disease parameter
               transmission_prob  = 0.1, # transmission dynamics
-              target_num_contacts_day = 10, 
+              target_num_contacts_day = 10,
               max_contact_distance = 2,
-              
+
               plot_time_delay  = 0.1,
-              
+
               # school settings
               # note: we model (abstract) school contacts in our simulation
               num_schools            = 2,          # number of classes per age group
               target_school_ages     = c(3:18),
-              
+
               # social contact parameters
-              num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community 
+              num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community
               contact_prob_household     = 1,    # probability for an "effective contact" at home (1 = fully connected)
-              contact_prob_school        = 0.5,  # probability for an "effective contact" at school 
-              contact_prob_workplace     = 0.1,  # probability for an "effective contact" at work 
-              
+              contact_prob_school        = 0.5,  # probability for an "effective contact" at school
+              contact_prob_workplace     = 0.1,  # probability for an "effective contact" at work
+
               num_workplaces = 100,
-              
+
               rng_seed = 2020,
-              
+
               #  visualisation parameters
               bool_show_demographics  = TRUE,   # option to show the demography figures (location IBM only)
               add_baseline            = FALSE,  # option to add the prevalence with default param
-              return_prevelance       = FALSE,  # option to return the prevalence (and stop)
+              return_prevalence       = FALSE,  # option to return the prevalence (and stop)
               bool_single_plot        = TRUE    # option to specify the plot layout using sub-panels (or not)
               ))
-  
-  
+
+
 }
 #'
 #' INDIVIDUAL-BASED MODEL (IBM) WITH:
 #'   --> INDIVIDUAL-BASED WITH SPATIALLY EXPLICIT RANDOM WALK
 #'   --> HEALTH STATES S, I, R, V
 #'   --> VACCINE EFFICACY: 100%
-#'   
-run_ibm_random_walk <- function(pop_size = 1000,  # population size
+#'
+run_ibm_random_walk = function(pop_size = 1000,  # population size
                                 num_days = 50,    # time horizon
                                 num_infected_seeds = 3, # initial infections
                                 vaccine_coverage = 0.1, # vaccine state
                                 apply_spatial_vaccine_refusal  = FALSE, # is vaccination geographically clustered?
-                                
+
                                 area_size = 20,     # geo-spatial settings
                                 max_velocity = 1,
-                                
+
                                 num_days_infected  = 7, # disease parameter
                                 transmission_prob  = 0.1, # transmission probability per contact
-                                target_num_contacts_day = 10, 
+                                target_num_contacts_day = 10,
                                 max_contact_distance = 2,
-                                
+
                                 plot_time_delay  = 0, # visualisation parameter (0 = no plots)
-                                
-                                rng_seed = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
-                                
+
+                                rng_seed = as.numeric(format(Sys.time(), '%S')), # random number seed = current time (seconds)
+
                                 # visualisation parameters
                                 add_baseline        = FALSE, # option to add the prevalence with default param
-                                return_prevelance  = FALSE,  # option to return the prevalence (and stop)
+                                return_prevalence  = FALSE,  # option to return the prevalence (and stop)
                                 bool_single_plot   = TRUE    # option to specify the plot layout using sub-panels (or not)
                                 ){
-  
+
   ######################################################### #
   # DEFENSIVE CHECKS  ----
   ######################################################### #
-  
+
   if(num_infected_seeds > pop_size){
     warning("ERROR: population size < number of infected seeds")
     return(NULL)
   }
-  
-  if(any(c(pop_size,num_days,num_infected_seeds,vaccine_coverage,
-           area_size,max_velocity,num_days_infected,transmission_prob,
-           target_num_contacts_day,max_contact_distance,plot_time_delay)<0)){
+
+  if(any(c(pop_size, num_days, num_infected_seeds, vaccine_coverage,
+           area_size, max_velocity, num_days_infected, transmission_prob,
+           target_num_contacts_day, max_contact_distance, plot_time_delay) < 0)){
     warning("ERROR: negative values not allowed as function parameter")
     return(NULL)
   }
-  
-  if(!is.logical(c(apply_spatial_vaccine_refusal,add_baseline,return_prevelance))){
-    warning("ERROR: 'apply_spatial_vaccine_refusal', 'add_baseline' and 'return_prevelance' should be a boolean")
+
+  if(!is.logical(c(apply_spatial_vaccine_refusal, add_baseline, return_prevalence))){
+    warning("ERROR: 'apply_spatial_vaccine_refusal', 'add_baseline' and 'return_prevalence' should be a boolean")
     return(NULL)
   }
-  
+
   ######################################################### #
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
   ######################################################### #
-  
+
   # save start time
-  time_start <- Sys.time()
-  
+  time_start = Sys.time()
+
   # initialize random number generator
   set.seed(rng_seed)
-  
+
   # population vector: one row per individual, one column per attribute, row index = id
-  pop_data     <- data.frame(health  = rep('S',length=pop_size),  # all individuals start in state 'S' (= susceptible)
-                             x_coord = sample(seq(0,area_size,0.01),pop_size,replace = T), # sample random x coordinate
-                             y_coord = sample(seq(0,area_size,0.01),pop_size,replace = T), # sample random y coordinate
-                             infector            = NA,            # column to store the source of infection
-                             time_of_infection   = NA,            # column to store the time of infection
-                             generation_interval = 0,             # column to store the generation interval
-                             secondary_cases     = 0,             # column to store the number of secondary cases
-                             stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
-  
+  pop_data     = data.frame(health  = rep('S', length = pop_size),  # all individuals start in state 'S' (= susceptible)
+                            x_coord = sample(seq(0, area_size, 0.01), pop_size, replace = T), # sample random x coordinate
+                            y_coord = sample(seq(0, area_size, 0.01), pop_size, replace = T), # sample random y coordinate
+                            infector            = NA,            # column to store the source of infection
+                            time_of_infection   = NA,            # column to store the time of infection
+                            generation_interval = 0,             # column to store the generation interval
+                            secondary_cases     = 0,             # column to store the number of secondary cases
+                            stringsAsFactors    = FALSE)         # option to treat characters as 'strings' instead of 'factors'
+
   # set vaccine coverage
-  
+
   if(apply_spatial_vaccine_refusal){
     # option A: spatial clustering with respect to vaccine refusal
-    id_vaccinated                  <- sample_vaccine_refusal(pop_data,vaccine_coverage)
+    id_vaccinated                  = sample_vaccine_refusal(pop_data, vaccine_coverage)
   } else{
     # option B: random
-    id_vaccinated                  <- sample(pop_size,pop_size*vaccine_coverage)
+    id_vaccinated                  = sample(pop_size, pop_size * vaccine_coverage)
   }
-  pop_data$health[id_vaccinated] <- 'V'
-  
+  pop_data$health[id_vaccinated] = 'V'
+
   # introduce infected individuals in the population
-  id_infected_seeds                             <- sample(which(pop_data$health=='S'),num_infected_seeds)
-  pop_data$health[id_infected_seeds]            <- 'I'
-  pop_data$time_of_infection[id_infected_seeds] <- 0
-  
+  id_infected_seeds                             = sample(which(pop_data$health == 'S'), num_infected_seeds)
+  pop_data$health[id_infected_seeds] = 'I'
+  pop_data$time_of_infection[id_infected_seeds] = 0
+
   # set recovery parameters
-  recovery_rate        <- 1/num_days_infected
-  recovery_probability <- 1-exp(-recovery_rate)      # convert rate to probability
-  
+  recovery_rate        = 1 / num_days_infected
+  recovery_probability = 1 - exp(-recovery_rate)      # convert rate to probability
+
   # create matrix to log health states: one row per individual, one column per time step
-  log_pop_data  <- matrix(NA,nrow=pop_size,ncol=num_days)
-  
+  log_pop_data  = matrix(NA, nrow = pop_size, ncol = num_days)
+
   # illustrate social contact radius
-  if(plot_time_delay>0)
-  geo_plot_social_contact_radius(pop_data,area_size,max_contact_distance,target_num_contacts_day,num_days)
-  
+  if(plot_time_delay > 0)
+  geo_plot_social_contact_radius(pop_data, area_size, max_contact_distance, target_num_contacts_day, num_days)
+
   ####################################### #
-  # RUN THE MODEL    ----                      
+  # RUN THE MODEL    ----
   ####################################### #
-  
+
   # LOOP OVER ALL DAYS
   for(day_i in 1:num_days)
   {
     # step 1a: move at random [-1,1] units along the x and y axis
-    step_vector      <- seq(-max_velocity,max_velocity,0.01)
-    pop_data$x_coord <- pop_data$x_coord + sample(step_vector,pop_size,replace=T)
-    pop_data$y_coord <- pop_data$y_coord + sample(step_vector,pop_size,replace=T)
-    
+    step_vector      = seq(-max_velocity, max_velocity, 0.01)
+    pop_data$x_coord = pop_data$x_coord + sample(step_vector, pop_size, replace = T)
+    pop_data$y_coord = pop_data$y_coord + sample(step_vector, pop_size, replace = T)
+
     # step 1b: if an individual crossed the model world boundary: relocate at boundary
-    pop_data$x_coord[pop_data$x_coord > area_size] <- area_size
-    pop_data$y_coord[pop_data$y_coord > area_size] <- area_size
-    pop_data$x_coord[pop_data$x_coord < 0]         <- 0
-    pop_data$y_coord[pop_data$y_coord < 0]         <- 0
-    
+    pop_data$x_coord[pop_data$x_coord > area_size] = area_size
+    pop_data$y_coord[pop_data$y_coord > area_size] = area_size
+    pop_data$x_coord[pop_data$x_coord < 0] = 0
+    pop_data$y_coord[pop_data$y_coord < 0] = 0
+
     # step 2: identify infected individuals
-    boolean_infected <- pop_data$health == 'I'   # = boolean TRUE/FALSE
-    ind_infected     <- which(boolean_infected)  # = indices
-    num_infected     <- length(ind_infected)     # = number
-    
+    boolean_infected = pop_data$health == 'I'   # = boolean TRUE/FALSE
+    ind_infected     = which(boolean_infected)  # = indices
+    num_infected     = length(ind_infected)     # = number
+
     # step 3: calculate the distance matrix using the 'dist' function and store as matrix
-    distance_matrix <- as.matrix(dist(pop_data[,c('x_coord','y_coord')],upper=T))
-    
+    distance_matrix = as.matrix(dist(pop_data[, c('x_coord', 'y_coord')], upper = T))
+
     # step 4: loop over all infected individuals
-    p <- ind_infected[1]
+    p = ind_infected[1]
     for(p in ind_infected)
     {
       # identify possible social contacts of person 'p'
-      num_possible_contacts  <- sum(distance_matrix[p,] <= max_contact_distance)
-      
+      num_possible_contacts  = sum(distance_matrix[p, ] <= max_contact_distance)
+
       # calculate contact probability
       # tip: ?get_contact_probability
-      contact_probability    <- get_contact_probability(target_num_contacts_day,num_possible_contacts)
-      
+      contact_probability    = get_contact_probability(target_num_contacts_day, num_possible_contacts)
+
       # new infections are possible if individuals are susceptible and within the range of the transmission distance
-      flag_new_infection     <- pop_data$health == 'S' &
-        distance_matrix[p,] <= max_contact_distance &
+      flag_new_infection     = pop_data$health == 'S' &
+        distance_matrix[p, ] <= max_contact_distance &
         rbinom(pop_size, size = 1, prob = contact_probability * transmission_prob)
-      
+
       # mark new infected individuals
-      pop_data$health[flag_new_infection] <- 'I'
-      
+      pop_data$health[flag_new_infection] = 'I'
+
       # log transmission details
-      pop_data$infector[flag_new_infection]             <- p
-      pop_data$time_of_infection[flag_new_infection]    <- day_i
-      pop_data$secondary_cases[p]                       <- pop_data$secondary_cases[p] + sum(flag_new_infection)
-      pop_data$generation_interval[flag_new_infection]  <- day_i - pop_data$time_of_infection[p]
+      pop_data$infector[flag_new_infection] = p
+      pop_data$time_of_infection[flag_new_infection] = day_i
+      pop_data$secondary_cases[p] = pop_data$secondary_cases[p] + sum(flag_new_infection)
+      pop_data$generation_interval[flag_new_infection] = day_i - pop_data$time_of_infection[p]
     }
-    
+
     # step 5: identify newly recovered individuals
-    new_recovered <- boolean_infected & rbinom(pop_size, size = 1, prob = recovery_probability)
-    pop_data$health[new_recovered] <- 'R'
-    
+    new_recovered = boolean_infected & rbinom(pop_size, size = 1, prob = recovery_probability)
+    pop_data$health[new_recovered] = 'R'
+
     # step 6: log population health states
-    log_pop_data[,day_i] <- pop_data$health
-    
+    log_pop_data[, day_i] = pop_data$health
+
     # plot spatial configuration of the population by health state
-    geo_plot_health_states(pop_data,area_size,day_i,num_days,plot_time_delay)
-    
+    geo_plot_health_states(pop_data, area_size, day_i, num_days, plot_time_delay)
+
   } # end for-loop for each day
-  
+
   # PLOT RESULTS ----
   # reformat the log matrix with one row per individual and one column per time step
   # 'colSums' = sum per column
-  log_s <- colSums(log_pop_data == 'S')  / pop_size
-  log_i <- colSums(log_pop_data == 'I')  / pop_size
-  log_r <- colSums(log_pop_data == 'R')  / pop_size
-  log_v <- colSums(log_pop_data == 'V')  / pop_size
-  
-  if(return_prevelance){
-    return(data.frame(log_i=log_i,log_r=log_r))
-  }
-  
-  # optional: change figure configuration => 3 sub-plots
-  if(bool_single_plot) {
-    par(mfrow=c(1,3))
+  log_s = colSums(log_pop_data == 'S') / pop_size
+  log_i = colSums(log_pop_data == 'I') / pop_size
+  log_r = colSums(log_pop_data == 'R') / pop_size
+  log_v = colSums(log_pop_data == 'V') / pop_size
+
+  if(return_prevalence){
+    return(data.frame(log_i = log_i, log_r = log_r))
   }
 
-  m <- rbind(c(1, 1,1), c(2, 3, 4))
+  # optional: change figure configuration => 3 sub-plots
+  if(bool_single_plot) {
+    par(mfrow = c(1, 3))
+  }
+
+  m = rbind(c(1, 1, 1), c(2, 3, 4))
   layout(m)
 
   # final population overview
-  geo_plot_health_states(pop_data,area_size,day_i,num_days,0.1,show_path = FALSE)
-  
+  geo_plot_health_states(pop_data, area_size, day_i, num_days, 0.1, show_path = FALSE)
+
   # plot health states over time
   plot(log_s,
-       type='l',
-       xlab='Time (days)',
-       ylab='Population fraction',
-       main='Spatial IBM',
-       ylim=c(0,1),
-       lwd=2)
-  lines(log_i,  col=2,lwd=2)
-  lines(log_r,  col=3,lwd=2)
-  lines(log_v,  col=4,lwd=2)
-  
-  legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7,bg='white')
-  
+       type = 'l',
+       xlab = 'Time (days)',
+       ylab = 'Population fraction',
+       main = 'Spatial IBM',
+       ylim = c(0, 1),
+       lwd = 2)
+  lines(log_i, col = 2, lwd = 2)
+  lines(log_r, col = 3, lwd = 2)
+  lines(log_v, col = 4, lwd = 2)
+
+  legend('top', legend = c('S', 'I', 'R', 'V'), col = 1:4, lwd = 2, ncol = 2, cex = 0.7, bg = 'white')
+
   if(add_baseline){
-    out_baseline <- run_ibm_random_walk(rng_seed=rng_seed, return_prevelance = T)
-    lines(out_baseline$log_i,  col=2,lwd=2,lty=2)
-    legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7,bg='white')
+    out_baseline = run_ibm_random_walk(rng_seed = rng_seed, return_prevalence = T)
+    lines(out_baseline$log_i, col = 2, lwd = 2, lty = 2)
+    legend('topright', legend = c('I (baseline)'), col = 2, lwd = 2, lty = 3, cex = 0.7, bg = 'white')
   } else{
     out_baseline = NA
   }
-  
-  boxplot(secondary_cases ~ time_of_infection, data=pop_data,
-          xlab='time of infection (day)',
-          ylab='secondary cases',
-          main='secondary cases',
-          ylim=c(0,10),
-          xlim=c(0,num_days),
-          xaxt='n')
-  axis(1,seq(0,num_days,5))
-  
-  boxplot(generation_interval ~ time_of_infection, data=pop_data,
-          xlab='time of infection (day)',
-          ylab='generation interval (days)',
-          main='generation interval',
-          ylim=c(0,10),
-          xlim=c(0,num_days),
-          xaxt='n')
-  axis(1,seq(0,num_days,5))
+
+  boxplot(secondary_cases ~ time_of_infection, data = pop_data,
+          xlab = 'time of infection (day)',
+          ylab = 'secondary cases',
+          main = 'secondary cases',
+          ylim = c(0, 10),
+          xlim = c(0, num_days),
+          xaxt = 'n')
+  axis(1, seq(0, num_days, 5))
+
+  boxplot(generation_interval ~ time_of_infection, data = pop_data,
+          xlab = 'time of infection (day)',
+          ylab = 'generation interval (days)',
+          main = 'generation interval',
+          ylim = c(0, 10),
+          xlim = c(0, num_days),
+          xaxt = 'n')
+  axis(1, seq(0, num_days, 5))
 
   # PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
-  all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage','apply_spatial_vaccine_refusal',
-                 'rng_seed','area_size','max_velocity','target_num_contacts_day',
-                 'max_contact_distance', 'num_days_infected','transmission_prob',
-                 'plot_time_delay'
+  all_param = c('pop_size', 'num_days', 'num_infected_seeds', 'vaccine_coverage', 'apply_spatial_vaccine_refusal',
+                'rng_seed', 'area_size', 'max_velocity', 'target_num_contacts_day',
+                'max_contact_distance', 'num_days_infected', 'transmission_prob',
+                'plot_time_delay'
   )
-  
+
   print('MODEL PARAMETERS')
   # loop over the given parameter names, if present, add name & value
   for(i_param in all_param){
     if(exists(i_param)){
       # param_str <- paste(param_str,'||',i_param,':',get(i_param))
-      print(paste0(i_param,': ',get(i_param)))
+      print(paste0(i_param, ': ', get(i_param)))
     }
   }
-  
+
   # # print total incidence
   print_model_results(log_i = log_i,
                       log_r = log_r,
-                      time_start=time_start,
+                      time_start = time_start,
                       out_baseline = out_baseline)
 
-  # set back the defaul par(mfrow)
-  par(mfrow=c(1,1))
+  # set back the default par(mfrow)
+  par(mfrow = c(1, 1))
 }
 
-print_model_results <- function(log_i,log_r,time_start,out_baseline=NA){
-  
-  add_baseline <- !any(is.na(out_baseline))
+print_model_results = function(log_i, log_r, time_start, out_baseline = NA){
+
+  add_baseline = !any(is.na(out_baseline))
   if(add_baseline){
     # default epidemic characteristics
-    default_ti <- paste0('   [baseline: ',round((out_baseline$log_i[length(out_baseline$log_i)] +
-                                                   out_baseline$log_r[length(out_baseline$log_r)])*100,digits=0),'%]')
-    default_pp <- paste0('   [baseline: ',round(max(out_baseline$log_i)*100,digits=0),'%]')
-    default_pd <- paste0('    [baseline: ',which(out_baseline$log_i == max(out_baseline$log_i))[1],']')
+    default_ti = paste0('   [baseline: ', round((out_baseline$log_i[length(out_baseline$log_i)] +
+                                                   out_baseline$log_r[length(out_baseline$log_r)]) * 100, digits = 0), '%]')
+    default_pp = paste0('   [baseline: ', round(max(out_baseline$log_i) * 100, digits = 0), '%]')
+    default_pd = paste0('    [baseline: ', which(out_baseline$log_i == max(out_baseline$log_i))[1], ']')
   }
- 
+
   # print total incidence
   print('-------------')
   print('MODEL RESULTS')
-  
-  print(paste0('total incidence: ',round((log_i[length(log_i)] + log_r[length(log_r)])*100,digits=0),'%',
-               ifelse(add_baseline,default_ti,'')))
-  
+
+  print(paste0('total incidence: ', round((log_i[length(log_i)] + log_r[length(log_r)]) * 100, digits = 0), '%',
+               ifelse(add_baseline, default_ti, '')))
+
   # print peak details
-  print(paste0('Peak prevalence: ',round(max(log_i)*100,digits=0),'%',
-               ifelse(add_baseline,default_pp,'')))
-  print(paste0('Peak day:        ',which(log_i == max(log_i))[1], 
-               ifelse(add_baseline,default_pd,'')))
-  
+  print(paste0('Peak prevalence: ', round(max(log_i) * 100, digits = 0), '%',
+               ifelse(add_baseline, default_pp, '')))
+  print(paste0('Peak day:        ', which(log_i == max(log_i))[1],
+               ifelse(add_baseline, default_pd, '')))
+
   # print total run time
-  total_time <- as.double(Sys.time() - time_start,unit='secs')
-  print(paste0('Total run time:  ',round(total_time,digits=0),'s'))
-  
+  total_time = as.double(Sys.time() - time_start, unit = 'secs')
+  print(paste0('Total run time:  ', round(total_time, digits = 0), 's'))
+
 }
 
 #' @title Calculate the social contact probability
@@ -358,15 +358,15 @@ print_model_results <- function(log_i,log_r,time_start,out_baseline=NA){
 #'
 #' @keywords external
 #' @export
-get_contact_probability <- function(average_num_contacts,num_possible_contacts)
+get_contact_probability = function(average_num_contacts, num_possible_contacts)
 {
 
   # calculate the probability as the 'average' / 'possible'
-  contact_probability <- average_num_contacts / num_possible_contacts
+  contact_probability = average_num_contacts / num_possible_contacts
 
   # limit the probability to '0.95'
   if(contact_probability >= 1) {
-    contact_probability <- 0.95
+    contact_probability = 0.95
   }
 
   # return the probability
@@ -384,37 +384,37 @@ get_contact_probability <- function(average_num_contacts,num_possible_contacts)
 #'
 #' @keywords external
 #' @export
-sample_vaccine_refusal <- function(pop_data,vaccine_coverage){
+sample_vaccine_refusal = function(pop_data, vaccine_coverage){
 
   # (re)define the center of the simulated area
-  area_size   <- max(c(pop_data$x_coord,pop_data$y_coord))
-  area_center <- area_size / 2
+  area_size   = max(c(pop_data$x_coord, pop_data$y_coord))
+  area_center = area_size / 2
 
   # (re)define population size
-  pop_size <- nrow(pop_data)
+  pop_size = nrow(pop_data)
 
   # define compliance radius
-  radius <- (area_size/2) * vaccine_coverage * 0.9
+  radius = (area_size / 2) * vaccine_coverage * 0.9
 
   # select individuals in the central region, based on central x- and y-coordinates
-  sel_x <- pop_data$x_coord < (area_center+radius) & pop_data$x_coord > (area_center-radius)
-  sel_y <- pop_data$y_coord < (area_center+radius) & pop_data$y_coord > (area_center-radius)
+  sel_x = pop_data$x_coord < (area_center + radius) & pop_data$x_coord > (area_center - radius)
+  sel_y = pop_data$y_coord < (area_center + radius) & pop_data$y_coord > (area_center - radius)
 
   # combine the selection on x- and y-coordinate
-  id_vaccine_potentials <- which(sel_x | sel_y)
+  id_vaccine_potentials = which(sel_x | sel_y)
   length(id_vaccine_potentials)
-  
-  # if we have to little vaccine potentials, add random individuals
-  if(length(id_vaccine_potentials) < (pop_size*vaccine_coverage)){
-    id_non_potentials        <- seq(1,pop_size) %in% id_vaccine_potentials
-    required_potentials      <- (pop_size*vaccine_coverage) - length(id_vaccine_potentials)
-    id_additional_potentials <- sample(id_non_potentials,required_potentials)
-    id_vaccine_potentials    <- c(id_vaccine_potentials,id_additional_potentials)
+
+  # if we have too little vaccine potentials, add random individuals
+  if(length(id_vaccine_potentials) < (pop_size * vaccine_coverage)){
+    id_non_potentials        = seq(1, pop_size) %in% id_vaccine_potentials
+    required_potentials      = (pop_size * vaccine_coverage) - length(id_vaccine_potentials)
+    id_additional_potentials = sample(id_non_potentials, required_potentials)
+    id_vaccine_potentials    = c(id_vaccine_potentials, id_additional_potentials)
   }
 
-  # sample from the potential vaccineted individualss
-  id_vaccinated <- sample(id_vaccine_potentials,pop_size*vaccine_coverage)
-  
+  # sample from the potential vaccinated individuals
+  id_vaccinated = sample(id_vaccine_potentials, pop_size * vaccine_coverage)
+
   # return indices
   return(id_vaccinated)
 }
@@ -432,95 +432,95 @@ sample_vaccine_refusal <- function(pop_data,vaccine_coverage){
 #'
 #' @keywords external
 #' @export
-geo_plot_health_states <- function(pop_data,area_size,day_i,num_days,plot_time_delay,show_path=TRUE)
+geo_plot_health_states = function(pop_data, area_size, day_i, num_days, plot_time_delay, show_path = TRUE)
 {
-  
+
   # if the time-delay is '0' ==>> skip figures
   if (plot_time_delay == 0){
     return(NULL)
   }
-  
+
   # (re)set figure layout on day 1
   if(day_i == 1){
-    par(mfrow=c(1,1))
+    par(mfrow = c(1, 1))
   }
-  
+
   # clear the console
   flush.console()
-  
+
   # set legend text size
-  legend_cex <- 0.7
-  
+  legend_cex = 0.7
+
   # translate health states into a numeric order
-  pop_data_health_factor <- factor(pop_data$health,levels=c('S','I','R','V'))
-  
+  pop_data_health_factor = factor(pop_data$health, levels = c('S', 'I', 'R', 'V'))
+
   # plot location and health state (color)
   plot(x    = pop_data$x_coord,
        y    = pop_data$y_coord,
        col  = pop_data_health_factor,
        xlab = 'x coordinate',
        ylab = 'y coordinate',
-       xlim = c(0,area_size),
-       ylim = c(0,area_size+2),
+       xlim = c(0, area_size),
+       ylim = c(0, area_size + 2),
        pch  = 2,
-       main = paste('day',day_i));
-  
+       main = paste('day', day_i));
+
   # add legend with color coding
   legend('topleft',
-         c('S','I','R','V'),
+         c('S', 'I', 'R', 'V'),
          col  = 1:nlevels(pop_data_health_factor),
          pch  = 2,
          ncol = 4,
          cex  = legend_cex)
-  
-  # track one individual? else ==>> skip 
+
+  # track one individual? else ==>> skip
   if (show_path){
-    
+
     # setup global variables for one participant 'X' (once!)
     if(day_i == 1 | !exists('participant_id')){
-      
+
       # select most centered individuals (min distance from the centre)
-       diff_cntr <- abs(pop_data$x_coord-(area_size/2)) + 
-                    abs(pop_data$y_coord-(area_size/2))
+       diff_cntr = abs(pop_data$x_coord - (area_size / 2)) +
+                    abs(pop_data$y_coord - (area_size / 2))
       participant_id <<- which(order(diff_cntr) == 1)
-      
+
       #create matrix to log the x- and y-coordinates
-      log_part_coord   <<- matrix(NA,nrow=2,ncol=num_days)
+      log_part_coord   <<- matrix(NA, nrow = 2, ncol = num_days)
     }
-    
+
     # log coordinates of participant 'X' (adapt global variable)
-    log_part_coord[,day_i]   <- c(pop_data$x_coord[participant_id],pop_data$y_coord[participant_id])
+    log_part_coord[, day_i] = c(pop_data$x_coord[participant_id], pop_data$y_coord[participant_id])
     log_part_coord <<- log_part_coord
-    
+
     # add movement of participant 'X'
-    lines(log_part_coord[1,],log_part_coord[2,],col=6,lwd=2)
+    lines(log_part_coord[1, ], log_part_coord[2, ], col = 6, lwd = 2)
     points(pop_data$x_coord[participant_id],
            pop_data$y_coord[participant_id],
-           col=6,
-           pch=2,
-           lwd=5);
-    
+           col = 6,
+           pch = 2,
+           lwd = 5);
+
     # add legend for participant 'X'
     legend('topright',
-           c('1 individual','path'),
+           c('1 individual', 'path'),
            col  = 6,
-           pch  = c(17,-1),
-           lty  = c(0,1),
+           pch  = c(17, -1),
+           lty  = c(0, 1),
            ncol = 2,
            lwd  = 2,
            cex  = legend_cex)
   }
-  
+
   # pause the system to make the time steps visual
   Sys.sleep(plot_time_delay)
-  
+
 } # end function
 
 
 #' @title Plot the population and focus on the social contact radius
 #'
 #' @description This function shows the spatial configuration of the population
-#' with color codes for the health state and the social contact radious of one individual.
+#' with color codes for the health state and the social contact radius of one individual.
 #'
 #' @param pop_data             the vector with population data
 #' @param area_size            the total area size
@@ -529,50 +529,50 @@ geo_plot_health_states <- function(pop_data,area_size,day_i,num_days,plot_time_d
 #'
 #' @keywords external
 #' @export
-geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distance,average_num_contacts,num_days)
+geo_plot_social_contact_radius = function(pop_data, area_size, max_contact_distance, average_num_contacts, num_days)
 {
-  
+
   # plot population
-  geo_plot_health_states(pop_data,area_size,1,num_days,0.1)
-  
+  geo_plot_health_states(pop_data, area_size, 1, num_days, 0.1)
+
   # add grid lines
-  # note: 'abline' covers the full figure area and cannot be stoped at the model world boundary
+  # note: 'abline' covers the full figure area and cannot be stopped at the model world boundary
   for(i_tick in 0:area_size){
-    
+
     # define color and line type (i.e., solid for boundaries)
-    line_col <- ifelse(i_tick %in% c(0,area_size),grey(0),grey(0.5))
-    line_lty <- ifelse(i_tick %in% c(0,area_size),1,2)
-    
+    line_col = ifelse(i_tick %in% c(0, area_size), grey(0), grey(0.5))
+    line_lty = ifelse(i_tick %in% c(0, area_size), 1, 2)
+
     # plot horizontal and vertical lines
-    lines(rep(i_tick,area_size+1),0:area_size,lty=line_lty,col=line_col)
-    lines(0:area_size,rep(i_tick,area_size+1),lty=line_lty,col=line_col)
+    lines(rep(i_tick, area_size + 1), 0:area_size, lty = line_lty, col = line_col)
+    lines(0:area_size, rep(i_tick, area_size + 1), lty = line_lty, col = line_col)
   }
-  
+
   # get participant 'x'
-  distance_matrix   <- as.matrix(dist(pop_data[,c('x_coord','y_coord')],upper=F,method = "euclidean"))
-  distance_matrix[participant_id,participant_id] <- NA
-  possible_contacts <- distance_matrix[participant_id,] < max_contact_distance
+  distance_matrix   = as.matrix(dist(pop_data[, c('x_coord', 'y_coord')], upper = F, method = "euclidean"))
+  distance_matrix[participant_id, participant_id] = NA
+  possible_contacts = distance_matrix[participant_id, ] < max_contact_distance
   points(pop_data$x_coord[possible_contacts],
          pop_data$y_coord[possible_contacts],
-         pch=2,
-         col="orange")
-  
+         pch = 2,
+         col = "orange")
+
   # count possible contacts
-  num_possible_contacts <- sum(possible_contacts,na.rm=T)
-  
+  num_possible_contacts = sum(possible_contacts, na.rm = T)
+
   # calculate the contact probability per possible contact
-  contact_probability   <- get_contact_probability(average_num_contacts,num_possible_contacts)
-  
+  contact_probability   = get_contact_probability(average_num_contacts, num_possible_contacts)
+
   # set legend text size
-  legend_cex <- 0.7
-  
+  legend_cex = 0.7
+
   legend('bottomleft',
-         c(paste('average num. contacts:      ',average_num_contacts),
-           paste('max. contact distance (km):',max_contact_distance),
-           paste('possible num. contacts: ',num_possible_contacts),
-           paste('contact probability:',trunc(contact_probability*100)/100)),
-         col  = c(0,"orange",0),
-         pch  = c(-1,2,-1),
+         c(paste('average num. contacts:      ', average_num_contacts),
+           paste('max. contact distance (km):', max_contact_distance),
+           paste('possible num. contacts: ', num_possible_contacts),
+           paste('contact probability:', trunc(contact_probability * 100) / 100)),
+         col  = c(0, "orange", 0),
+         pch  = c(-1, 2, -1),
          lty  = 0,
          ncol = 2,
          lwd  = 2,
@@ -580,276 +580,276 @@ geo_plot_social_contact_radius <- function(pop_data,area_size,max_contact_distan
 }
 
 
-run_ibm_location <- function(pop_size              = 2000,     # population size                         
-                             num_days              = 50,       # number of days to simulate (time step = one day) 
-                             num_infected_seeds    = 3,        # initial number of infected individuals   
-                             vaccine_coverage      = 0 ,       # vaccine coverage [0,1]                
-                             rng_seed              = as.numeric(format(Sys.time(),'%S')), # random number seed = current time (seconds)
-                             
+run_ibm_location = function(pop_size              = 2000,     # population size
+                             num_days              = 50,       # number of days to simulate (time step = one day)
+                             num_infected_seeds    = 3,        # initial number of infected individuals
+                             vaccine_coverage      = 0,       # vaccine coverage [0,1]
+                             rng_seed              = as.numeric(format(Sys.time(), '%S')), # random number seed = current time (seconds)
+
                              # schools =  number of classes per age group
-                             num_schools            = 2,         
+                             num_schools            = 2,
                              target_school_ages     = c(3:18),
-                             
+
                              # workplaces = total number of workplaces
                              num_workplaces         = 150,
-                             
+
                              # social contact parameters
-                             num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community 
+                             num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community
                              contact_prob_household     = 1,    # probability for an "effective contact" at home (1 = fully connected)
-                             contact_prob_school        = 0.5,  # probability for an "effective contact" at school 
-                             contact_prob_workplace     = 0.3,  # probability for an "effective contact" at work  
-                             
+                             contact_prob_school        = 0.5,  # probability for an "effective contact" at school
+                             contact_prob_workplace     = 0.3,  # probability for an "effective contact" at work
+
                              # disease parameters
-                             num_days_infected     = 7,        # average number of days individuals are infected/infectious   
-                             transmission_prob     = 0.1,      # transmission probability per social contact                  
-                             
+                             num_days_infected     = 7,        # average number of days individuals are infected/infectious
+                             transmission_prob     = 0.1,      # transmission probability per social contact
+
                              # visualisation parameters
                              bool_show_demographics = TRUE,    # option to show the demography figures
                              add_baseline           = FALSE,   # option to add the prevalence with default param
-                             return_prevelance      = FALSE,   # option to return the prevalence (and stop)
-                             bool_single_plot       = TRUE     # option to specify the plot layout using sub-pabels (or not)
+                             return_prevalence      = FALSE,   # option to return the prevalence (and stop)
+                             bool_single_plot       = TRUE     # option to specify the plot layout using sub-panels (or not)
                              ){
-  
+
   ######################################################### #
   # DEFENSIVE CHECKS  ----
   ######################################################### #
-  
+
   if(num_infected_seeds > pop_size){
     warning("ERROR: population size < number of infected seeds")
     return(NULL)
   }
 
-  if(any(c(pop_size,num_days,num_infected_seeds,vaccine_coverage,num_schools,
-           target_school_ages,num_workplaces,num_contacts_community_day,
-           contact_prob_household,contact_prob_school,contact_prob_workplace,
-           num_days_infected,transmission_prob)<0)){
+  if(any(c(pop_size, num_days, num_infected_seeds, vaccine_coverage, num_schools,
+           target_school_ages, num_workplaces, num_contacts_community_day,
+           contact_prob_household, contact_prob_school, contact_prob_workplace,
+           num_days_infected, transmission_prob) < 0)){
     warning("ERROR: negative values not allowed as function parameter")
     return(NULL)
   }
-  
-  if(!is.logical(c(bool_show_demographics,add_baseline,return_prevelance))){
-    warning("ERROR: 'bool_show_demographics', 'add_baseline' and 'return_prevelance' should be a boolean")
+
+  if(!is.logical(c(bool_show_demographics, add_baseline, return_prevalence))){
+    warning("ERROR: 'bool_show_demographics', 'add_baseline' and 'return_prevalence' should be a boolean")
     return(NULL)
   }
-  
+
   ######################################################### #
   # INITIALIZE POPULATION & MODEL PARAMETERS  ----
   ######################################################### #
-  
+
   # save start time
-  time_start <- Sys.time()
-  
+  time_start = Sys.time()
+
   # initialize random number generator
   set.seed(rng_seed)
-  
+
   # create a population matrix with:
   #   - age             the age of each individual
   #   - household_id    the household index of each individual
   #   - member_id       the household member index of each individual
-  pop_data              <- create_population_matrix(pop_size, num_schools, 
+  pop_data              = create_population_matrix(pop_size, num_schools,
                                                     target_school_ages, num_workplaces,
                                                     bool_show_demographics)
   # set contact and transmission parameters
-  contact_prob_community         <- 1-exp(-num_contacts_community_day / pop_size)  # rate to probability
-  transmission_prob_community    <- contact_prob_community * transmission_prob
-  transmission_prob_household    <- contact_prob_household * transmission_prob
-  transmission_prob_school       <- contact_prob_school    * transmission_prob
-  transmission_prob_workplace    <- contact_prob_workplace * transmission_prob
-    
+  contact_prob_community         = 1 - exp(-num_contacts_community_day / pop_size)  # rate to probability
+  transmission_prob_community    = contact_prob_community * transmission_prob
+  transmission_prob_household    = contact_prob_household * transmission_prob
+  transmission_prob_school       = contact_prob_school * transmission_prob
+  transmission_prob_workplace    = contact_prob_workplace * transmission_prob
+
   # set vaccine coverage
-  id_vaccinated                  <- sample(pop_size,pop_size*vaccine_coverage)
-  pop_data$health[id_vaccinated] <- 'V'
-  
+  id_vaccinated                  = sample(pop_size, pop_size * vaccine_coverage)
+  pop_data$health[id_vaccinated] = 'V'
+
   # introduce infected individuals in the population
-  id_infected_seeds                             <- sample(which(pop_data$health=='S'),num_infected_seeds)
-  pop_data$health[id_infected_seeds]            <- 'I'
-  pop_data$time_of_infection[id_infected_seeds] <- 0
-  
+  id_infected_seeds                             = sample(which(pop_data$health == 'S'), num_infected_seeds)
+  pop_data$health[id_infected_seeds] = 'I'
+  pop_data$time_of_infection[id_infected_seeds] = 0
+
   # set recovery parameters
-  recovery_rate        <- 1/num_days_infected
-  recovery_probability <- 1-exp(-recovery_rate)      # convert rate to probability
-  
+  recovery_rate        = 1 / num_days_infected
+  recovery_probability = 1 - exp(-recovery_rate)      # convert rate to probability
+
   # create matrix to log health states: one row per individual, one column per time step
-  log_pop_data  <- matrix(NA,nrow=pop_size,ncol=num_days)
-  
-  
+  log_pop_data  = matrix(NA, nrow = pop_size, ncol = num_days)
+
+
   ####################################### #
   # RUN THE MODEL        ----
   ####################################### #
-  
+
   # LOOP OVER ALL DAYS
   for(day_i in 1:num_days)
   {
-    
+
     # step 2: identify infected individuals
-    boolean_infected <- pop_data$health == 'I'   # = boolean TRUE/FALSE
-    ind_infected     <- which(boolean_infected)  # = indices
-    num_infected     <- length(ind_infected)     # = number
-    
+    boolean_infected = pop_data$health == 'I'   # = boolean TRUE/FALSE
+    ind_infected     = which(boolean_infected)  # = indices
+    num_infected     = length(ind_infected)     # = number
+
     # step 4: loop over all infected individuals
-    p <- ind_infected[1]
+    p = ind_infected[1]
     for(p in ind_infected)
     {
       # new infections are possible in the household and in the community
-      flag_new_infection_community <- pop_data$health == 'S' &
+      flag_new_infection_community = pop_data$health == 'S' &
         rbinom(pop_size, size = 1, prob = transmission_prob_community)
-      
-      flag_new_infection_household <- pop_data$health == 'S' &
-        pop_data$hh_id[p]  == pop_data$hh_id &
+
+      flag_new_infection_household = pop_data$health == 'S' &
+        pop_data$hh_id[p] == pop_data$hh_id &
         rbinom(pop_size, size = 1, prob = transmission_prob_household)
-      
-      flag_new_infection_school    <- pop_data$health == 'S' &
-        pop_data$classroom_id[p]  == pop_data$classroom_id &
+
+      flag_new_infection_school    = pop_data$health == 'S' &
+        pop_data$classroom_id[p] == pop_data$classroom_id &
         rbinom(pop_size, size = 1, prob = transmission_prob_school)
       # fix NA's in the school boolean
-      flag_new_infection_school[is.na(flag_new_infection_school)] <- FALSE
-      
-      flag_new_infection_workplace    <- pop_data$health == 'S' &
-        pop_data$workplace_id[p]  == pop_data$workplace_id &
+      flag_new_infection_school[is.na(flag_new_infection_school)] = FALSE
+
+      flag_new_infection_workplace    = pop_data$health == 'S' &
+        pop_data$workplace_id[p] == pop_data$workplace_id &
         rbinom(pop_size, size = 1, prob = transmission_prob_workplace)
       # fix NA's in the school boolean
-      flag_new_infection_workplace[is.na(flag_new_infection_workplace)] <- FALSE
-      
+      flag_new_infection_workplace[is.na(flag_new_infection_workplace)] = FALSE
+
       # aggregate booleans
-      flag_new_infection           <- flag_new_infection_household | flag_new_infection_community | flag_new_infection_school | flag_new_infection_workplace
-      
+      flag_new_infection           = flag_new_infection_household | flag_new_infection_community | flag_new_infection_school | flag_new_infection_workplace
+
       # mark new infected individuals
-      pop_data$health[flag_new_infection] <- 'I'
-      
+      pop_data$health[flag_new_infection] = 'I'
+
       # log transmission details
-      pop_data$infector[flag_new_infection]             <- p
-      pop_data$infector_age[flag_new_infection]         <- pop_data$age[p]
-      pop_data$time_of_infection[flag_new_infection]    <- day_i
-      pop_data$secondary_cases[p]                       <- pop_data$secondary_cases[p] + sum(flag_new_infection)
-      pop_data$generation_interval[flag_new_infection]  <- day_i - pop_data$time_of_infection[p]
+      pop_data$infector[flag_new_infection] = p
+      pop_data$infector_age[flag_new_infection] = pop_data$age[p]
+      pop_data$time_of_infection[flag_new_infection] = day_i
+      pop_data$secondary_cases[p] = pop_data$secondary_cases[p] + sum(flag_new_infection)
+      pop_data$generation_interval[flag_new_infection] = day_i - pop_data$time_of_infection[p]
     }
-    
+
     # step 5: identify newly recovered individuals
-    new_recovered <- boolean_infected & rbinom(pop_size, size = 1, prob = recovery_probability)
-    pop_data$health[new_recovered] <- 'R'
-    
+    new_recovered = boolean_infected & rbinom(pop_size, size = 1, prob = recovery_probability)
+    pop_data$health[new_recovered] = 'R'
+
     # step 6: log population health states
-    log_pop_data[,day_i] <- pop_data$health
-    
+    log_pop_data[, day_i] = pop_data$health
+
   } # end for-loop for each day
-  
+
   ####################################### #
   # PLOT RESULTS  ----
   ####################################### #
   # reformat the log matrix with one row per individual and one column per time step
   # 'colSums' = sum per column
-  log_s <- colSums(log_pop_data == 'S')  / pop_size
-  log_i <- colSums(log_pop_data == 'I')  / pop_size
-  log_r <- colSums(log_pop_data == 'R')  / pop_size
-  log_v <- colSums(log_pop_data == 'V')  / pop_size
-  
-  if(return_prevelance){
-    return(data.frame(log_i=log_i,log_r=log_r))
-  }
-  
-  # change figure configuration => 4 sub-plots
-  if(bool_single_plot) {
-    par(mfrow=c(2,2))
-  }
-  
-  # plot health states over time
-  plot(log_s,
-       type='l',
-       xlab='Time (days)',
-       ylab='Population fraction',
-       main='location-specific IBM',
-       ylim=c(0,1),
-       lwd=2)
-  lines(log_i,  col=2,lwd=2)
-  lines(log_r,  col=3,lwd=2)
-  lines(log_v,  col=4,lwd=2)
-  
-  legend('top',legend=c('S','I','R','V'),col=1:4,lwd=2,ncol=2,cex=0.7,bg='white')
-  
-  if(add_baseline){
-    out_baseline <- run_ibm_location(rng_seed=rng_seed, return_prevelance = T, bool_show_demographics=F)
-    lines(out_baseline$log_i,  col=2,lwd=2,lty=2)
-    legend('topright',legend=c('I (baseline)'),col=2,lwd=2,lty=3,cex=0.7,bg='white')
-  } else{
-    out_baseline <- NA
-  }
-  
-  if(all(is.na(pop_data$secondary_cases))){
-    pop_data$secondary_cases <- -1
+  log_s = colSums(log_pop_data == 'S') / pop_size
+  log_i = colSums(log_pop_data == 'I') / pop_size
+  log_r = colSums(log_pop_data == 'R') / pop_size
+  log_v = colSums(log_pop_data == 'V') / pop_size
+
+  if(return_prevalence){
+    return(data.frame(log_i = log_i, log_r = log_r))
   }
 
-  boxplot(secondary_cases ~ time_of_infection, data=pop_data,
-          xlab='time of infection (day)',
-          ylab='secondary cases',
-          main='secondary cases',
-          ylim=c(0,10),
-          xlim=c(0,num_days),
-          xaxt='n')
-  axis(1,seq(0,num_days,5))
-  
-  if(all(is.na(pop_data$generation_interval))){
-    pop_data$generation_interval <- -1
+  # change figure configuration => 4 sub-plots
+  if(bool_single_plot) {
+    par(mfrow = c(2, 2))
   }
-  boxplot(generation_interval ~ time_of_infection, data=pop_data,
-          xlab='time of infection (day)',
-          ylab='generation interval (days)',
-          main='generation interval',
-          ylim=c(0,10),
-          xlim=c(0,num_days),
-          xaxt='n')
-  axis(1,seq(0,num_days,5))
-  
+
+  # plot health states over time
+  plot(log_s,
+       type = 'l',
+       xlab = 'Time (days)',
+       ylab = 'Population fraction',
+       main = 'location-specific IBM',
+       ylim = c(0, 1),
+       lwd = 2)
+  lines(log_i, col = 2, lwd = 2)
+  lines(log_r, col = 3, lwd = 2)
+  lines(log_v, col = 4, lwd = 2)
+
+  legend('top', legend = c('S', 'I', 'R', 'V'), col = 1:4, lwd = 2, ncol = 2, cex = 0.7, bg = 'white')
+
+  if(add_baseline){
+    out_baseline = run_ibm_location(rng_seed = rng_seed, return_prevalence = T, bool_show_demographics = F)
+    lines(out_baseline$log_i, col = 2, lwd = 2, lty = 2)
+    legend('topright', legend = c('I (baseline)'), col = 2, lwd = 2, lty = 3, cex = 0.7, bg = 'white')
+  } else{
+    out_baseline = NA
+  }
+
+  if(all(is.na(pop_data$secondary_cases))){
+    pop_data$secondary_cases = -1
+  }
+
+  boxplot(secondary_cases ~ time_of_infection, data = pop_data,
+          xlab = 'time of infection (day)',
+          ylab = 'secondary cases',
+          main = 'secondary cases',
+          ylim = c(0, 10),
+          xlim = c(0, num_days),
+          xaxt = 'n')
+  axis(1, seq(0, num_days, 5))
+
+  if(all(is.na(pop_data$generation_interval))){
+    pop_data$generation_interval = -1
+  }
+  boxplot(generation_interval ~ time_of_infection, data = pop_data,
+          xlab = 'time of infection (day)',
+          ylab = 'generation interval (days)',
+          main = 'generation interval',
+          ylim = c(0, 10),
+          xlim = c(0, num_days),
+          xaxt = 'n')
+  axis(1, seq(0, num_days, 5))
+
   ####################################### #
   # TRANSMISSION MATRIX    ----
   ####################################### #
   # use 3-year age classes
-  max_age                 <- max(pop_data$age)
-  age_cat                 <- seq(1,max_age,3)
-  transmission_age_matrix <- table(cut(pop_data$infector_age,age_cat,right=F),cut(pop_data$age,age_cat,right=F),dnn = list('age infector','age contact'))
-  
+  max_age                 = max(pop_data$age)
+  age_cat                 = seq(1, max_age, 3)
+  transmission_age_matrix = table(cut(pop_data$infector_age, age_cat, right = F), cut(pop_data$age, age_cat, right = F), dnn = list('age infector', 'age contact'))
+
   # create plot title with some driving parameters
-  plot_title <- paste('num_cnt_community',num_contacts_community_day,' || ',
-                      'p_cnt_household', contact_prob_household, '\n',
-                      'p_cnt_school',contact_prob_school,' || ',
-                      'p_cnt_workplace',contact_prob_workplace, '\n',
-                      'p_transmission',transmission_prob)
-  
-  if(max(transmission_age_matrix)>25){
-    plot_breaks <- c(0:4,seq(5,25,10),max(c(30,transmission_age_matrix)))
+  plot_title = paste('num_cnt_community', num_contacts_community_day, ' || ',
+                     'p_cnt_household', contact_prob_household, '\n',
+                     'p_cnt_school', contact_prob_school, ' || ',
+                     'p_cnt_workplace', contact_prob_workplace, '\n',
+                     'p_transmission', transmission_prob)
+
+  if(max(transmission_age_matrix) > 25){
+    plot_breaks = c(0:4, seq(5, 25, 10), max(c(30, transmission_age_matrix)))
   } else{
-    plot_breaks <- pretty(transmission_age_matrix)
+    plot_breaks = pretty(transmission_age_matrix)
   }
-    
+
   # plot the matrix with color coding
   plot_transmission_matrix(mij = transmission_age_matrix,
                            breaks = plot_breaks,
                            main = plot_title,
                            num.digits = NA)
-  
+
   # PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
-  all_param <- c('pop_size','num_days' ,'num_infected_seeds','vaccine_coverage',
-                 'rng_seed', 'num_days_infected','transmission_prob',
-                 'num_contacts_community_day','contact_prob_household','contact_prob_school','contact_prob_workplace',
-                 'num_schools','target_school_ages','num_workplaces','bool_show_demographics'
+  all_param = c('pop_size', 'num_days', 'num_infected_seeds', 'vaccine_coverage',
+                'rng_seed', 'num_days_infected', 'transmission_prob',
+                'num_contacts_community_day', 'contact_prob_household', 'contact_prob_school', 'contact_prob_workplace',
+                'num_schools', 'target_school_ages', 'num_workplaces', 'bool_show_demographics'
   )
-  
+
   print('MODEL PARAMETERS')
   # loop over the given parameter names, if present, add name & value
   for(i_param in all_param){
     if(exists(i_param)){
-      print(paste0(i_param,': ',paste(get(i_param),collapse = ',')))
+      print(paste0(i_param, ': ', paste(get(i_param), collapse = ',')))
     }
   }
-  
+
   # print total incidence
   print_model_results(log_i = log_i,
                       log_r = log_r,
-                      time_start=time_start,
+                      time_start = time_start,
                       out_baseline = out_baseline)
 
-  # set back the defaul par(mfrow)
-  par(mfrow=c(1,1))
+  # set back the default par(mfrow)
+  par(mfrow = c(1, 1))
 }
 
 #' @title Create a synthetic population with households
@@ -863,187 +863,187 @@ run_ibm_location <- function(pop_size              = 2000,     # population size
 #' @keywords external
 #' @export
 #pop_size <- 1e4
-create_population_matrix <- function(pop_size, num_schools, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
+create_population_matrix = function(pop_size, num_schools, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
 {
   ## demographic parameters
-  ages_adult <- 19:60
-  ages_child <- 1:18
-  adult_age_tolerance     <- 0:5    # age tolerance between adults
-  child_age_tolerance     <- 1:4    # age tolerance between children
-  household_age_gap_min   <- 22     # min age gap between adults and youngest child
-  household_age_gap_max   <- 35     # max age gap age between adults and youngest child
-  
+  ages_adult = 19:60
+  ages_child = 1:18
+  adult_age_tolerance     = 0:5    # age tolerance between adults
+  child_age_tolerance     = 1:4    # age tolerance between children
+  household_age_gap_min   = 22     # min age gap between adults and youngest child
+  household_age_gap_max   = 35     # max age gap age between adults and youngest child
+
   # create the population
-  pop_data         <- NULL  # start from empty matrix
-  current_pop_size <- 0     # start from size '0'
-  hh_id            <- 1     # a counter variable to track the household id
-  
+  pop_data         = NULL  # start from empty matrix
+  current_pop_size = 0     # start from size '0'
+  hh_id            = 1     # a counter variable to track the household id
+
   # continue as long as 'population size' < 'target population size'
-  while(current_pop_size<pop_size){
-    
+  while(current_pop_size < pop_size){
+
     # sample the age of adult 1
-    age_adult1 <- sample(ages_adult, 1)
-    
+    age_adult1 = sample(ages_adult, 1)
+
     # sample the age of adult 2, given adult 1
-    age_adult2 <- sample(age_adult1 + adult_age_tolerance, 1)
-    
+    age_adult2 = sample(age_adult1 + adult_age_tolerance, 1)
+
     # get the possible child ages
-    ages_child_option <- min(age_adult1,age_adult2) - (household_age_gap_min:household_age_gap_max )
-    ages_child_option[!ages_child_option %in% ages_child]  <- NA
-    ages_child_option <- c(NA,ages_child_option[!is.na(ages_child_option)])
-    
+    ages_child_option = min(age_adult1, age_adult2) - (household_age_gap_min:household_age_gap_max )
+    ages_child_option[!ages_child_option %in% ages_child] = NA
+    ages_child_option = c(NA, ages_child_option[!is.na(ages_child_option)])
+
     # sample the age of child 1
-    age_child1 <- sample(ages_child_option, 1)
-    
+    age_child1 = sample(ages_child_option, 1)
+
     # sample the age of child 2, given child 1
-    age_child2 <- sample(age_child1 + child_age_tolerance, 1)
-    
+    age_child2 = sample(age_child1 + child_age_tolerance, 1)
+
     # aggregate all ages with the household id
-    hh_data <- data.frame(age = c(age_adult1,age_adult2,age_child1,age_child2),
-                          hh_id = hh_id)
-    
+    hh_data = data.frame(age   = c(age_adult1, age_adult2, age_child1, age_child2),
+                         hh_id = hh_id)
+
     # remove individuals with age 'NA' or negative ages (unborn)
-    hh_data <- hh_data[!is.na(hh_data$age),]
-    hh_data <- hh_data[hh_data$age>=0,]
-    
+    hh_data = hh_data[!is.na(hh_data$age), ]
+    hh_data = hh_data[hh_data$age >= 0, ]
+
     # add a household member id
-    hh_data$member_id <- 1:nrow(hh_data)
-    
+    hh_data$member_id = 1:nrow(hh_data)
+
     # add hh_data to pop_data
-    pop_data <- rbind(pop_data,
-                      hh_data)
-    
+    pop_data = rbind(pop_data,
+                     hh_data)
+
     # update statistics and household counter
-    current_pop_size <- nrow(pop_data)
-    hh_id    <- hh_id + 1
-    
+    current_pop_size = nrow(pop_data)
+    hh_id            = hh_id + 1
+
   } # end while-loop
-  
+
   # select all individuals within the given population size
-  pop_data <- pop_data[1:pop_size,]
-  
+  pop_data = pop_data[1:pop_size, ]
+
   # add health state: susceptible
-  pop_data <- data.frame(pop_data,
-                         health              = 'S',           # column to store the health state
-                         infector            = NA,            # column to store the source of infection
-                         time_of_infection   = NA,            # column to store the time of infection
-                         generation_interval = 0,             # column to store the generation interval
-                         secondary_cases     = 0,             # column to store the number of secondary cases
-                         stringsAsFactors    = FALSE)
-  
+  pop_data = data.frame(pop_data,
+                        health              = 'S',           # column to store the health state
+                        infector            = NA,            # column to store the source of infection
+                        time_of_infection   = NA,            # column to store the time of infection
+                        generation_interval = 0,             # column to store the generation interval
+                        secondary_cases     = 0,             # column to store the number of secondary cases
+                        stringsAsFactors    = FALSE)
+
   # set school classes by age and number of schools
-  pop_data <- set_schools(pop_data, num_schools, target_school_ages)
-  
-  # set workplace 
-  pop_data <- set_workplaces(pop_data, num_workplaces, target_school_ages)
-  
+  pop_data = set_schools(pop_data, num_schools, target_school_ages)
+
+  # set workplace
+  pop_data = set_workplaces(pop_data, num_workplaces, target_school_ages)
+
   # option to plot demographics
   if(bool_show_demographics){
     # create a figure with 8 subplots
-    par(mfrow=c(2,4))
-    hist(pop_data$age,-1:70,main='total population',xlab='age')
-    hist(pop_data$age[pop_data$member_id==1],-1:70,main='adult 1',xlab='age')
-    hist(pop_data$age[pop_data$member_id==2],-1:70,main='adult 2',xlab='age')
-    hist(pop_data$age[pop_data$member_id==3],-1:70,main='child 1',xlab='age')
-    hist(pop_data$age[pop_data$member_id==4],-1:70,main='child 2',xlab='age')
-    hist(table(pop_data$hh_id),main='household size',xlab='household size')
-    
+    par(mfrow = c(2, 4))
+    hist(pop_data$age, -1:70, main = 'total population', xlab = 'age')
+    hist(pop_data$age[pop_data$member_id == 1], -1:70, main = 'adult 1', xlab = 'age')
+    hist(pop_data$age[pop_data$member_id == 2], -1:70, main = 'adult 2', xlab = 'age')
+    hist(pop_data$age[pop_data$member_id == 3], -1:70, main = 'child 1', xlab = 'age')
+    hist(pop_data$age[pop_data$member_id == 4], -1:70, main = 'child 2', xlab = 'age')
+    hist(table(pop_data$hh_id), main = 'household size', xlab = 'household size')
+
     # check class and workplace size
-    if(any(!is.na(pop_data$classroom_id))) hist(table(pop_data$classroom_id),xlab='Size',main='School class size')
-    if(any(!is.na(pop_data$workplace_id))) hist(table(pop_data$workplace_id),xlab='Size',main='Worplace size')
+    if(any(!is.na(pop_data$classroom_id))) hist(table(pop_data$classroom_id), xlab = 'Size', main = 'School class size')
+    if(any(!is.na(pop_data$workplace_id))) hist(table(pop_data$workplace_id), xlab = 'Size', main = 'Workplace size')
   }
-  
-  
+
+
   return(pop_data)
-  
+
 } # end function
 
-set_schools <- function(pop_data, num_schools, target_school_ages){
+set_schools = function(pop_data, num_schools, target_school_ages){
   if(num_schools > 0){
     # eg. 'class3_1' is the 1th classroom with 3-year olds children
-    pop_data$classroom_id <- paste0('class', pop_data$age, '_', sample(num_schools, nrow(pop_data), replace = TRUE))
-    
+    pop_data$classroom_id = paste0('class', pop_data$age, '_', sample(num_schools, nrow(pop_data), replace = TRUE))
+
     # set 'classroom_id' for infants and adults outside the target ages to 'NA' (=none)
-    boolean_school_pop    <- pop_data$age %in% target_school_ages
-    pop_data$classroom_id[!boolean_school_pop] <- NA
+    boolean_school_pop    = pop_data$age %in% target_school_ages
+    pop_data$classroom_id[!boolean_school_pop] = NA
   } else {
-    pop_data$classroom_id <- NA
+    pop_data$classroom_id = NA
   }
   # return the result
   return(pop_data)
 }
 
 ## workplaces
-set_workplaces <- function(pop_data, num_workplaces, target_school_ages){
+set_workplaces = function(pop_data, num_workplaces, target_school_ages){
   if(num_workplaces > 0){
     # sample a workplace for each individual
-    pop_data$workplace_id <- sample(num_workplaces, nrow(pop_data), replace = TRUE)
-    
+    pop_data$workplace_id = sample(num_workplaces, nrow(pop_data), replace = TRUE)
+
     # set 'workplace_id' for children to 'NA' (= no workplace)
-    boolean_workplace_pop <- pop_data$age <= max(target_school_ages)
-    pop_data$workplace_id[boolean_workplace_pop] <- NA    
+    boolean_workplace_pop = pop_data$age <= max(target_school_ages)
+    pop_data$workplace_id[boolean_workplace_pop] = NA
   } else {
-    pop_data$workplace_id <- NA
+    pop_data$workplace_id = NA
   }
   # return the result
   return(pop_data)
 }
 
-plot_transmission_matrix <- function(mij,
+plot_transmission_matrix = function(mij,
                                      breaks = NA,
                                      main = 'Transmission matrix',
                                      num.digits = NA){
-  
+
   # if no breaks given, use uniform values
   if(all(is.na(breaks))){
-    breaks <- pretty(mij)
-  } 
-  
+    breaks = pretty(mij)
+  }
+
   # add additional starting break, to include the minimum value as starting point (in the legend)
-  breaks <- c(min(breaks)-1,breaks)
-  
+  breaks = c(min(breaks) - 1, breaks)
+
   # set midpoints
-  midpoints <- matrix(
+  midpoints = matrix(
     breaks[-length(breaks)] + diff(breaks) / 2,
     nrow = 1, ncol = length(breaks) - 1
   )
 
   # set colors
-  num.colors <- length(breaks)-1
-  redc <- heat.colors(num.colors)
-  
+  num.colors = length(breaks) - 1
+  redc = heat.colors(num.colors)
+
   # get plot region for matrix and legend based on current graphical parameters
   # note: based on layout from fields::imagePlot
-  char.size     <- par()$cin[1] / par()$din[1] # get text character size
-  offset        <- char.size * par()$mar[4] # space between legend and main plot
-  legend.width  <- 1
-  legend.mar    <- 8.1
-  legend.shrink <- 0.9
-  cex.lab       <- 1.2
-  cex.axis      <- 0.8
-  cex.text      <- 1
-  
+  char.size     = par()$cin[1] / par()$din[1] # get text character size
+  offset        = char.size * par()$mar[4] # space between legend and main plot
+  legend.width  = 1
+  legend.mar    = 8.1
+  legend.shrink = 0.9
+  cex.lab       = 1.2
+  cex.axis      = 0.8
+  cex.text      = 1
+
   # set legends' plot region
-  legend_plot_region <- par()$plt
-  legend_plot_region[2] <- 1 - (legend.mar * char.size)
-  legend_plot_region[1] <- legend_plot_region[2] - (legend.width * char.size)
+  legend_plot_region = par()$plt
+  legend_plot_region[2] = 1 - (legend.mar * char.size)
+  legend_plot_region[1] = legend_plot_region[2] - (legend.width * char.size)
 
   # account for legend.shrink
-  pr <- (legend_plot_region[4] - legend_plot_region[3]) * ((1 - legend.shrink) / 2)
-  legend_plot_region[4] <- legend_plot_region[4] - pr
-  legend_plot_region[3] <- legend_plot_region[3] + pr
+  pr = (legend_plot_region[4] - legend_plot_region[3]) * ((1 - legend.shrink) / 2)
+  legend_plot_region[4] = legend_plot_region[4] - pr
+  legend_plot_region[3] = legend_plot_region[3] + pr
 
   # set main matrix' plot region
-  main_plot_region    <- par()$plt
-  main_plot_region[2] <- min(main_plot_region[2], legend_plot_region[1] - offset)
+  main_plot_region    = par()$plt
+  main_plot_region[2] = min(main_plot_region[2], legend_plot_region[1] - offset)
 
   # defensive check for main and legends' plot region
-  dp <- legend_plot_region[2] - legend_plot_region[1]
-  legend_plot_region[1] <- min(main_plot_region[2] + offset, legend_plot_region[1])
-  legend_plot_region[2] <- legend_plot_region[1] + dp
+  dp = legend_plot_region[2] - legend_plot_region[1]
+  legend_plot_region[1] = min(main_plot_region[2] + offset, legend_plot_region[1])
+  legend_plot_region[2] = legend_plot_region[1] + dp
 
   # store old graphical parameters, and initiate the ones for the main plot
-  old.par <- par(no.readonly = TRUE)
+  old.par = par(no.readonly = TRUE)
   par(plt = main_plot_region)
 
   # add image plot
@@ -1056,9 +1056,9 @@ plot_transmission_matrix <- function(mij,
         col = redc,
         xaxt = "n",
         yaxt = "n")
-  
+
   # add axis labels
-  plt_ticks <- seq(0, 1, length = nrow(mij))
+  plt_ticks = seq(0, 1, length = nrow(mij))
   axis(2, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 1, mgp = c(3, 0.3, 0))
   axis(1, at = plt_ticks, labels = c(colnames(mij)), cex.axis = cex.axis, tick = FALSE, las = 2, mgp = c(3, 0.3, 0))
 
@@ -1066,16 +1066,16 @@ plot_transmission_matrix <- function(mij,
   if (!is.na(num.digits) && !is.na(cex.text) && cex.text > 0) {
     # format results (rounding/scientific)
     if (any(max(mij, na.rm = TRUE) > 1)) {
-      mij <- round(mij, digits = num.digits)
+      mij = round(mij, digits = num.digits)
     } else {
-      mij <- format(mij, digits = num.digits)
+      mij = format(mij, digits = num.digits)
     }
-    
+
     # get grid centers and add values
-    e_grid <- expand.grid(plt_ticks, plt_ticks)
+    e_grid = expand.grid(plt_ticks, plt_ticks)
     text(e_grid, labels = mij, cex = cex.text)
   }
-  
+
   # set graphical parameters for the legend
   par(new = TRUE, pty = "m", plt = legend_plot_region, err = -1)
 
@@ -1085,17 +1085,17 @@ plot_transmission_matrix <- function(mij,
         ylab = "", col = redc,
         breaks = breaks)
   #axis(side = 4, at = 1:length(breaks[-1]), labels= breaks[-1], mgp = c(3, 1, 0), las = 2)
-  mtext("count", side = 2, cex = 0.8)  
-  breaks_label <- breaks
-  if(any(diff(breaks)>1)){
-    sel_bin <- c(FALSE,diff(breaks) > 1)
-    breaks_label_bin <- breaks_label
-    breaks_label_bin[-1] <- paste(breaks_label[-length(breaks_label)], breaks_label[-1], sep=' - ')
-    breaks_label[sel_bin] <- breaks_label_bin[sel_bin]
+  mtext("count", side = 2, cex = 0.8)
+  breaks_label = breaks
+  if(any(diff(breaks) > 1)){
+    sel_bin = c(FALSE, diff(breaks) > 1)
+    breaks_label_bin = breaks_label
+    breaks_label_bin[-1] = paste(breaks_label[-length(breaks_label)], breaks_label[-1], sep = ' - ')
+    breaks_label[sel_bin] = breaks_label_bin[sel_bin]
   }
-  axis(side = 4, at = 1:length(breaks[-1])+0.5, labels = breaks_label[-1], cex.axis = cex.axis, mgp = c(3, 0.3, 0), las = 2, tick = FALSE)
-  
+  axis(side = 4, at = 1:length(breaks[-1]) + 0.5, labels = breaks_label[-1], cex.axis = cex.axis, mgp = c(3, 0.3, 0), las = 2, tick = FALSE)
+
   # restore original graphical parameters
   par(old.par)
-  
+
 }

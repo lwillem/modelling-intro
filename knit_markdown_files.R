@@ -8,7 +8,7 @@ require('rmarkdown')
 # set directories
 project_dir = path.expand(".")
 Rmd_dir     = file.path(project_dir, "Rmd")
-html_dir    = file.path(project_dir, "Rmd")
+html_dir    = file.path(project_dir, "docs")
 
 # Rmd files that use show_results to toggle solution visibility
 rmd_files = dir(Rmd_dir, full.names = FALSE, pattern = '.Rmd')

@@ -12,11 +12,11 @@ options(width = 80)
 ```
 
 ```{r setup, echo=FALSE}
-knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, tidy=TRUE, warning=FALSE)
+knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, tidy = TRUE, warning = FALSE)
 ```
 
 # Objectives
-The aim of this tutorial is to introduce you to the Susceptible-Infected-Recovered transmission model in R and to solve the corresponding ordinary differential equations.  
+The aim of this tutorial is to introduce you to the Susceptible-Infected-Recovered transmission model in R and to solve the corresponding ordinary differential equations.
 
 In this session, you will
 
@@ -25,13 +25,13 @@ In this session, you will
 2. adapt an SIR model to include births and deaths, producing cycles
 
 
-The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. All the data to download is in the [github repository](https://github.com/lwillem/modelling-intro/tree/master/data) (links to download any data files are given below when you are supposed to load them). 
+The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. All the data to download is in the [github repository](https://github.com/lwillem/modelling-intro/tree/master/data) (links to download any data files are given below when you are supposed to load them).
 
 # Modelling concept
 
-Modelling goals: 
+Modelling goals:
 
-* To create a transmission model with susceptible (S), infected (I) and recovered (R) individuals 
+* To create a transmission model with susceptible (S), infected (I) and recovered (R) individuals
 * To plot the health states over time
 * To adapt model parameters and compare model outcomes
 
@@ -47,19 +47,19 @@ $$
 with $\beta$ as the transmission rate and $\gamma$ the recovery rate.
 
 # Set working directory
-The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`.
 
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. For example
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_intro/" ## on a OS X
+home = "~/Documents/Modelling_intro/" ## on a OS X
 setwd(home)
 ```
 
 or
 
 ```{r results = "hide", eval = FALSE}
-home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+home = "C:\\Documents\\Modelling_intro\\" ## on windows
 setwd(home)
 ```
 
@@ -71,7 +71,7 @@ install.packages(curl) # install the curl library (to import data)
 install.packages(deSolve) # install the deSolve library (to solve ODE)
 ```
 
-Once installed, you have to load the package(s) at the start of the R file. This is done using 
+Once installed, you have to load the package(s) at the start of the R file. This is done using
 
 ```{r results = "hide"}
 library(curl) # load in the curl library of function (to import data)
@@ -79,13 +79,13 @@ library(deSolve) # load in the deSolve library of functions (to solve ODE)
 ```
 
 # Writing and solving ordinary differential equations
-In order to write and solve ODE, you need to learn the basic `ode` syntax in R and load the package that we installed earlier (`deSolve`). 
+In order to write and solve ODE, you need to learn the basic `ode` syntax in R and load the package that we installed earlier (`deSolve`).
 
 The package `deSolve` includes a function `ode` that solves ODE equations. This function needs certain inputs. Have a look at
 ```{r results = "hide", tidy = FALSE}
 ?ode
 ```
-and see if you can understand what the required inputs are. 
+and see if you can understand what the required inputs are.
 
 For this part of the tutorial, we will build and solve our own SIR model. We will compare it to data and try to determine the correct parameters. Firstly we need to read in the data, which is stored in "data_sir.csv". As before, download this from [here](https://github.com/lwillem/modelling-intro/raw/master/data/data_sir.csv) and point R to the correct working directory where you have this data saved. Or you can also use:
 
@@ -96,134 +96,134 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/data/data_s
 Then use the following to load the data
 
 ```{r results = "hide"}
-data <- read.csv("data_sir.csv") 
+data = read.csv("data_sir.csv")
 ```
-Can you make a simple plot to check what this SIR outbreak looks like? 
+Can you make a simple plot to check what this SIR outbreak looks like?
 
-As described in the help pages for `ode`, this function itself requires several inputs including another function. 
+As described in the help pages for `ode`, this function itself requires several inputs including another function.
 
 The first input it requires are the initial conditions. We have to specify the initial conditions for all of the states. Here we have three states, S, I and R:
 ```{r results = "hide"}
-init <- c(S = 0, I = 0, R = 0)
+init = c(S = 0, I = 0, R = 0)
 ```
-Can you alter this initial vector for a population of 100,000 to have initially one infected and the rest susceptible? 
+Can you alter this initial vector for a population of 100,000 to have initially one infected and the rest susceptible?
 
-The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the time steps over which the ODE will be solved. These are specified by the method. Here let's assume we want output every year for 40 years. 
+The second required input are the times over which the output for the ODE is wanted. Note this is not the same as the time steps over which the ODE will be solved. These are specified by the method. Here let's assume we want output every year for 40 years.
 ```{r results = "hide"}
-times <- seq(0, 40, by = 1) 
+times = seq(0, 40, by = 1)
 ```
 
 The third required input is the function itself, which governs the dynamics between the states. Here as we have an SIR model we can translate the differential equations into three simple relationships:
 ```{r results = "hide"}
-sir <- function(time, state, parameters) { # {{Curly brackets indicate the beginning and end of functions}}
+sir = function(time, state, parameters) { # {{Curly brackets indicate the beginning and end of functions}}
   # This is the core of the function - what happens to the parameters. Here it needs to be a list}}
   with(as.list(c(state, parameters)), {
-    dS = -beta * S * I  # The change in S 
+    dS = -beta * S * I  # The change in S
     dI = beta * S * I - gamma * I
     dR = gamma * I
     return(list(c(dS, dI, dR))) # {{"Return" as in "spit out" the values that you want}}
-  }) 
-} 
+  })
+}
 ```
 
 Finally, the `ode` function requires the input parameters, which here are only beta and gamma:
 ```{r results = "hide"}
-parameters <- c(beta = 2/100000, gamma = 0.5)
+parameters = c(beta = 2 / 100000, gamma = 0.5)
 ```
 
 In order to run the function we input all of the above and save the output in a vector called `out`:
 ```{r results = "hide"}
-init <- c(S = 100000 - 1, I = 1, R = 0)
-out <- ode(y = init,  func = sir, times = times, parms = parameters)
-head(out) 
+init = c(S = 100000 - 1, I = 1, R = 0)
+out = ode(y = init, func = sir, times = times, parms = parameters)
+head(out)
 ```
-What does the output data look like? Does it make sense? Can you build a simple plot to look at the change in the number Infected over time? 
+What does the output data look like? Does it make sense? Can you build a simple plot to look at the change in the number Infected over time?
 
 To look at all of the model output we can plot everything on the same graph:
 ```{r results = "hide"}
-plot(out[,"time"],out[,"S"],type="l",lwd = 5, col="green",xlab="Time",ylab="Number")
-lines(out[,"time"],out[,"I"],col="red",lwd = 5)
-lines(out[,"time"],out[,"R"],col="blue",lwd = 5)
-legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, col =c("green","red","blue")) # Add legend and specific position
+plot(out[, "time"], out[, "S"], type = "l", lwd = 5, col = "green", xlab = "Time", ylab = "Number")
+lines(out[, "time"], out[, "I"], col = "red", lwd = 5)
+lines(out[, "time"], out[, "R"], col = "blue", lwd = 5)
+legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, col = c("green", "red", "blue")) # Add legend and specific position
 ```
 
-Does this match the data you read before in using `read.csv` well? Note, that the data given is the proportions infected over time. So in order to compare you either need to convert the data to numbers or the numbers to data. Try and do this, and plot the data and model output on the same graph. A solution is given below if you get stuck. 
+Does this match the data you read before in using `read.csv` well? Note, that the data given is the proportions infected over time. So in order to compare you either need to convert the data to numbers or the numbers to data. Try and do this, and plot the data and model output on the same graph. A solution is given below if you get stuck.
 
-What we are doing here is assessing our model's "fit" to the data. This is a key stage in the development of any model - does it reflect reality? The simplest way to do this is by plotting model output and data together and comparing them by eye. Over the next few days, we will introduce several more formal and quantitative methods for assessing a model "fit".  
+What we are doing here is assessing our model's "fit" to the data. This is a key stage in the development of any model - does it reflect reality? The simplest way to do this is by plotting model output and data together and comparing them by eye. Over the next few days, we will introduce several more formal and quantitative methods for assessing a model "fit".
 
 
 ```{r }
-data$number <- data$proportion * 100000
-plot(out[,"time"],out[,"S"],type="l",lwd = 5, col="green",xlab="Time",ylab="Number")
-lines(out[,"time"],out[,"I"],col="red",lwd = 5)
-lines(out[,"time"],out[,"R"],col="blue",lwd = 5)
-legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, col = c("green","red","blue")) #
-points(data$time,data$number)
+data$number = data$proportion * 100000
+plot(out[, "time"], out[, "S"], type = "l", lwd = 5, col = "green", xlab = "Time", ylab = "Number")
+lines(out[, "time"], out[, "I"], col = "red", lwd = 5)
+lines(out[, "time"], out[, "R"], col = "blue", lwd = 5)
+legend(23, 80000, c("Susceptible", "Infected", "Recovered"), lwd = 3, lty = 1, col = c("green", "red", "blue")) #
+points(data$time, data$number)
 ```
 
-Assume you know that the value for `beta` is 2/100000. Can you write a function that considers a range of different parameters for `gamma`, runs the model with these various values and then plots the outcomes with the data? From this what is the best estimate you can get for `gamma`? 
+Assume you know that the value for `beta` is 2/100000. Can you write a function that considers a range of different parameters for `gamma`, runs the model with these various values and then plots the outcomes with the data? From this what is the best estimate you can get for `gamma`?
 
-Note that this was output generated with a set value for gamma and so you can find a solution - however in the real world epidemic there is unlikely to be such a perfect fit! 
+Note that this was output generated with a set value for gamma and so you can find a solution - however in the real world epidemic there is unlikely to be such a perfect fit!
 
-The solution to the code is below, but try not to look at this before having a go yourself. This will use all the skills you've learnt in R and will prepare you for the rest of the course. 
+The solution to the code is below, but try not to look at this before having a go yourself. This will use all the skills you've learnt in R and will prepare you for the rest of the course.
 
 
 ```{r results = "hide"}
 # Run for many values of gamma
-gamma_values <- seq(0.2,0.8,0.1) # vector of possible gamma values
-store_I <- matrix(0,length(gamma_values) * length(times) ,3) ### Empty vector where we will store the output
+gamma_values = seq(0.2, 0.8, 0.1) # vector of possible gamma values
+store_I = matrix(0, length(gamma_values) * length(times), 3) ### Empty vector where we will store the output
 
 # Run through and solve with each gamma value
 for(i in 1:length(gamma_values)){ # Length = how many entries in vector
-  # What gamma value in this run? 
-  gamma_new <- gamma_values[i]
+  # What gamma value in this run?
+  gamma_new = gamma_values[i]
   # New parameter set
-  parameters <- c(beta = 2/100000, gamma = gamma_new)
+  parameters = c(beta = 2 / 100000, gamma = gamma_new)
   # Run with this new parameter set
-  out <- ode(y = init, times = times, func = sir, parms = parameters)
+  out = ode(y = init, times = times, func = sir, parms = parameters)
   # Store the number of infected individuals this produces
-  stored <- cbind(out[,"time"],out[,"I"],gamma_new) # Bind the columns with time, the infected and the new gamma
-  store_I[((i-1)*length(times)+1):(i*length(times)),]=stored # Store in the big matrix 
+  stored = cbind(out[, "time"], out[, "I"], gamma_new) # Bind the columns with time, the infected and the new gamma
+  store_I[((i - 1) * length(times) + 1):(i * length(times)), ] = stored # Store in the big matrix
 }
 # Have a look at what you have...(again wouldn't usually include this in the saved R code)
 head(store_I)
-colnames(store_I)<-c("Time","Infecteds","gamma_new")
+colnames(store_I) = c("Time", "Infecteds", "gamma_new")
 
-# Plot 
-plot(store_I[,"Time"],store_I[,"Infecteds"],type="l",xlab="Time",ylab="Number")
-points(data$time,data$number) # compare visually to data
+# Plot
+plot(store_I[, "Time"], store_I[, "Infecteds"], type = "l", xlab = "Time", ylab = "Number")
+points(data$time, data$number) # compare visually to data
 
 ```
 
 You can store your data for the SIR solution at different gamma values using (as above):
 
 ```{r eval = FALSE}
-setwd(home) # Where do you want to store it? maybe have a "store" folder? 
-write.csv(store_I,"store_changing_gamma.csv") # What you want to save and then the name to give the file
+setwd(home) # Where do you want to store it? maybe have a "store" folder?
+write.csv(store_I, "store_changing_gamma.csv") # What you want to save and then the name to give the file
 ```
 
 # Going further
 
 ## The SIR model with births and deaths
 
-If you have gotten this far, try to build and solve using ode, your own version of this SIR model with births and deaths. 
+If you have gotten this far, try to build and solve using ode, your own version of this SIR model with births and deaths.
 
 The set of ordinary differential equations for this is:
 $$
 \begin{align}
 \frac{dS}{dt} &= - \beta \frac{I}{N} S + \nu N - \mu S \\
 \frac{dI}{dt} &=  \beta \frac{I}{N} S -\gamma I - \mu I \\
-\frac{dR}{dt} &= \gamma I - \mu R 
+\frac{dR}{dt} &= \gamma I - \mu R
 \end{align}$$
 
 Initial parameters could be:
 $$ \beta = 500, \gamma = 50, \nu = 0.02 $$
 
-Remember that the population size should stay constant, at say 1,000. 
+Remember that the population size should stay constant, at say 1,000.
 
 ## Extending the SIR model
 
-If you have time, you can now try to build more complex versions of the SIR model to match the infectious disease you are interested in. For example, you could try and include a latent (or "Exposed") compartment or extend the model to include waning immunity, vaccination, maternal immunity, etc. The first stage should be to sketch the model structure on paper. Remember that simplicity is the key and that you will need data to inform any parameter values. Secondly, translate the model structure into differential equations. Thirdly, translate the differential equations into a new function to use in the ode solver function. 
+If you have time, you can now try to build more complex versions of the SIR model to match the infectious disease you are interested in. For example, you could try and include a latent (or "Exposed") compartment or extend the model to include waning immunity, vaccination, maternal immunity, etc. The first stage should be to sketch the model structure on paper. Remember that simplicity is the key and that you will need data to inform any parameter values. Secondly, translate the model structure into differential equations. Thirdly, translate the differential equations into a new function to use in the ode solver function.
 
 
 <div>

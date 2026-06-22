@@ -2,7 +2,7 @@
 title: "Discounting in Health Economics"
 output:
   html_document:
-    toc: false  
+    toc: false
 ---
 
 <div style="text-align: right">
@@ -41,7 +41,7 @@ This document will walk you through practical examples of discounting in R, usin
 ```{r}
 discount = function(values, rate, year) {
   # Calculate discounted values
-  discounted_values = values / ((1 + rate) ^ year)
+  discounted_values = values / ((1 + rate)^year)
   return(discounted_values)
 }
 ```
@@ -74,7 +74,7 @@ discounted_data = data.frame(Year             = years,
 
 print(discounted_data)
 
-print(colSums(discounted_data[,-1]))
+print(colSums(discounted_data[, -1]))
 ```
 
 ### Example on discounted life expectancy
@@ -95,13 +95,13 @@ where:
 ```{r}
 
 # Set some examples
-life_expectancy = c(84, 50, 10, 2)  # years 
+life_expectancy = c(84, 50, 10, 2)  # years
 
 # Set the yearly discount rate (e.g., 1.5%)
 discount_rate = 0.015
 
 # Apply discounting
-discounted_life_expectancy = numeric(length=length(life_expectancy))
+discounted_life_expectancy = numeric(length = length(life_expectancy))
 
 # loop over all values in the vector 'life expectancy'
 for(i in 1:length(life_expectancy)){

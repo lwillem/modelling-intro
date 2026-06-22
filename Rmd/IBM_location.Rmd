@@ -6,13 +6,15 @@ title: "Introduction to location-specific IBMs"
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
+
 suppressPackageStartupMessages(library('curl'))
 set.seed(2020)
 options(width = 80)
 source('../lib/ibm_functions.R')
 
-knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
+
 ```
 
 # Objectives
@@ -30,26 +32,31 @@ The best thing to do is to read each section and type (or copy and paste) the R 
 The individual-based model will make use of a virtual population in which each individual is part of a household, school/work (based on age), and the general community. Each day (= time step), individuals can interact at home, school/work and in the community. We specify for each location a contact probability or average number of contacts per day.
 
 # Set working directory
-The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`.
 
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_intro/" ## on a OS X
-home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+
+home = "~/Documents/Modelling_intro/"     ## on a OS X
+home = "C:\\Documents\\Modelling_intro\\" ## on windows
 setwd(home)
+
 ```
 
 # Load model code
 
 If the `curl` package is not installed yet, you can do so by
-```{r results = "hide", eval=FALSE}
+```{r results = "hide", eval = FALSE}
+
 install.packages(curl) # install the curl library (to import data)
+
 ```
 
 Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
 
-```{r eval= FALSE}
+```{r eval = FALSE}
+
 # load package 'curl'
 library('curl')
 
@@ -58,6 +65,7 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_fun
 
 # load the IBM functions
 source('ibm_functions.R')
+
 ```
 
 # Household setup
@@ -66,7 +74,9 @@ In our simulation model, we include households composed of two adults, as well a
 
 
 ```{r}
-head(create_population_matrix,9)
+
+head(create_population_matrix, 9)
+
 ```
 
 # School and workplace setup
@@ -75,6 +85,7 @@ In daily life, we visit locations suited to our tasks, which are age-specific. I
 
 
 ```{r}
+
 # inspect the set_schools function (by omitting the brackets = function call)
 set_schools
 
@@ -89,6 +100,7 @@ First, let's run the model with the default parameters:
 </n>
 
 ```{r }
+
 # you can run the location-specific IBM with default parameters (see console)
 run_ibm_location()
 
@@ -102,7 +114,7 @@ What can you learn from these graphs and output? Can you confirm the population 
 
 The "model parameters" from the model printout above can be used as function arguments to modify the default settings. For example, you can change the number of community contacts per day by adjusting `num_contacts_community_day`.
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 
 # increase the number of contacts in the community per day to 6 (= 'num_contacts_community_day')
 run_ibm_location(num_contacts_community_day = 6)

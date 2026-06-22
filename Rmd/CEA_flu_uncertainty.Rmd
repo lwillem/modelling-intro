@@ -44,7 +44,7 @@ For some parameters, the sample size is rather small or they should be strictly 
 ```{r}
 
 sample_gamma = function(nsamples, mean, se){
-  rgamma(nsamples, shape = mean^2/se^2, rate = mean/se^2)
+  rgamma(nsamples, shape = mean^2 / se^2, rate = mean / se^2)
 }
 
 sample_beta_event = function(nsamples, events, sample_size){
@@ -52,8 +52,8 @@ sample_beta_event = function(nsamples, events, sample_size){
 }
 
 sample_beta_mean = function(nsamples, mean, se){
-  alpha = mean^2 * (1 - mean)/se^2
-  beta  = alpha * (1 - mean)/mean
+  alpha = mean^2 * (1 - mean) / se^2
+  beta  = alpha * (1 - mean) / mean
   return(rbeta(nsamples, shape1 = alpha, shape2 = beta))
 }
 

@@ -6,13 +6,15 @@ title: "Scenario Analyses with a random walk IBM"
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
+
 suppressPackageStartupMessages(library('curl'))
 set.seed(2020)
 options(width = 80)
 source('../lib/ibm_functions.R')
 
-knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
+
 ```
 
 # Objectives
@@ -26,21 +28,25 @@ In this session, you will
 The best thing to do is to read each section and type (or copy and paste) the R commands (in grey boxes) into your own R session to check that you understand the code. <n style="color:darkred"> Hands-on questions are indicated in **red** </n>
 
 # Set working directory
-The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`.
 
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example:
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_intro/" ## on a OS X
-home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+
+home = "~/Documents/Modelling_intro/"     ## on a OS X
+home = "C:\\Documents\\Modelling_intro\\" ## on windows
 setwd(home)
+
 ```
 
 # Load model code
 
 If the `curl` package is not installed yet, you can do so by
-```{r results = "hide", eval=FALSE}
+```{r results = "hide", eval = FALSE}
+
 install.packages(curl) # install the curl library (to import data)
+
 ```
 
 Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model with random walks and vaccination yourselves.
@@ -55,6 +61,7 @@ curl_download("https://github.com/lwillem/modelling-intro/raw/master/lib/ibm_fun
 
 # load the IBM functions
 source('ibm_functions.R')
+
 ```
 
 # Scenario analyses
@@ -62,6 +69,7 @@ source('ibm_functions.R')
 First, let's run the model with the default parameters:
 
 ```{r }
+
 # you can run the IBM with default parameters (see console)
 run_ibm_random_walk()
 
@@ -74,7 +82,8 @@ What can you learn from these graphs? What about the model parameters that are p
 
 This IBM is able to show the location and health states of each individual over time. Therefore, you have to increase the parameter `plot_time_delay` to set a delay between two time steps (= default this is 0 = no time between 2 time steps = no plots)
 
-```{r eval=FALSE}
+```{r eval = FALSE}
+
 # you can run the IBM with default parameters (see console)
 run_ibm_random_walk(plot_time_delay = 0.2)
 
@@ -84,12 +93,11 @@ run_ibm_random_walk(plot_time_delay = 0.2)
 
 This IBM is able to account for vaccination. Therefore, you have to specify the parameter `vaccine_coverage`. By default, vaccinated individuals are randomly distributed over the area. To make this clear, we suggest to exclude the random movement, and use a static population (with velocity = 0).
 
-```{r eval=TRUE}
+```{r eval = TRUE}
 
 # set vaccination coverage to 60% with a population that does not move
 run_ibm_random_walk(max_velocity = 0,
                     vaccine_coverage = 0.6)
-
 
 ```
 
@@ -99,13 +107,12 @@ run_ibm_random_walk(max_velocity = 0,
 What happens if vaccine refusal is geographically clustered and individuals do not move? Run the following and have a look at the outcomes.
 </n>
 
-```{r eval=TRUE}
+```{r eval = TRUE}
 
 # is vaccination clustered?
 run_ibm_random_walk(max_velocity = 0,
                     vaccine_coverage = 0.6,
                     apply_spatial_vaccine_refusal = TRUE)
-
 
 ```
 

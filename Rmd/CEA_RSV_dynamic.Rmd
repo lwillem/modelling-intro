@@ -173,8 +173,7 @@ initials['S'] = 1 - sum(initials['I'] + initials['R'])
 dynamic_rsv_reference = SIR(pars = parameters, init = initials, time = 0:time_horizon)
 
 # calculate total infections
-dynamic_cases_reference = diff(dynamic_rsv_reference$results$R[c(1, nrow(dynamic_rsv_reference$results))]) * 
-                            population_size
+dynamic_cases_reference = diff(dynamic_rsv_reference$results$R[c(1, nrow(dynamic_rsv_reference$results))]) * population_size
 dynamic_cases_reference # print to terminal
 
 ```

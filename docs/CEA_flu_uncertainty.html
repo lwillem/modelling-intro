@@ -505,7 +505,7 @@ be strictly positive, hence other distribution might be preferred. Let’s
 first define some help functions to facilitate sampling using a given
 mean, se, proportion, samples size or confidence interval:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>sample_gamma <span class="ot">=</span> <span class="cf">function</span>(nsamples, mean, se){</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">rgamma</span>(nsamples, <span class="at">shape =</span> mean<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>se<span class="sc">^</span><span class="dv">2</span>, <span class="at">rate =</span> mean<span class="sc">/</span>se<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">rgamma</span>(nsamples, <span class="at">shape =</span> mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> se<span class="sc">^</span><span class="dv">2</span>, <span class="at">rate =</span> mean <span class="sc">/</span> se<span class="sc">^</span><span class="dv">2</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>}</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>sample_beta_event <span class="ot">=</span> <span class="cf">function</span>(nsamples, events, sample_size){</span>
@@ -513,8 +513,8 @@ mean, se, proportion, samples size or confidence interval:</p>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>}</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>sample_beta_mean <span class="ot">=</span> <span class="cf">function</span>(nsamples, mean, se){</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  alpha <span class="ot">=</span> mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean)<span class="sc">/</span>se<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  beta  <span class="ot">=</span> alpha <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean)<span class="sc">/</span>mean</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  alpha <span class="ot">=</span> mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean) <span class="sc">/</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  beta  <span class="ot">=</span> alpha <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean) <span class="sc">/</span> mean</span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">rbeta</span>(nsamples, <span class="at">shape1 =</span> alpha, <span class="at">shape2 =</span> beta))</span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>}</span></code></pre></div>
 </div>

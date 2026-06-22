@@ -1,6 +1,6 @@
 R code style guide for Rmd files in this project
 ==================================================
-Version: 2026-06-22 at 11:59
+Version: 2026-06-22 at 15:30
 
 1. Assignment operator
    - Use = instead of <-
@@ -75,3 +75,8 @@ Version: 2026-06-22 at 11:59
    - Do not hard-code show_results in the Rmd; set it via envir in the
      knit script so the file can also be knitted interactively:
        if (!exists("show_results")) show_results = FALSE
+
+11. Typos
+   - When applying style formatting to a file, flag any typos found in
+     comments, strings, or variable/function names in the Claude session.
+   - Fix all flagged typos directly in the file before finishing.
