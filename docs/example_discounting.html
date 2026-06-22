@@ -252,6 +252,7 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -500,38 +501,37 @@ visualization of discounted cash flows and benefits.</p>
 </div>
 <div id="define-a-discounting-function-in-r" class="section level3">
 <h3>Define a discounting function in R</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>discount <span class="ot">&lt;-</span> <span class="cf">function</span>(values, rate, year) {</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>discount <span class="ot">=</span> <span class="cf">function</span>(values, rate, year) {</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="co"># Calculate discounted values</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  discounted_values <span class="ot">&lt;-</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate) <span class="sc">^</span> year)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  discounted_values <span class="ot">=</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate) <span class="sc">^</span> year)</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="fu">return</span>(discounted_values)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="example-with-costs-and-benefits-over-time" class="section level3">
 <h3>Example with costs and benefits over time</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Example data: costs and QALYs over 11 years</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>years <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">11</span>  <span class="co"># Time periods from 0 to 10 (11 years)</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>years <span class="ot">=</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">11</span>  <span class="co"># Time periods from 0 to 10 (11 years)</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Set the yearly discount rate (e.g., 1.5% or 3%)</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>discount_rate <span class="ot">&lt;-</span> <span class="fl">0.015</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>discount_rate <span class="ot">=</span> <span class="fl">0.015</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># fixed values</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>costs <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1000</span>, <span class="fu">length</span>(years))  <span class="co"># Example costs per year</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>qalys <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(years))     <span class="co"># Example QALYs per year</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>costs <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1000</span>, <span class="fu">length</span>(years))  <span class="co"># Example costs per year</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>qalys <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(years))     <span class="co"># Example QALYs per year</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># Apply discounting</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>discounted_costs <span class="ot">&lt;-</span> <span class="fu">discount</span>(costs, discount_rate, years)</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>discounted_qalys <span class="ot">&lt;-</span> <span class="fu">discount</span>(qalys, discount_rate, years)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>discounted_costs <span class="ot">=</span> <span class="fu">discount</span>(costs, discount_rate, years)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>discounted_qalys <span class="ot">=</span> <span class="fu">discount</span>(qalys, discount_rate, years)</span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co"># Display the results</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>discounted_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  <span class="at">Year =</span> years,</span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="at">Costs =</span> costs,</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="at">Discounted_Costs =</span> discounted_costs,</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  <span class="at">QALYs =</span> qalys,</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  <span class="at">Discounted_QALYs =</span> discounted_qalys</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>)</span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>discounted_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">Year             =</span> years,</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>                             <span class="at">Costs            =</span> costs,</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>                             <span class="at">Discounted_Costs =</span> discounted_costs,</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>                             <span class="at">QALYs            =</span> qalys,</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>                             <span class="at">Discounted_QALYs =</span> discounted_qalys</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>)</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
 <pre><code>##    Year Costs Discounted_Costs QALYs Discounted_QALYs
 ## 1     0  1000        1000.0000     1        1.0000000
 ## 2     1  1000         985.2217     1        0.9852217
@@ -554,34 +554,33 @@ visualization of discounted cash flows and benefits.</p>
 <p>To calculate the discounted value of expected life years, we use the
 formula for a finite sum of discounted values over a defined period:</p>
 <p><span class="math display">\[
-PV = \sum_{t=0}^{n-1} \frac{1}{(1 + r)^t}
+PV = \sum_{t = 0} ^ {n - 1} \frac{1}{(1 + r) ^ t}
 \]</span></p>
 <p>where: <span class="math inline">\(PV\)</span>: Present Value , <span class="math inline">\(n\)</span>: Total number of years, <span class="math inline">\(r\)</span>: Discount Rate, and <span class="math inline">\(t\)</span>: Time in years.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Set some examples</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>life_expectancy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">84</span>, <span class="dv">50</span>, <span class="dv">10</span>, <span class="dv">2</span>)  <span class="co"># years </span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>life_expectancy <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">84</span>, <span class="dv">50</span>, <span class="dv">10</span>, <span class="dv">2</span>)  <span class="co"># years </span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># Set the yearly discount rate (e.g., 1.5%)</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>discount_rate <span class="ot">&lt;-</span> <span class="fl">0.015</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>discount_rate <span class="ot">=</span> <span class="fl">0.015</span></span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># Apply discounting</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>discounted_life_expectancy <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="at">length=</span><span class="fu">length</span>(life_expectancy))</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>discounted_life_expectancy <span class="ot">=</span> <span class="fu">numeric</span>(<span class="at">length=</span><span class="fu">length</span>(life_expectancy))</span>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a></span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co"># loop over all values in the vector &#39;life expectancy&#39;</span></span>
 <span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(life_expectancy)){</span>
 <span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="co"># per expected life year, add the discounted valued of year &#39;j&#39;</span></span>
 <span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="co"># note that we start with year &#39;0&#39;, so the discounted value of the initial year equals 1</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">0</span><span class="sc">:</span>(life_expectancy[i]<span class="sc">-</span><span class="dv">1</span>)){</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  discounted_life_expectancy[i] <span class="ot">&lt;-</span> discounted_life_expectancy[i] <span class="sc">+</span> <span class="fu">discount</span>(<span class="dv">1</span>, discount_rate, j)</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">0</span><span class="sc">:</span>(life_expectancy[i] <span class="sc">-</span> <span class="dv">1</span>)){</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  discounted_life_expectancy[i] <span class="ot">=</span> discounted_life_expectancy[i] <span class="sc">+</span> <span class="fu">discount</span>(<span class="dv">1</span>, discount_rate, j)</span>
 <span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  }</span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>}</span>
 <span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a></span>
 <span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co"># Display the results</span></span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>discounted_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="at">Life_expectancy =</span> life_expectancy,</span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  <span class="at">Discounted_life_expectancy =</span> discounted_life_expectancy</span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>)</span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a></span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>discounted_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">Life_expectancy =</span> life_expectancy,</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>                             <span class="at">Discounted_life_expectancy =</span> discounted_life_expectancy</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>)</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
 <pre><code>##   Life_expectancy Discounted_life_expectancy
 ## 1              84                  48.292313
 ## 2              50                  35.524683
