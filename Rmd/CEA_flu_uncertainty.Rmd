@@ -7,8 +7,10 @@ toc: no
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
+
+show_results = FALSE
 ```
 
 This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
@@ -104,11 +106,11 @@ for (i in 1:nsamples){
 
 
 Calculate the burden of disease with the program in place, along with the associated medical and program costs:
-```{r eval = FALSE}
+```{r echo = !show_results, eval = FALSE}
 ### Similar to the previous tutorial: "CEA: Influenza"
 ```
 
-```{r include = FALSE}
+```{r include = show_results}
 # Program
 population_at_risk = targetgroup * (1 - uptake_program) + 
                       targetgroup * uptake_program * (1 - vaccine_efficacy)
@@ -129,11 +131,11 @@ program_QALYloss_disc      = program_infections * QALYloss_per_case + program_li
 ```
 
 Calculate the burden of disease for the comparator without the program in place, including the medical costs:
-```{r eval = FALSE}
+```{r echo = !show_results, eval = FALSE}
 ### Similar to the previous tutorial: "CEA: Influenza"
 ```
 
-```{r include = FALSE}
+```{r include = show_results}
 # Comparator
 comparator_infections         = targetgroup * force_of_infection
 comparator_hospitalisations   = comparator_infections * p_hosp
@@ -151,11 +153,11 @@ comparator_QALYloss_disc      = comparator_infections * QALYloss_per_case + comp
 ```
 
 Calculate the difference between the program and the comparator:
-```{r eval = FALSE}
+```{r echo = !show_results, eval = FALSE}
 ### Similar to the previous tutorial: "CEA: Influenza"
 ```
 
-```{r include = FALSE}
+```{r include = show_results}
 # To calculate the difference between 'program' and 'comparator'
 infections_averted         = comparator_infections - program_infections
 hospitalisations_averted   = comparator_hospitalisations - program_hospitalisations
@@ -553,6 +555,13 @@ plot(evppi_bcea, col = 1:2, pos = c(1, 1))
 
 <div>
 # Navigate
-Top: [Index](index.html)
+Top: [Index](index.html) ---
+`r if (!show_results) {
+    '<a href="CEA_flu_uncertainty_results.html"> Results</a>'
+  } else {
+    '<a href="CEA_flu_uncertainty.html"> Back</a>'
+  }
+`
 </div>
+
 

@@ -572,12 +572,51 @@ expectancy:</p>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>}</span></code></pre></div>
 <p>Calculate the burden of disease with the program in place, along with
 the associated medical and program costs:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">### Similar to the previous tutorial: &quot;CEA: Influenza&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Program</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>population_at_risk <span class="ot">=</span> targetgroup <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> uptake_program) <span class="sc">+</span> </span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                      targetgroup <span class="sc">*</span> uptake_program <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> vaccine_efficacy)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>program_infections         <span class="ot">=</span> population_at_risk <span class="sc">*</span> force_of_infection </span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>program_hospitalisations   <span class="ot">=</span> program_infections <span class="sc">*</span> p_hosp</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>program_deaths             <span class="ot">=</span> program_hospitalisations <span class="sc">*</span> hosp_case_fatality_ratio</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>program_lifeyearslost      <span class="ot">=</span> program_deaths <span class="sc">*</span> life_expectancy</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>program_lifeyearslost_disc <span class="ot">=</span> program_deaths <span class="sc">*</span> life_expectancy_disc</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>program_treatment_cost     <span class="ot">=</span> program_infections <span class="sc">*</span> treatment_cost_per_case</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>program_vaccination_cost   <span class="ot">=</span> fixed_program_cost <span class="sc">+</span> targetgroup <span class="sc">*</span> uptake_program <span class="sc">*</span> vaccine_cost_per_dose</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>program_total_cost         <span class="ot">=</span> program_treatment_cost <span class="sc">+</span> program_vaccination_cost</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>program_QALYloss           <span class="ot">=</span> program_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> program_lifeyearslost</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>program_QALYloss_disc      <span class="ot">=</span> program_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> program_lifeyearslost_disc</span></code></pre></div>
 <p>Calculate the burden of disease for the comparator without the
 program in place, including the medical costs:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="do">### Similar to the previous tutorial: &quot;CEA: Influenza&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Comparator</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>comparator_infections         <span class="ot">=</span> targetgroup <span class="sc">*</span> force_of_infection</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>comparator_hospitalisations   <span class="ot">=</span> comparator_infections <span class="sc">*</span> p_hosp</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>comparator_deaths             <span class="ot">=</span> comparator_hospitalisations <span class="sc">*</span> hosp_case_fatality_ratio</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>comparator_lifeyearslost      <span class="ot">=</span> comparator_deaths <span class="sc">*</span> life_expectancy</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>comparator_lifeyearslost_disc <span class="ot">=</span> comparator_deaths <span class="sc">*</span> life_expectancy_disc</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>        </span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>comparator_treatment_cost     <span class="ot">=</span> comparator_infections <span class="sc">*</span> treatment_cost_per_case</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>comparator_vaccination_cost   <span class="ot">=</span> <span class="dv">0</span> <span class="co"># for ilustration purpose, no vaccine in the comparator</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>comparator_total_cost         <span class="ot">=</span> comparator_treatment_cost <span class="sc">+</span> comparator_vaccination_cost</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>comparator_QALYloss           <span class="ot">=</span> comparator_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> comparator_lifeyearslost</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>comparator_QALYloss_disc      <span class="ot">=</span> comparator_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> comparator_lifeyearslost_disc</span></code></pre></div>
 <p>Calculate the difference between the program and the comparator:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="do">### Similar to the previous tutorial: &quot;CEA: Influenza&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># To calculate the difference between &#39;program&#39; and &#39;comparator&#39;</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>infections_averted         <span class="ot">=</span> comparator_infections <span class="sc">-</span> program_infections</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>hospitalisations_averted   <span class="ot">=</span> comparator_hospitalisations <span class="sc">-</span> program_hospitalisations</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>deaths_averted             <span class="ot">=</span> comparator_deaths <span class="sc">-</span> program_deaths</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>lifeyearslost_averted      <span class="ot">=</span> comparator_lifeyearslost <span class="sc">-</span> program_lifeyearslost</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>lifeyearslost_averted_disc <span class="ot">=</span> comparator_lifeyearslost_disc <span class="sc">-</span> program_lifeyearslost_disc</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>QALY_gained                <span class="ot">=</span> comparator_QALYloss <span class="sc">-</span> program_QALYloss</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>QALY_gained_disc           <span class="ot">=</span> comparator_QALYloss_disc <span class="sc">-</span> program_QALYloss_disc</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>treatment_cost_averted     <span class="ot">=</span> comparator_treatment_cost <span class="sc">-</span> program_treatment_cost</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>incr_vaccination_cost      <span class="ot">=</span> program_vaccination_cost <span class="sc">-</span> comparator_vaccination_cost <span class="co"># incremental vaccine cost</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>incr_total_cost            <span class="ot">=</span> incr_vaccination_cost <span class="sc">-</span> treatment_cost_averted</span></code></pre></div>
 <p>Calculate the incremental effectiveness ratios for infections,
 hospitalizations, and deaths averted. Warning, the expected ICER equals
 the expected incremental cost / average incremental effect. this is NOT
@@ -934,7 +973,7 @@ perfect information for parameter subsets.</p>
 <div id="navigate" class="section level1">
 <h1>Navigate</h1>
 <p>Top: <a href="index.html">Index</a> —
-<a href="CEA_flu_uncertainty_results.html"> Results</a></p>
+<a href="CEA_flu_uncertainty.html"> Back</a></p>
 </div>
 
 
