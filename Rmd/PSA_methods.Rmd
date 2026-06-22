@@ -7,10 +7,10 @@ toc: no
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 set.seed(2020)
 
-knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
 ```
 
 This script was developed by Lander Willem for illustration and teaching purposes only. Please make contact if you would like to use this model in any public way.
@@ -76,14 +76,14 @@ Calculate the QALY loss and cost for the comparator and intervention:
 set.seed(345698) 
 
 # comparator
-force_of_infection   = sample_beta_event(nsamples,foi_mean,foi_sample_size)  
+force_of_infection   = sample_beta_event(nsamples, foi_mean, foi_sample_size)  
 cost_per_case        = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
 comp_infections      = force_of_infection * targetgroup
 comp_QALY_loss       = comp_infections * QALYloss_case
 comp_total_cost      = comp_infections * cost_per_case
 
 # intervention
-force_of_infection   = sample_beta_event(nsamples,foi_mean,foi_sample_size)  
+force_of_infection   = sample_beta_event(nsamples, foi_mean, foi_sample_size)  
 cost_per_case        = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
 interv_infections    = force_of_infection * targetgroup * (1 - vaccine_efficacy * uptake_program)
 interv_QALY_loss     = interv_infections * QALYloss_case
@@ -94,19 +94,24 @@ incr_QALY_gain = comp_QALY_loss - interv_QALY_loss
 incr_cost =  interv_total_cost - comp_total_cost
 
 # plot CE-plane
-plot(x = incr_QALY_gain, y = incr_cost, xlim = c(-10,80), ylim = c(-12e3,5e3), 
-        xlab = 'Incremental effect', ylab = 'Incremental cost', pch = 19)
+plot(x = incr_QALY_gain, 
+     y = incr_cost, 
+     xlim = c(-10, 80), 
+     ylim = c(-12e3, 5e3), 
+     xlab = 'Incremental effect', 
+     ylab = 'Incremental cost', 
+     pch = 19)
 abline(h=0,lty=2)
 abline(v=0,lty=2)
 
 # show table
-data_out = data.frame(sample = 1:nsamples,
-                      comp_total_cost = comp_total_cost,
+data_out = data.frame(sample           = 1:nsamples,
+                      comp_total_cost  = comp_total_cost,
                       interv_total_cost = interv_total_cost,
-                      incr_cost = incr_cost,
-                      comp_QALY_loss = comp_QALY_loss,
-                      interv_QALY_loss = interv_QALY_loss,
-                      incr_QALY_gain = incr_QALY_gain)
+                      incr_cost         = incr_cost,
+                      comp_QALY_loss    = comp_QALY_loss,
+                      interv_QALY_loss  = interv_QALY_loss,
+                      incr_QALY_gain    = incr_QALY_gain)
 
 # print table
 knitr::kable(round(data_out), caption = "Summary Table of Costs and QALY Values")
@@ -129,12 +134,12 @@ diff_current_practice = interv_infections_baseline - comp_infections
 # calculate difference with program in place
 incr_infections_program =  interv_infections - comp_infections
 
-data_out = data.frame(sample = 1:nsamples,
-                      comp_infections = comp_infections,
+data_out = data.frame(sample                     = 1:nsamples,
+                      comp_infections            = comp_infections,
                       interv_infections_baseline = interv_infections_baseline,
-                      diff_current_practice = diff_current_practice,
-                      interv_infections = interv_infections,
-                      incr_infections_program = incr_infections_program
+                      diff_current_practice      = diff_current_practice,
+                      interv_infections          = interv_infections,
+                      incr_infections_program    = incr_infections_program
                        )
 
 # print table
@@ -153,7 +158,7 @@ Include uncertainty from the input parameters of the influenza model:
 set.seed(345698) 
 
 # comparator
-force_of_infection   = sample_beta_event(nsamples,foi_mean,foi_sample_size)  
+force_of_infection   = sample_beta_event(nsamples, foi_mean, foi_sample_size)  
 cost_per_case        = sample_gamma(nsamples, cost_mean, cost_se) 	  # euro
 comp_infections      = force_of_infection * targetgroup
 comp_QALY_loss       = comp_infections * QALYloss_case
@@ -171,19 +176,24 @@ incr_QALY_gain = comp_QALY_loss - interv_QALY_loss
 incr_cost =  interv_total_cost - comp_total_cost
 
 # plot CE-plane
-plot(incr_QALY_gain,incr_cost, xlim = c(-10,80), ylim = c(-12e3,5e3), 
-        xlab = 'Incremental effect', ylab = 'Incremental cost', pch = 19)
+plot(x = incr_QALY_gain,
+     y = incr_cost, 
+     xlim = c(-10,80), 
+     ylim = c(-12e3, 5e3), 
+     xlab = 'Incremental effect', 
+     ylab = 'Incremental cost', 
+     pch = 19)
 abline(h=0,lty=2)
 abline(v=0,lty=2)
 
 # show table
-data_out = data.frame(sample = 1:nsamples,
-                      comp_total_cost = comp_total_cost,
+data_out = data.frame(sample            = 1:nsamples,
+                      comp_total_cost   = comp_total_cost,
                       interv_total_cost = interv_total_cost,
-                      incr_cost = incr_cost,
-                      comp_QALY_loss = comp_QALY_loss,
-                      interv_QALY_loss = interv_QALY_loss,
-                      incr_QALY_gain = incr_QALY_gain)
+                      incr_cost         = incr_cost,
+                      comp_QALY_loss    = comp_QALY_loss,
+                      interv_QALY_loss  = interv_QALY_loss,
+                      incr_QALY_gain    = incr_QALY_gain)
 
 # print table
 knitr::kable(round(data_out), caption = "Summary Table of Costs and QALY Values")
@@ -237,26 +247,26 @@ inmb_sample = (incr_QALY_gain * k) - incr_cost_adj
 inmb_pos    = as.numeric(inmb_sample > 0)
 
 # show table
-data_out = data.frame(sample = 1:nsamples,
-                      incr_cost_adj = incr_cost_adj,
+data_out = data.frame(sample         = 1:nsamples,
+                      incr_cost_adj  = incr_cost_adj,
                       incr_QALY_gain = incr_QALY_gain,
-                      inmb_sample = inmb_sample,
-                      inmb_pos = inmb_pos)
+                      inmb_sample    = inmb_sample,
+                      inmb_pos       = inmb_pos)
 
 
 # print table
 knitr::kable(round(data_out), caption = "Summary Table per Sample (k = 5000)")
 
 # summary statistics
-inmb_mean    = mean(incr_QALY_gain * k) - mean(incr_cost_adj)
-inmb_mean2   = mean(inmb_sample)
-icer         = mean(incr_cost_adj) / mean(incr_QALY_gain)
+inmb_mean  = mean(incr_QALY_gain * k) - mean(incr_cost_adj)
+inmb_mean2 = mean(inmb_sample)
+icer       = mean(incr_cost_adj) / mean(incr_QALY_gain)
 
 # show table
-data_out = data.frame(inmb_mean = inmb_mean,
+data_out = data.frame(inmb_mean  = inmb_mean,
                       inmb_mean2 = inmb_mean2,
-                      inmb_pos = sum(inmb_pos) / length(inmb_pos),
-                      icer = icer)
+                      inmb_pos   = sum(inmb_pos) / length(inmb_pos),
+                      icer       = icer)
 
 # print table
 knitr::kable(data_out, caption = "Summary Table (k = 5000)")
@@ -279,11 +289,11 @@ inmb_sample = (incr_QALY_gain * k) - incr_cost_adj
 inmb_pos    = as.numeric(inmb_sample > 0)
 
 # show table
-data_out = data.frame(sample = 1:nsamples,
-                      incr_cost_adj = incr_cost_adj,
+data_out = data.frame(sample         = 1:nsamples,
+                      incr_cost_adj  = incr_cost_adj,
                       incr_QALY_gain = incr_QALY_gain,
-                      inmb_sample = inmb_sample,
-                      inmb_pos = inmb_pos)
+                      inmb_sample    = inmb_sample,
+                      inmb_pos       = inmb_pos)
 
 
 # print table
@@ -296,8 +306,8 @@ icer      = mean(incr_cost_adj) / mean(incr_QALY_gain)
 
 # show table
 data_out = data.frame(inmb_mean = inmb_mean,
-                      inmb_pos = sum(inmb_pos) / length(inmb_pos),
-                      icer = icer)
+                      inmb_pos  = sum(inmb_pos) / length(inmb_pos),
+                      icer      = icer)
 
 # print table
 knitr::kable(data_out, caption = "Summary Table (k = 3500)")
@@ -314,7 +324,7 @@ For illustrative purposes, assume a fixed program cost of 100,000 euro and WTP o
 incr_cost_adj = incr_cost + 100000
 
 # set WTP threshold
-k = seq(0,5000,500)
+k = seq(0, 5000, 500)
 
 inmb_wtp = mean(incr_QALY_gain) * k - mean(incr_cost_adj)
 inmb_pos = as.numeric(inmb_wtp > 0)
@@ -323,10 +333,10 @@ net_loss_comparator = (inmb_pos == TRUE) * inmb_wtp
 net_loss_intervention = (inmb_pos == FALSE) * -inmb_wtp
 
 # show table
-data_out = data.frame(k = k,
-                      inmb_wtp = inmb_wtp,
-                      inmb_pos = inmb_pos,
-                      net_loss_comparator = net_loss_comparator,
+data_out = data.frame(k                     = k,
+                      inmb_wtp              = inmb_wtp,
+                      inmb_pos              = inmb_pos,
+                      net_loss_comparator   = net_loss_comparator,
                       net_loss_intervention = net_loss_intervention)
 
 
@@ -334,14 +344,25 @@ data_out = data.frame(k = k,
 knitr::kable(round(data_out), caption = "Summary Table Net Loss")
 
 # Plot Net Loss
-plot(k, net_loss_comparator, type = 'l', xlab = 'WTP threshold', ylab = 'Expected net loss', lwd=2)
-lines(k, net_loss_intervention, xlab = 'WTP threshold', ylab = 'Expected net loss', col =  2, lty=2, lwd = 2)
+plot(x = k, 
+     y = net_loss_comparator, 
+     type = 'l', 
+     xlab = 'WTP threshold', 
+     ylab = 'Expected net loss', 
+     lwd = 2)
+lines(x = k, 
+      y = net_loss_intervention, 
+      xlab = 'WTP threshold', 
+      ylab = 'Expected net loss',
+      col =  2,
+      lty = 2,
+      lwd = 2)
 
 # PLOT EVPI
-evpi <- apply(cbind(net_loss_comparator,net_loss_intervention),1,min)
+evpi = apply(cbind(net_loss_comparator,net_loss_intervention),1,min)
 
 #plot subset
-subs <- seq(1,length(evpi),length=15)
+subs = seq(1,length(evpi),length=15)
 points(k[subs],evpi[subs],pch=20,col=3)
 
 # add legend
@@ -349,19 +370,26 @@ legend('topleft',
        c('comparator',
        'intervention',
        'EVPI'),
-       col=1:3,
-       lwd=c(2,2,NA),
-       pch=c(NA,NA,20),
-       lty=1:2)
+       col = 1:3,
+       lwd = c(2, 2, NA),
+       pch = c(NA, NA, 20),
+       lty = 1:2)
 
 ```
 
 ```{r}
 # Plot INMB
-plot(k, inmb_wtp, type = 'l', xlab = 'WTP threshold', ylab = 'Expected INMB', lwd=2)
-abline(h=0)
-abline(v=icer, lty=3)
-text(x = icer, y = 3e4, labels = round(icer))
+plot(x = k, 
+     y = inmb_wtp,
+     type = 'l',
+     xlab = 'WTP threshold',
+     ylab = 'Expected INMB',
+     lwd = 2)
+abline(h = 0)
+abline(v = icer, lty=3)
+text(x = icer, 
+     y = 3e4, 
+     labels = round(icer))
 
 ```
 
@@ -377,18 +405,18 @@ The EVPPI can be obtained using an iterative process (see below) by calculating 
 library(mgcv)
 
 # specify WTP
-opt_wtp <- seq(0,5000,500)
-num_wtp <- length(opt_wtp)
+opt_wtp = seq(0, 5000, 500)
+num_wtp = length(opt_wtp)
 
 # combine input parameters with uncertainty
-model_param = data.frame(force_of_infection= force_of_infection,
+model_param = data.frame(force_of_infection = force_of_infection,
                          cost_per_case = cost_per_case)
 
 # specify the number parameter values
-num_param <- ncol(model_param)
+num_param = ncol(model_param)
 
 # initiate matrix to store EVPPI values
-evppi <- matrix(0,num_wtp,num_param)  
+evppi = matrix(0,num_wtp,num_param)  
 
 # run over all WTP levels
 for(j in 1:length(opt_wtp)){
@@ -405,21 +433,21 @@ for(j in 1:length(opt_wtp)){
     model     = gam(inmb_sample ~ model_param[,i])
     g.hat_new = model$fitted
 
-    perfect.info  <- mean(pmax(g.hat_new,0))
-    baseline      <- pmax(mean(g.hat_new),0)
+    perfect.info  = mean(pmax(g.hat_new, 0))
+    baseline      = pmax(mean(g.hat_new), 0)
     
     ## estimate EVPPI 
-    evppi[j,i]  <- round(perfect.info - baseline, digits=4) 
+    evppi[j,i]  = round(perfect.info - baseline, digits=4) 
   }
 }  
 
 # add column names
-colnames(evppi) <- colnames(model_param)
+colnames(evppi) = colnames(model_param)
 
 
 data.frame(inmb_sample = inmb_sample,
-          model_param = model_param[,i],
-          g.hat_new = g.hat_new)
+          model_param  = model_param[,i],
+          g.hat_new    = g.hat_new)
 
 ```
 
@@ -429,9 +457,18 @@ Explore EVPPI
 
 
 # start with empty plot, and add EVPPI one by one
-plot(range(opt_wtp),range(evppi),col=0, xlab = "WTP",ylab="EVPPI (euro)")
+plot(x = range(opt_wtp),
+     y = range(evppi),
+     col=0, 
+     xlab = "WTP",
+     ylab="EVPPI (euro)")
 for(i in 1:ncol(evppi)){
-  lines(opt_wtp,evppi[,i],type='b',lwd=2,col=i,pch=i)
+  lines(x = opt_wtp,
+        y = evppi[,i],
+        type='b',
+        lwd=2,
+        col=i,
+        pch=i)
 }
 legend('topright',
        colnames(model_param),
@@ -446,42 +483,42 @@ legend('topright',
 # Iterative EVPPI for one WTP level
 
 ```{r}
-vaccine_price_per_dose <- 12.5
+vaccine_price_per_dose = 12.5
 
 # select one WTP
 k = 2500
 
-evvpi_vector <- vector(length=nsamples)  # program vs doing nothing
+evvpi_vector = vector(length = nsamples)  # program vs doing nothing
 
 for(i in 1:nsamples){
 
 # let's say cost_per_case is known
-cost_per_case_fixed <- cost_per_case[i]
+cost_per_case_fixed = cost_per_case[i]
 
 # account for uncertainty in force of infection...
 
 # comparator
-comp_infections      = force_of_infection * targetgroup
-comp_QALY_loss       = comp_infections * QALYloss_case
-comp_total_cost      = comp_infections * cost_per_case_fixed
+comp_infections = force_of_infection * targetgroup
+comp_QALY_loss  = comp_infections * QALYloss_case
+comp_total_cost = comp_infections * cost_per_case_fixed
 
 # intervention
-interv_infections    = comp_infections * (1 - vaccine_efficacy * uptake_program)
-interv_QALY_loss     = interv_infections * QALYloss_case
-interv_total_cost    = interv_infections * cost_per_case_fixed + (targetgroup * vaccine_price_per_dose * uptake_program)
+interv_infections = comp_infections * (1 - vaccine_efficacy * uptake_program)
+interv_QALY_loss  = interv_infections * QALYloss_case
+interv_total_cost = interv_infections * cost_per_case_fixed + (targetgroup * vaccine_price_per_dose * uptake_program)
 
 # calculate incremental cost and effect
 incr_QALY_gain = comp_QALY_loss - interv_QALY_loss
-incr_cost =  interv_total_cost - comp_total_cost
+incr_cost      =  interv_total_cost - comp_total_cost
 
 # calculate inmb
 inmb_sample = (incr_QALY_gain * k) - incr_cost
 
-perfect.info  <- mean(pmax(inmb_sample,0)) # select best options
-baseline      <- pmax(mean(inmb_sample),0) # mean
+perfect.info = mean(pmax(inmb_sample,0)) # select best options
+baseline     = pmax(mean(inmb_sample),0) # mean
 
 ## estimate EVPPI 
-evvpi_vector[i]  <- round(perfect.info - baseline, digits=4) 
+evvpi_vector[i]  = round(perfect.info - baseline, digits=4) 
 }
 
 mean(evvpi_vector)

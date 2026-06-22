@@ -7,10 +7,10 @@ toc: FALSE
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 set.seed(2020)
 
-knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 6, fig.width = 10)
+knitr::opts_chunk$set(fig.cap='', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
 
 show_results = FALSE
 ```
@@ -29,8 +29,8 @@ The first step when creating a new R file is to specify a working directory. You
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_intro/"     # on OS X
-home <- "C:\\Documents\\Modelling_intro\\" # on windows
+home = "~/Documents/Modelling_intro/"     # on OS X
+home = "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
 ```
 
@@ -49,24 +49,24 @@ The goal is to calculate the cost-effectiveness (cost per flu case prevented, pe
 ```{r }
 
 # population
-targetgroup     <- 2500000 # people +65 years
-life_expectancy <- 12      # years
+targetgroup     = 2500000 # people +65 years
+life_expectancy = 12      # years
 
 # burden of disease
-force_of_infection       <- 0.04  # static
-p_hospital               <- 0.10
-hosp_case_fatality_ratio <- 0.30  # applies to all hospital cases
+force_of_infection       = 0.04  # static
+p_hospital               = 0.10
+hosp_case_fatality_ratio = 0.30  # applies to all hospital cases
 
 # disease-related costs
-cost_hosp_case     <- 2000 # euro
-cost_non_hosp_case <- 100  # euro
+cost_hosp_case     = 2000 # euro
+cost_non_hosp_case = 100  # euro
 
 # program details
-uptake_program          <- 0.80
-vaccine_efficacy        <- 0.60
-vaccine_price_per_dose  <- 10   # euro
-admin_cost_per_dose     <- 50   # euro
-fixed_program_costs     <- 0    # euro
+uptake_program          = 0.80
+vaccine_efficacy        = 0.60
+vaccine_price_per_dose  = 10   # euro
+admin_cost_per_dose     = 50   # euro
+fixed_program_costs     = 0    # euro
 
 
 ```
@@ -108,8 +108,8 @@ To begin the health technology assessment, we calculate the vaccine cost per dos
 
 
 ```{r, echo = show_results}
-vaccine_cost_per_dose     <- vaccine_price_per_dose + admin_cost_per_dose
-treatment_cost_per_case   <- cost_hosp_case * p_hospital + (1 - p_hospital) * cost_non_hosp_case
+vaccine_cost_per_dose     = vaccine_price_per_dose + admin_cost_per_dose
+treatment_cost_per_case   = cost_hosp_case * p_hospital + (1 - p_hospital) * cost_non_hosp_case
 
 ```
 
@@ -128,14 +128,14 @@ Calculate the burden of disease for the comparator without the program in place,
 
 ```{r, echo = show_results}
 # Comparator
-comparator_infections        <- targetgroup * force_of_infection
-comparator_hospitalisations  <- comparator_infections * p_hospital
-comparator_deaths            <- comparator_hospitalisations * hosp_case_fatality_ratio
-comparator_lifeyearslost     <- comparator_deaths * life_expectancy
+comparator_infections        = targetgroup * force_of_infection
+comparator_hospitalisations  = comparator_infections * p_hospital
+comparator_deaths            = comparator_hospitalisations * hosp_case_fatality_ratio
+comparator_lifeyearslost     = comparator_deaths * life_expectancy
 
-comparator_treatment_costs   <- comparator_infections * treatment_cost_per_case
-comparator_vaccination_costs <- 0
-comparator_total_costs       <- comparator_treatment_costs + comparator_vaccination_costs
+comparator_treatment_costs   = comparator_infections * treatment_cost_per_case
+comparator_vaccination_costs = 0
+comparator_total_costs       = comparator_treatment_costs + comparator_vaccination_costs
 
 ```
 
@@ -148,16 +148,16 @@ Calculate the burden of disease with the program in place, along with the associ
 
 ```{r, echo = show_results}
 # Program
-population_at_risk        <- targetgroup * ((1 - uptake_program) + uptake_program * (1 - vaccine_efficacy))
+population_at_risk        = targetgroup * ((1 - uptake_program) + uptake_program * (1 - vaccine_efficacy))
 
-program_infections        <- population_at_risk * force_of_infection 
-program_hospitalisations  <- program_infections * p_hospital
-program_deaths            <- program_hospitalisations * hosp_case_fatality_ratio
-program_lifeyearslost     <- program_deaths * life_expectancy
+program_infections        = population_at_risk * force_of_infection 
+program_hospitalisations  = program_infections * p_hospital
+program_deaths            = program_hospitalisations * hosp_case_fatality_ratio
+program_lifeyearslost     = program_deaths * life_expectancy
 
-program_treatment_costs   <- program_infections * treatment_cost_per_case
-program_vaccination_costs <- fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
-program_total_costs       <- program_treatment_costs + program_vaccination_costs
+program_treatment_costs   = program_infections * treatment_cost_per_case
+program_vaccination_costs = fixed_program_costs + targetgroup * uptake_program * vaccine_cost_per_dose
+program_total_costs       = program_treatment_costs + program_vaccination_costs
 
 ```
 
@@ -176,14 +176,14 @@ Calculate the difference between the program and the comparator:
 
 ```{r, echo = show_results}
 # To calculate the difference between 'program' and 'comparator' 
-infections_averted       <- comparator_infections - program_infections
-hospitalisations_averted <- comparator_hospitalisations - program_hospitalisations
-deaths_averted           <- comparator_deaths - program_deaths
-lifeyearslost_averted    <- comparator_lifeyearslost - program_lifeyearslost
+infections_averted       = comparator_infections - program_infections
+hospitalisations_averted = comparator_hospitalisations - program_hospitalisations
+deaths_averted           = comparator_deaths - program_deaths
+lifeyearslost_averted    = comparator_lifeyearslost - program_lifeyearslost
 
-treatment_costs_averted  <- comparator_treatment_costs - program_treatment_costs
-incr_vaccination_costs   <- program_vaccination_costs - comparator_vaccination_costs # incremental costs
-incr_total_costs         <- incr_vaccination_costs - treatment_costs_averted
+treatment_costs_averted  = comparator_treatment_costs - program_treatment_costs
+incr_vaccination_costs   = program_vaccination_costs - comparator_vaccination_costs # incremental costs
+incr_total_costs         = incr_vaccination_costs - treatment_costs_averted
 
 ```
 
@@ -196,10 +196,10 @@ Calculate the incremental effectiveness ratios for infections, hospitalizations,
 ```{r, echo = show_results}
 
 # Calculate incremental effectiveness ratios
-incr_cost_per_case_prevented            <- incr_total_costs / infections_averted
-incr_cost_per_hospitalisation_prevented <- incr_total_costs / hospitalisations_averted
-incr_cost_per_death_averted             <- incr_total_costs / deaths_averted
-incr_cost_per_lifeyear_gained           <- incr_total_costs / lifeyearslost_averted
+incr_cost_per_case_prevented            = incr_total_costs / infections_averted
+incr_cost_per_hospitalisation_prevented = incr_total_costs / hospitalisations_averted
+incr_cost_per_death_averted             = incr_total_costs / deaths_averted
+incr_cost_per_lifeyear_gained           = incr_total_costs / lifeyearslost_averted
 
 ```
 
@@ -212,7 +212,7 @@ Show the results:
 ```{r, echo = show_results}
 # combine results
 # note: specify column names at once
-ICER_values<-c(incr_cost_per_case_prevented  = incr_cost_per_case_prevented,
+ICER_values=c(incr_cost_per_case_prevented  = incr_cost_per_case_prevented,
                incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
                incr_cost_per_death_averted   = incr_cost_per_death_averted,
                incr_cost_per_lifeyear_gained = incr_cost_per_lifeyear_gained)
@@ -228,8 +228,8 @@ The burden of disease can also be represented by quality-adjusted life years (QA
 
 ```{r}
 
-QALYloss_hosp_case     <- 0.0180
-QALYloss_non_hosp_case <- 0.0082
+QALYloss_hosp_case     = 0.0180
+QALYloss_non_hosp_case = 0.0082
 
 ```
 
@@ -246,13 +246,13 @@ Calculate the effect per average case and the total burden of disease for the co
 ```{r, echo = show_results}
 
 # intermediate results
-QALYloss_per_case    <- QALYloss_hosp_case * p_hospital + QALYloss_non_hosp_case * (1 - p_hospital)
+QALYloss_per_case    = QALYloss_hosp_case * p_hospital + QALYloss_non_hosp_case * (1 - p_hospital)
 
 # program: effect
-program_QALYloss     <- program_infections * QALYloss_per_case + program_lifeyearslost
+program_QALYloss     = program_infections * QALYloss_per_case + program_lifeyearslost
 
 # comparator: effect
-comparator_QALYloss  <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost
+comparator_QALYloss  = comparator_infections * QALYloss_per_case + comparator_lifeyearslost
 
 print(c(QALYloss_per_case = QALYloss_per_case, 
         program_QALYloss = program_QALYloss, 
@@ -268,12 +268,12 @@ Time to calculate the incremental effect, and ICER:
 
 ```{r, echo = show_results}
 # incremental effect
-QALY_gained                <- comparator_QALYloss - program_QALYloss
+QALY_gained                = comparator_QALYloss - program_QALYloss
 
 # incremental cost-effectiveness ratio
-incr_costs_per_QALY_gained <- incr_total_costs / QALY_gained
+incr_costs_per_QALY_gained = incr_total_costs / QALY_gained
 
-ICER_values <- c(ICER_values,
+ICER_values = c(ICER_values,
                  incr_costs_per_QALY_gained = incr_costs_per_QALY_gained)
 
 ```
@@ -314,32 +314,32 @@ Health Technology Assessments often involves comparing the costs and benefits of
 ```{r}
 
 # Set the discount rate (e.g., 1.5% or 3%)
-discount_rate <- 0.015
+discount_rate = 0.015
 
 ```
 
 
 ```{r}
 # Define a discounting function
-discount <- function(values, rate, years) {
+discount = function(values, rate, years) {
   # Calculate discounted values
-  discounted_values <- values / ((1 + rate) ^ years)
+  discounted_values = values / ((1 + rate) ^ years)
   return(discounted_values)
 }
 
 # Example data: costs and QALYs over 12 years
-years <- 0:11  # Time periods from 0 to 11 (12 years)
+years = 0:11  # Time periods from 0 to 11 (12 years)
 
 # fixed
-costs <- rep(1000, length(years))  # Example costs per year
-qalys <- rep(1, length(years))     # Example QALYs per year
+costs = rep(1000, length(years))  # Example costs per year
+qalys = rep(1, length(years))     # Example QALYs per year
 
 # Apply discounting
-discounted_costs <- discount(costs, discount_rate, years)
-discounted_qalys <- discount(qalys, discount_rate, years)
+discounted_costs = discount(costs, discount_rate, years)
+discounted_qalys = discount(qalys, discount_rate, years)
 
 # Display the results
-discounted_data <- data.frame(
+discounted_data = data.frame(
   Year = years,
   Costs = costs,
   Discounted_Costs = discounted_costs,
@@ -370,31 +370,31 @@ Calculate the discounted life expectancy to include in the effect calculation, a
 
 ```{r, echo = show_results}
 # intermediate results
-life_expectancy_disc <- sum(1/((1+discount_rate)^(0:(life_expectancy-1))))
+life_expectancy_disc = sum(1/((1+discount_rate)^(0:(life_expectancy-1))))
 
 
 # program: effect
-program_lifeyearslost_disc   <- program_deaths * life_expectancy_disc
-program_QALYloss_disc       <- program_infections * QALYloss_per_case + program_lifeyearslost_disc
+program_lifeyearslost_disc = program_deaths * life_expectancy_disc
+program_QALYloss_disc      = program_infections * QALYloss_per_case + program_lifeyearslost_disc
 
 # comparator: effect
-comparator_lifeyearslost_disc <- comparator_deaths * life_expectancy_disc
-comparator_QALYloss_disc     <- comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
+comparator_lifeyearslost_disc = comparator_deaths * life_expectancy_disc
+comparator_QALYloss_disc      = comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
 
 # incremental effect
-QALY_gained_disc              <- comparator_QALYloss_disc - program_QALYloss_disc
+QALY_gained_disc = comparator_QALYloss_disc - program_QALYloss_disc
 
 # print
-print(c(life_expectancy_disc = life_expectancy_disc,
-        program_QALYloss_disc = program_QALYloss_disc,
+print(c(life_expectancy_disc     = life_expectancy_disc,
+        program_QALYloss_disc    = program_QALYloss_disc,
         comparator_QALYloss_disc = comparator_QALYloss_disc,
-        QALY_gained_disc = QALY_gained_disc))
+        QALY_gained_disc         = QALY_gained_disc))
 
 # incremental cost-effectiveness ratio
-incr_costs_per_QALY_gained_disc <- incr_total_costs / QALY_gained_disc
+incr_costs_per_QALY_gained_disc = incr_total_costs / QALY_gained_disc
 
 # add to output vector
-ICER_values <- c(ICER_values,
+ICER_values = c(ICER_values,
                  incr_costs_per_QALY_gained_disc = incr_costs_per_QALY_gained_disc)
 
 ```

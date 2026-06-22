@@ -39,9 +39,9 @@ This document will walk you through practical examples of discounting in R, usin
 
 ### Define a discounting function in R
 ```{r}
-discount <- function(values, rate, year) {
+discount = function(values, rate, year) {
   # Calculate discounted values
-  discounted_values <- values / ((1 + rate) ^ year)
+  discounted_values = values / ((1 + rate) ^ year)
   return(discounted_values)
 }
 ```
@@ -51,26 +51,25 @@ discount <- function(values, rate, year) {
 
 ```{r}
 # Example data: costs and QALYs over 11 years
-years <- 0:11  # Time periods from 0 to 10 (11 years)
+years = 0:11  # Time periods from 0 to 10 (11 years)
 
 # Set the yearly discount rate (e.g., 1.5% or 3%)
-discount_rate <- 0.015
+discount_rate = 0.015
 
 # fixed values
-costs <- rep(1000, length(years))  # Example costs per year
-qalys <- rep(1, length(years))     # Example QALYs per year
+costs = rep(1000, length(years))  # Example costs per year
+qalys = rep(1, length(years))     # Example QALYs per year
 
 # Apply discounting
-discounted_costs <- discount(costs, discount_rate, years)
-discounted_qalys <- discount(qalys, discount_rate, years)
+discounted_costs = discount(costs, discount_rate, years)
+discounted_qalys = discount(qalys, discount_rate, years)
 
 # Display the results
-discounted_data <- data.frame(
-  Year = years,
-  Costs = costs,
-  Discounted_Costs = discounted_costs,
-  QALYs = qalys,
-  Discounted_QALYs = discounted_qalys
+discounted_data = data.frame(Year             = years,
+                             Costs            = costs,
+                             Discounted_Costs = discounted_costs,
+                             QALYs            = qalys,
+                             Discounted_QALYs = discounted_qalys
 )
 
 print(discounted_data)
@@ -83,7 +82,7 @@ print(colSums(discounted_data[,-1]))
 To calculate the discounted value of expected life years, we use the formula for a finite sum of discounted values over a defined period:
 
 \[
-PV = \sum_{t=0}^{n-1} \frac{1}{(1 + r)^t}
+PV = \sum_{t = 0} ^ {n - 1} \frac{1}{(1 + r) ^ t}
 \]
 
 where:
@@ -96,36 +95,31 @@ where:
 ```{r}
 
 # Set some examples
-life_expectancy <- c(84, 50, 10, 2)  # years 
+life_expectancy = c(84, 50, 10, 2)  # years 
 
 # Set the yearly discount rate (e.g., 1.5%)
-discount_rate <- 0.015
+discount_rate = 0.015
 
 # Apply discounting
-discounted_life_expectancy <- numeric(length=length(life_expectancy))
+discounted_life_expectancy = numeric(length=length(life_expectancy))
 
 # loop over all values in the vector 'life expectancy'
 for(i in 1:length(life_expectancy)){
   # per expected life year, add the discounted valued of year 'j'
   # note that we start with year '0', so the discounted value of the initial year equals 1
-  for(j in 0:(life_expectancy[i]-1)){
-  discounted_life_expectancy[i] <- discounted_life_expectancy[i] + discount(1, discount_rate, j)
+  for(j in 0:(life_expectancy[i] - 1)){
+  discounted_life_expectancy[i] = discounted_life_expectancy[i] + discount(1, discount_rate, j)
   }
 }
 
 # Display the results
-discounted_data <- data.frame(
-  Life_expectancy = life_expectancy,
-  Discounted_life_expectancy = discounted_life_expectancy
+discounted_data = data.frame(Life_expectancy = life_expectancy,
+                             Discounted_life_expectancy = discounted_life_expectancy
 )
 
 print(discounted_data)
 
 ```
-
-
-
-
 
 
 <div style="text-align: right">

@@ -82,8 +82,8 @@ time_horizon = 365 # days
 # PRE-PROCESSING
 Based on the input above, we can compute the program cost and the proportion of the population that will be effectively protected:
 ```{r}
-program_costs = population_size * uptake * (cost_per_dose + admin_cost)
-proportion_protected =  uptake * vaccine_efficacy
+program_costs         = population_size * uptake * (cost_per_dose + admin_cost)
+proportion_protected  =  uptake * vaccine_efficacy
 qaly_loss_per_episode = morbidity_per_episode + (proportion_mortality * average_life_expectancy)
 
 ```
@@ -99,8 +99,8 @@ force_of_infection  = rsv_incidence
 
 # INFECTIONS (prevented)
 reference_infections = population_size * force_of_infection
-program_infections = population_size * (1 - proportion_protected) * force_of_infection
-prevented_cases = reference_infections - program_infections
+program_infections   = population_size * (1 - proportion_protected) * force_of_infection
+prevented_cases      = reference_infections - program_infections
 
 # COSTS AND EFFECTS
 static_incr_cost = program_costs - (prevented_cases * cost_per_episode)
@@ -111,13 +111,12 @@ static_icer = static_incr_cost  / static_qaly_gain
 
 # PRINT RESULTS
 round(c(reference_infections = reference_infections,
-        program_infections = program_infections,
-        static_qaly_gain = static_qaly_gain,
-        static_icer = static_icer),digits=2)
+        program_infections   = program_infections,
+        static_qaly_gain     = static_qaly_gain,
+        static_icer          = static_icer),
+      digits = 2)
 
 ```
-
-
 
 
 # DYNAMIC DISEASE MODEL: general
@@ -156,27 +155,27 @@ In order to achieve the desired RSV incidence for this Cost-Effectiveness Analys
 ```{r }
 # set initial immunity levels
 initials['R'] = 0.95099
-initials['S'] = 1 - sum(initials['I']+initials['R'])
+initials['S'] = 1 - sum(initials['I'] + initials['R'])
 
 # Solve 
-dynamic_rsv_reference = SIR(pars = parameters,init = initials,time = 0:time_horizon)
+dynamic_rsv_reference = SIR(pars = parameters, init = initials, time = 0:time_horizon)
 
 # calculate total infections
-dynamic_cases_reference = diff(dynamic_rsv_reference$results$R[c(1,nrow(dynamic_rsv_reference$results))]) * population_size
+dynamic_cases_reference = diff(dynamic_rsv_reference$results$R[c(1, nrow(dynamic_rsv_reference$results))]) * population_size
 dynamic_cases_reference # print to terminal
 ```
 
 To incorporate vaccination within the model, we can conceptualize the adoption of the vaccine as a transition from the "Susceptible" to the "Recovered" compartment:
 
 ```{r }
-initials['S'] = initials['S'] * (1-proportion_protected)
-initials['R'] = 1 - sum(initials['S']+initials['I'])
+initials['S'] = initials['S'] * (1 - proportion_protected)
+initials['R'] = 1 - sum(initials['S'] + initials['I'])
 
 # Solve 
-dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
+dynamic_rsv = SIR(pars = parameters,init = initials, 0:time_horizon)
 
 #PlotMods(dynamic_rsv)
-dynamic_cases_program = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+dynamic_cases_program = diff(dynamic_rsv$results$R[c(1, nrow(dynamic_rsv$results))]) * population_size
 
 # prevented cases
 dynamic_cases_prevented = dynamic_cases_reference - dynamic_cases_program
@@ -186,13 +185,14 @@ dynamic_incr_cost = program_costs - (dynamic_cases_prevented * cost_per_episode)
 dynamic_qaly_gain = dynamic_cases_prevented * qaly_loss_per_episode
 
 # ICER
-dynamic_icer = dynamic_incr_cost  / dynamic_qaly_gain
+dynamic_icer = dynamic_incr_cost / dynamic_qaly_gain
 
 # PRINT RESULTS
-round(c(dynamic_cases_reference=dynamic_cases_reference,
-        dynamic_cases_program=dynamic_cases_program,
-        dynamic_qaly_gain=dynamic_qaly_gain,
-        dynamic_icer=dynamic_icer),digits=2)
+round(c(dynamic_cases_reference = dynamic_cases_reference,
+        dynamic_cases_program   = dynamic_cases_program,
+        dynamic_qaly_gain       = dynamic_qaly_gain,
+        dynamic_icer            = dynamic_icer),
+      digits = 2)
 
 ```
 
@@ -201,26 +201,26 @@ Inspection of the disease prevalence:
 
 
 plot(x = dynamic_rsv_reference$time,
-         y = dynamic_rsv_reference$results$I,
-        xlab='time (days)',
-        ylab='prevalence (infected)',
-     ylim=c(0,max(dynamic_rsv_reference$results$I)),
-        col=1,
-        lwd=2,
-        type='l')
+     y = dynamic_rsv_reference$results$I,
+     xlab ='time (days)',
+     ylab ='prevalence (infected)',
+     ylim = c(0, max(dynamic_rsv_reference$results$I)),
+     col = 1,
+     lwd = 2,
+     type = 'l')
 lines(x = dynamic_rsv$time,
-         y = dynamic_rsv$results$I,
-        col=1,
-        lwd=2,
+      y = dynamic_rsv$results$I,
+      col=1,
+      lwd=2,
       lty=2)
 
 legend('topright',
        c('dynamic: reference',
          'dynamic: program'),
-       lwd=2,
-       col=c(1,1,4,4),
-       lty=c(1,2,1,2),
-       cex=0.8)
+       lwd = 2,
+       col = c(1, 1, 4, 4),
+       lty = c(1, 2, 1, 2),
+       cex = 0.8)
 
 ```
 
@@ -229,12 +229,12 @@ legend('topright',
 Inspect the cost-effectiveness plane:
 ```{r}
 
-plot(x = c(static_qaly_gain,dynamic_qaly_gain),
-     y = c(static_incr_cost,dynamic_incr_cost),
+plot(x = c(static_qaly_gain, dynamic_qaly_gain),
+     y = c(static_incr_cost, dynamic_incr_cost),
      col = 1:2,
-     xlab= 'QALY gain',
+     xlab = 'QALY gain',
      ylab = 'incremental cost (euro)',
-     pch=16)
+     pch = 16)
 legend('topright',
        c('static model',
          'dynamic model'),
@@ -242,20 +242,20 @@ legend('topright',
        )
 ```
 
-```{r, echo=F}
+```{r, echo = F}
 
 data.frame(model = c('static','dynamic'),
            reference_infections = c(reference_infections, 
                                     dynamic_cases_reference),
-              program_infections = c(program_infections,
+           program_infections   = c(program_infections,
                                       dynamic_cases_program),
-              qaly_gain = c(static_qaly_gain,dynamic_qaly_gain),
-              incr_cost = c(static_incr_cost,dynamic_incr_cost),
-              program_icer = c(static_icer,dynamic_icer)) -> db_out
+           qaly_gain            = c(static_qaly_gain, dynamic_qaly_gain),
+           incr_cost            = c(static_incr_cost, dynamic_incr_cost),
+           program_icer         = c(static_icer, dynamic_icer)) -> db_out
 
-db_out[,-1] <- round(db_out[,-1])
+db_out[,-1] = round(db_out[,-1])
 
-db_out$infections_reduction <- round((db_out$reference_infections - db_out$program_infections) / reference_infections,digits=2)
+db_out$infections_reduction = round((db_out$reference_infections - db_out$program_infections) / reference_infections,digits=2)
 
 kable(db_out)
  
@@ -268,23 +268,23 @@ Compute the Incremental Net Monetary Benefit for the RSV illustration provided, 
 ```{r, eval=show_results, echo=show_results}
 
 # define wtp thresholds
-opt_wtp <- c(20e3,40e3)
+opt_wtp = c(20e3, 40e3)
 
 # define function to calculate the inmb
-get_inmb <- function(wtp,incr_qaly,incr_cost){
-  return(incr_qaly*wtp-incr_cost)
+get_inmb = function(wtp,incr_qaly, incr_cost){
+  return(incr_qaly * wtp-incr_cost)
 }
 
 # static model
-static_inmb <- get_inmb(opt_wtp,static_qaly_gain,static_incr_cost)
+static_inmb = get_inmb(opt_wtp, static_qaly_gain, static_incr_cost)
 
 # dynamic model
-dynamic_inmb <- dynamic_inmb <- get_inmb(opt_wtp,dynamic_qaly_gain,dynamic_incr_cost)
+dynamic_inmb = dynamic_inmb = get_inmb(opt_wtp, dynamic_qaly_gain, dynamic_incr_cost)
 
 # aggregate into table
-db_out_inmb <- db_out[c(1,1,2,2),c(1,4,5,6)]
-db_out_inmb$wtp <- rep(opt_wtp,2)
-db_out_inmb$inmb <- c(static_inmb,dynamic_inmb)
+db_out_inmb      = db_out[c(1, 1, 2, 2),c(1, 4, 5, 6)]
+db_out_inmb$wtp  = rep(opt_wtp, 2)
+db_out_inmb$inmb = c(static_inmb, dynamic_inmb)
 
 kable(db_out_inmb)
 
@@ -298,16 +298,16 @@ kable(db_out_inmb)
 # To conduct model explorations, it is convenient to create a function for 
 # the static and dynamic approach
 
-run_static_model <- function(uptake = 0.2,
+run_static_model = function(uptake = 0.2,
                              admin_cost = 50,
                              wtp = 20e3,
                              rsv_incidence = 0.03525){
   # PRE-PROCESSING
-  program_costs = population_size * uptake * (cost_per_dose + admin_cost)
+  program_costs        = population_size * uptake * (cost_per_dose + admin_cost)
   proportion_protected =  uptake * vaccine_efficacy
 
  # TRANSLATE TO STATIC MODEL SETTING
-  force_of_infection  = rsv_incidence
+  force_of_infection = rsv_incidence
   
   # INFECTIONS (prevented)
   reference_infections = population_size * force_of_infection
@@ -327,40 +327,40 @@ run_static_model <- function(uptake = 0.2,
   # RETURN RESULTS
   return(c(
            uptake = uptake,
-           round(c(
-                 admin_cost = admin_cost,
-                 wtp = wtp,
-                 reference_infections = reference_infections,
-                 program_infections = program_infections,
-                 qaly_gain = static_qaly_gain,
-                 incr_cost = static_incr_cost,
-                 icer = static_icer,
-                 inmb_k=static_inmb/1e3),digits=0)))
+           round(c(admin_cost = admin_cost,
+                   wtp = wtp,
+                   reference_infections = reference_infections,
+                   program_infections = program_infections,
+                   qaly_gain = static_qaly_gain,
+                   incr_cost = static_incr_cost,
+                   icer = static_icer,
+                   inmb_k = static_inmb/1e3),
+                 digits=0)))
 }
 
 run_static_model(uptake = 0.1)
 
-run_dynamic_model <- function(uptake = 0.2,
-                              admin_cost = 50,
-                              wtp = 20e3,
-                              initial_R = 0.95099){
+run_dynamic_model = function(uptake = 0.2,
+                             admin_cost = 50,
+                             wtp = 20e3,
+                             initial_R = 0.95099){
   
   # pre-processing
-  program_costs = population_size * uptake * (cost_per_dose + admin_cost)
+  program_costs        = population_size * uptake * (cost_per_dose + admin_cost)
   proportion_protected =  uptake * vaccine_efficacy
 
   # Reference
   initials['I'] = 1e-06
   initials['R'] = initial_R
   initials['S'] = 1 - sum(initials['I']+initials['R'])
-  dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
+  dynamic_rsv   = SIR(pars = parameters,init = initials,0:time_horizon)
   dynamic_cases_reference = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
   
   # Program
-  initials['S'] = initials['S'] * (1-proportion_protected)
-  initials['R'] = 1 - sum(initials['S']+initials['I'])
-  dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
-  dynamic_cases_program = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+  initials['S'] = initials['S'] * (1 - proportion_protected)
+  initials['R'] = 1 - sum(initials['S'] + initials['I'])
+  dynamic_rsv   = SIR(pars = parameters,init = initials, 0:time_horizon)
+  dynamic_cases_program = diff(dynamic_rsv$results$R[c(1, nrow(dynamic_rsv$results))]) * population_size
   
   # prevented cases
   dynamic_cases_prevented = dynamic_cases_reference - dynamic_cases_program
@@ -370,7 +370,7 @@ run_dynamic_model <- function(uptake = 0.2,
   dynamic_qaly_gain = dynamic_cases_prevented * qaly_loss_per_episode
   
   # ICER
-  dynamic_icer = dynamic_incr_cost  / dynamic_qaly_gain
+  dynamic_icer = dynamic_incr_cost / dynamic_qaly_gain
   
   # INMB
   dynamic_inmb = wtp * dynamic_qaly_gain - dynamic_incr_cost
@@ -378,15 +378,15 @@ run_dynamic_model <- function(uptake = 0.2,
   # RETURN RESULTS
   return(c(
            uptake = uptake,
-           round(c(
-                 admin_cost = admin_cost,
-                 wtp = wtp,
-                 reference_infections = dynamic_cases_reference,
-                 program_infections = dynamic_cases_program,
-                 qaly_gain = dynamic_qaly_gain,
-                 incr_cost = dynamic_incr_cost,
-                 icer = dynamic_icer,
-                 inmb_k=dynamic_inmb/1e3),digits=0)))
+           round(c(admin_cost = admin_cost,
+                   wtp = wtp,
+                   reference_infections = dynamic_cases_reference,
+                   program_infections = dynamic_cases_program,
+                   qaly_gain = dynamic_qaly_gain,
+                   incr_cost = dynamic_incr_cost,
+                   icer = dynamic_icer,
+                   inmb_k = dynamic_inmb / 1e3),
+                 digits=0)))
 }
 
 ```
@@ -398,12 +398,12 @@ run_dynamic_model <- function(uptake = 0.2,
 
 ```{r, eval = show_results, echo = show_results}
 
-static_out <- rbind(run_static_model(uptake = 0.1),
+static_out = rbind(run_static_model(uptake = 0.1),
                     run_static_model(uptake = 0.2),
                     run_static_model(uptake = 0.7),
                     run_static_model(uptake = 0.9))
 
-dynamic_out <-rbind(run_dynamic_model(uptake = 0.1),
+dynamic_out =rbind(run_dynamic_model(uptake = 0.1),
                     run_dynamic_model(uptake = 0.2),
                     run_dynamic_model(uptake = 0.7),
                     run_dynamic_model(uptake = 0.9))
@@ -425,22 +425,22 @@ kable(cbind(model='dynamic',dynamic_out))
 ```{r, eval = show_results, echo = show_results}
 
 # note on INMB:
-inmb_example1 <- c(wtp = 20e3,
-                   incr_cost = 4e3,
-                   qaly_gain = 2,
-                   icer = 4e3 / 2,
-                   inmb = 20e3*2 - 4e3)
-inmb_example2 <- c(wtp = 20e3,
-                   incr_cost = 4e3*2,
-                   qaly_gain = 2*2,
-                   icer = (4e3*2) / (2*2) ,
-                   inmb = 20e3*(2*2) - (4e3*2))
-inmb_example3 <- c(wtp = 20e3,
-                   incr_cost = 4e3*6,
-                   qaly_gain = 2*6,
-                   icer = (4e3*6) / (2*6) ,
-                   inmb = 20e3*(2*6) - (4e3*6))
-kable(rbind(inmb_example1,inmb_example2,inmb_example3))
+inmb_example1 = c(wtp = 20e3,
+                  incr_cost = 4e3,
+                  qaly_gain = 2,
+                  icer = 4e3 / 2,
+                  inmb = 20e3*2 - 4e3)
+inmb_example2 = c(wtp = 20e3,
+                  incr_cost = 4e3*2,
+                  qaly_gain = 2*2,
+                  icer = (4e3*2) / (2*2) ,
+                  inmb = 20e3*(2*2) - (4e3*2))
+inmb_example3 = c(wtp = 20e3,
+                  incr_cost = 4e3*6,
+                  qaly_gain = 2*6,
+                  icer = (4e3*6) / (2*6) ,
+                  inmb = 20e3*(2*6) - (4e3*6))
+kable(rbind(inmb_example1, inmb_example2, inmb_example3))
 
 ```
 
@@ -462,15 +462,15 @@ kable(rbind(inmb_example1,inmb_example2,inmb_example3))
 
 ```{r, eval = show_results, echo = show_results}
 
-static_out <- rbind(run_static_model(admin_cost = admin_cost),
-                    run_static_model(admin_cost = admin_cost/2))
+static_out = rbind(run_static_model(admin_cost = admin_cost),
+                   run_static_model(admin_cost = admin_cost / 2))
 
-dynamic_out <-rbind(run_dynamic_model(admin_cost = admin_cost),
-                    run_dynamic_model(admin_cost = admin_cost/2))
+dynamic_out =rbind(run_dynamic_model(admin_cost = admin_cost),
+                   run_dynamic_model(admin_cost = admin_cost / 2))
 
-kable(cbind(model='static',static_out))
+kable(cbind(model='static', static_out))
 
-kable(cbind(model='dynamic',dynamic_out))
+kable(cbind(model='dynamic', dynamic_out))
 
 # Combining the administration of different vaccines, hence reducing the 
 # administration cost, is beneficial for the cost-effectiveness.
@@ -495,17 +495,17 @@ kable(cbind(model='dynamic',dynamic_out))
 # can tip the balance quickly and result in large herd immunity effects, hence more 
 # positive CEA outcomes. 
 
-dynamic_out <-rbind(run_dynamic_model(uptake = 0.1, initial_R = 0),
-                    run_dynamic_model(uptake = 0.2, initial_R = 0))
+dynamic_out =rbind(run_dynamic_model(uptake = 0.1, initial_R = 0),
+                   run_dynamic_model(uptake = 0.2, initial_R = 0))
 
-rsv_incidence_new <- as.numeric(dynamic_out[1,'reference_infections'] / population_size)
+rsv_incidence_new = as.numeric(dynamic_out[1, 'reference_infections'] / population_size)
 
-static_out <- rbind(run_static_model(uptake = 0.1, rsv_incidence = rsv_incidence_new),
+static_out = rbind(run_static_model(uptake = 0.1, rsv_incidence = rsv_incidence_new),
                     run_static_model(uptake = 0.2, rsv_incidence = rsv_incidence_new))
 
 
-kable(cbind(model='static',static_out))
-kable(cbind(model='dynamic',dynamic_out))
+kable(cbind(model='static', static_out))
+kable(cbind(model='dynamic', dynamic_out))
 
 ```
 
@@ -521,8 +521,8 @@ kable(cbind(model='dynamic',dynamic_out))
 
 Reflect on the decision when 
 
-* the cost per case is represented by `rgamma(100, shape=(122/70)^2, rate = 122/70^2))` 
-* the vaccine efficacy by `rnorm(100,vaccine_efficacy,0.1)`. 
+* the cost per case is represented by `rgamma(100, shape=(122 / 70)^2, rate = 122 / 70^2))` 
+* the vaccine efficacy by `rnorm(100, vaccine_efficacy, 0.1)`. 
 
 Try to reproduce the figure below for 100 samples:
 
@@ -534,10 +534,10 @@ Try to reproduce the figure below for 100 samples:
 # Note: it is also possible to use the summary functions above
 # For illustration purposes, we explicitly include all code here.
 
-num_samples <- 100
+num_samples = 100
 set.seed(1234)
-unc_cost_per_episode <- rgamma(num_samples, shape=(122/70)^2, rate = 122/70^2)
-unc_vaccine_efficacy <- rnorm(num_samples,vaccine_efficacy,0.1)
+unc_cost_per_episode = rgamma(num_samples, shape=(122 / 70)^2, rate = 122 / 70^2)
+unc_vaccine_efficacy = rnorm(num_samples,vaccine_efficacy,0.1)
 
 # static
 unc_static_prevented_cases = population_size * (uptake * unc_vaccine_efficacy) * force_of_infection
@@ -546,41 +546,40 @@ unc_static_incr_cost       = program_costs - (unc_static_prevented_cases * unc_c
 unc_static_icer            = mean(unc_static_incr_cost)  / mean(unc_static_incr_qaly)
 
 # dynamic
-unc_dynamic_prevented_cases <- vector(length=num_samples)
+unc_dynamic_prevented_cases = vector(length=num_samples)
 initial_prop_R = 0.95099
 for(i in 1:num_samples){
  unc_proportion_protected = uptake * unc_vaccine_efficacy[i]
  initials['I'] = 1e-06
  initials['S'] = (1-initial_prop_R) * (1-unc_proportion_protected)
  initials['R'] = 1 - sum(initials['S']+initials['I'])
- dynamic_rsv = SIR(pars = parameters,init = initials,0:time_horizon)
- dynamic_cases_program = diff(dynamic_rsv$results$R[c(1,nrow(dynamic_rsv$results))]) * population_size
+ dynamic_rsv   = SIR(pars = parameters,init = initials,0:time_horizon)
+ dynamic_cases_program = diff(dynamic_rsv$results$R[c(1, nrow(dynamic_rsv$results))]) * population_size
  unc_dynamic_prevented_cases[i] = dynamic_cases_reference - dynamic_cases_program
 } 
 
 # prevented cases
-unc_dynamic_incr_qaly       = unc_dynamic_prevented_cases * qaly_loss_per_episode
-unc_dynamic_incr_cost       = program_costs - (unc_dynamic_prevented_cases * unc_cost_per_episode)
-unc_dynamic_icer            = mean(unc_dynamic_incr_cost)  / mean(unc_dynamic_incr_qaly)
+unc_dynamic_incr_qaly = unc_dynamic_prevented_cases * qaly_loss_per_episode
+unc_dynamic_incr_cost = program_costs - (unc_dynamic_prevented_cases * unc_cost_per_episode)
+unc_dynamic_icer      = mean(unc_dynamic_incr_cost)  / mean(unc_dynamic_incr_qaly)
 
 
 plot(x=unc_static_incr_qaly,
      y=unc_static_incr_cost,
       xlim = range(unc_static_incr_qaly,unc_dynamic_incr_qaly),
-     # ylim = range(unc_static_incr_cost,unc_dynamic_incr_cost),
      ylim = c(4,6)*1e7,
      xlab = 'incremental QALY gain',
      ylab = "incremental cost (euro)",
-     pch=1)
+     pch = 1)
 points(x=unc_dynamic_incr_qaly,
        y=unc_dynamic_incr_cost,
-     col = 2,
-     pch=20)
+       col = 2,
+       pch = 20)
 legend('topright',
        c('static model',
          'dynamic model'),
        col = 1:2,
-       pch = c(1,20)
+       pch = c(1, 20)
        )
 ```
 

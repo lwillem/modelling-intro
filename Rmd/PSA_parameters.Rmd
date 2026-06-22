@@ -41,8 +41,8 @@ The first step when creating a new R file is to specify a working directory. You
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
 
 ```{r results = "hide", eval = FALSE}
-home <- "~/Documents/Modelling_intro/" ## on a OS X
-home <- "C:\\Documents\\Modelling_intro\\" ## on windows
+home = "~/Documents/Modelling_intro/" ## on a OS X
+home = "C:\\Documents\\Modelling_intro\\" ## on windows
 setwd(home)
 ```
 
@@ -74,15 +74,15 @@ Let's first explore the parameter distribution if we assume the sample size larg
 set.seed(5698) # use this to get exactly the same results each time you run the code (e.g. for code checking)
 
 # if probability (p) and sample size (n) given: se = sqrt(p*(1-p)/n
-force_of_infection_norm      = rnorm(nsamples,0.04, sqrt(0.04 * (1-0.04) / 100))	
-p_hospital_norm   = rnorm(nsamples,0.1, sqrt(0.1 * (1-0.1) / 100))		  
-hosp_case_fatality_ratio_norm   = rnorm(nsamples,0.3, sqrt(0.3 * (1-0.3) / 1000)) 
+force_of_infection_norm       = rnorm(nsamples,0.04, sqrt(0.04 * (1 - 0.04) / 100))	
+p_hospital_norm               = rnorm(nsamples,0.1, sqrt(0.1 * (1 - 0.1) / 100))		  
+hosp_case_fatality_ratio_norm = rnorm(nsamples,0.3, sqrt(0.3 * (1 - 0.3) / 1000)) 
 
 # if mean and se given (and n unknown)
 life_expectancy_norm = rnorm(nsamples,12,2)	
 
 # if CI given: se = (CI_high - CI_low)/(2*1.96)
-vaccine_efficacy_norm       = rnorm(nsamples,0.6, (0.7 - 0.5) / (2 * 1.96))			
+vaccine_efficacy_norm       = rnorm(nsamples, 0.6, (0.7 - 0.5) / (2 * 1.96))			
 
 # if mean and se given
 adm_cost_norm       = rnorm(nsamples, 50, 4)		
@@ -96,15 +96,15 @@ QALYloss_non_hosp_case_norm  = rnorm(nsamples, 0.0082, 0.0018)
 For some parameters, the sample size is rather small or they should be strictly positive, hence other distribution might be preferred. Let's first define some help functions to facilitate sampling using a given mean, se, proportion, samples size or confidence interval:
 
 ```{r}
-sample_gamma <- function(nsamples, mean, se){
+sample_gamma = function(nsamples, mean, se){
   rgamma(nsamples, shape = mean^2 / se^2, rate = mean / se^2)
 }
 
-sample_beta_event <- function(nsamples, events, sample_size){
+sample_beta_event = function(nsamples, events, sample_size){
   return(rbeta(nsamples, shape1 = events , shape2 = sample_size - events))
 }
 
-sample_beta_mean <- function(nsamples, mean, se){
+sample_beta_mean = function(nsamples, mean, se){
   alpha = mean^2 * (1 - mean) / se^2 
   beta  = alpha * (1 - mean) / mean
   return(rbeta(nsamples, shape1 = alpha, shape2 = beta))
@@ -117,7 +117,7 @@ Let's sample from an adjusted distribution:
 ```{r , echo = !show_results, eval = FALSE}
 
 # probability
-force_of_infection_beta    = sample_beta_event(nsamples,4,100) # = rbeta(nsamples,4,96)
+force_of_infection_beta = sample_beta_event(nsamples, 4, 100) # = rbeta(nsamples,4,96)
 
 ...
 
@@ -126,18 +126,18 @@ force_of_infection_beta    = sample_beta_event(nsamples,4,100) # = rbeta(nsample
 ```{r , echo = show_results}
 
 # probability
-force_of_infection_beta       = sample_beta_event(nsamples,4,100)
-p_hospital_beta               = sample_beta_event(nsamples,10,100)
-hosp_case_fatality_ratio_beta = sample_beta_event(nsamples,300,1000)
+force_of_infection_beta       = sample_beta_event(nsamples, 4, 100)
+p_hospital_beta               = sample_beta_event(nsamples, 10, 100)
+hosp_case_fatality_ratio_beta = sample_beta_event(nsamples, 300, 1000)
 
 # count data
-life_expectancy_gamma =  sample_gamma(nsamples,12,2)
+life_expectancy_gamma =  sample_gamma(nsamples, 12, 2)
 
 # efficacy =  probability 
-vaccine_efficacy_beta = sample_beta_mean(nsamples, mean = 0.6, se = (0.7-0.5)/(2*1.96))
+vaccine_efficacy_beta = sample_beta_mean(nsamples, mean = 0.6, se = (0.7 - 0.5) / (2 * 1.96))
 
 # efficacy = 1-RR
-vaccine_efficacy_lognormal = 1 - exp(rnorm(nsamples,log(0.4),(log(0.5)-log(0.3))/(2*1.96)))
+vaccine_efficacy_lognormal = 1 - exp(rnorm(nsamples, log(0.4), (log(0.5) - log(0.3)) / (2 * 1.96)))
   
 # cost = count data
 adm_cost_gamma = sample_gamma(nsamples, 50, 4)
@@ -158,112 +158,145 @@ To check if sample size is sufficiently large to use normal distribution:
 
 ```{r, eval = TRUE}
 
-plot(density(force_of_infection_norm), main = 'force of infection', ylim = c(0,25))
-lines(density(force_of_infection_beta),col = 2)
-abline(v = mean(force_of_infection_norm), lty = 2)
+plot(density(force_of_infection_norm), 
+     main = 'force of infection', 
+     ylim = c(0,25))
+lines(density(force_of_infection_beta), 
+      col = 2)
+abline(v = mean(force_of_infection_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Beta()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 ```
 
 ```{r, eval = show_results, echo = show_results}
 
-plot(density(p_hospital_norm), main = 'probability of hospitalisation', ylim = c(0,25))
-lines(density(p_hospital_beta),col = 2)
-abline(v = mean(p_hospital_norm), lty = 2)
+plot(density(p_hospital_norm), 
+     main = 'probability of hospitalisation', 
+     ylim = c(0, 25))
+lines(density(p_hospital_beta),
+      col = 2)
+abline(v = mean(p_hospital_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Beta()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
 
-plot(density(hosp_case_fatality_ratio_norm), main = 'hospital case fatality ratio')
-lines(density(hosp_case_fatality_ratio_beta),col = 2)
-abline(v = mean(hosp_case_fatality_ratio_norm), lty = 2)
+plot(density(hosp_case_fatality_ratio_norm), 
+     main = 'hospital case fatality ratio')
+lines(density(hosp_case_fatality_ratio_beta),
+      col = 2)
+abline(v = mean(hosp_case_fatality_ratio_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Beta()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
 
-plot(density(life_expectancy_norm), main = 'life expectancy')
-lines(density(life_expectancy_gamma),col = 2)
-abline(v = mean(life_expectancy_norm), lty = 2)
+plot(density(life_expectancy_norm), 
+     main = 'life expectancy')
+lines(density(life_expectancy_gamma),
+      col = 2)
+abline(v = mean(life_expectancy_norm), 
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Gamma()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
 
-plot(density(vaccine_efficacy_norm), main = 'vaccine effectiveness')
-lines(density(vaccine_efficacy_lognormal),col = 2)
-lines(density(vaccine_efficacy_beta),col = 3)
-abline(v = mean(vaccine_efficacy_norm), lty = 2)
+plot(density(vaccine_efficacy_norm), 
+     main = 'vaccine effectiveness')
+lines(density(vaccine_efficacy_lognormal),
+      col = 2)
+lines(density(vaccine_efficacy_beta),
+      col = 3)
+abline(v = mean(vaccine_efficacy_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','logNorm()','Beta()', 'mean'),
-      col = c(1,2,3,1),
-      lty=c(1,1,1,2),
-      lwd=1)
+      col = c(1, 2, 3, 1),
+      lty = c(1, 1, 1, 2),
+      lwd = 1)
 
-plot(density(adm_cost_norm), main = 'administration cost')
-lines(density(adm_cost_gamma),col = 2)
-abline(v = mean(adm_cost_norm), lty = 2)
+plot(density(adm_cost_norm), 
+     main = 'administration cost')
+lines(density(adm_cost_gamma),
+      col = 2)
+abline(v = mean(adm_cost_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Gamma()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
-plot(density(cost_hosp_norm), main = 'cost per hospital case')
-lines(density(cost_hosp_gamma),col = 2)
-abline(v = mean(cost_hosp_norm), lty = 2)
+plot(density(cost_hosp_norm), 
+     main = 'cost per hospital case')
+lines(density(cost_hosp_gamma),
+      col = 2)
+abline(v = mean(cost_hosp_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Gamma()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
-plot(density(cost_non_hosp_norm), main = 'cost per non-hospital case')
-lines(density(cost_non_hosp_gamma),col = 2)
-abline(v = mean(cost_non_hosp_norm), lty = 2)
+plot(density(cost_non_hosp_norm), 
+     main = 'cost per non-hospital case')
+lines(density(cost_non_hosp_gamma),
+      col = 2)
+abline(v = mean(cost_non_hosp_norm), 
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Gamma()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
-plot(density(QALYloss_hosp_case_norm), main = 'QALY loss per hospital case')
-lines(density(QALYloss_hosp_case_beta),col = 2)
-abline(v = mean(QALYloss_hosp_case_norm), lty = 2)
+plot(density(QALYloss_hosp_case_norm), 
+     main = 'QALY loss per hospital case')
+lines(density(QALYloss_hosp_case_beta),
+      col = 2)
+abline(v = mean(QALYloss_hosp_case_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Beta()', 'mean'),
       col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      lty = c(1, 1, 2),
+      lwd = 1)
 
-plot(density(QALYloss_non_hosp_case_norm), main = 'QALY loss per non-hospital case')
-lines(density(QALYloss_non_hosp_case_beta),col = 2)
-abline(v = mean(QALYloss_non_hosp_case_norm), lty = 2)
+plot(density(QALYloss_non_hosp_case_norm), 
+     main = 'QALY loss per non-hospital case')
+lines(density(QALYloss_non_hosp_case_beta),
+      col = 2)
+abline(v = mean(QALYloss_non_hosp_case_norm),
+       lty = 2)
 grid()
 legend('topright',
       c('Norm()','Beta()', 'mean'),
-      col = c(1,2,1),
-      lty=c(1,1,2),
-      lwd=1)
+      col = c(1, 2, 1),
+      lty = c(1, 1, 2),
+      lwd = 1)
 
 ```
 
