@@ -2,7 +2,6 @@
 .Rdata
 *.pdf
 *.csv
-*.txt
 *.sublime-project
 *.sublime-workspace
 

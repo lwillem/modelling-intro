@@ -494,7 +494,7 @@ do this you use the command to “set the working directory” or
 <p>You can label this working directory as ‘home’, and have other
 locations stored for plotting or for getting data. This location should
 be an existing folder on your computer. For example</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>home <span class="ot">=</span> <span class="st">&quot;~/Documents/Modelling_intro/&quot;</span> <span class="do">## on a OS X</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>home <span class="ot">=</span> <span class="st">&quot;~/Documents/Modelling_intro/&quot;</span>     <span class="do">## on OS X</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>home <span class="ot">=</span> <span class="st">&quot;C:</span><span class="sc">\\</span><span class="st">Documents</span><span class="sc">\\</span><span class="st">Modelling_intro</span><span class="sc">\\</span><span class="st">&quot;</span> <span class="do">## on windows</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">setwd</span>(home)</span></code></pre></div>
 </div>
@@ -524,22 +524,22 @@ uncertainty for the mean.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5698</span>) <span class="co"># use this to get exactly the same results each time you run the code (e.g. for code checking)</span></span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co"># if probability (p) and sample size (n) given: se = sqrt(p*(1-p)/n</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>force_of_infection_norm       <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.04</span>, <span class="fu">sqrt</span>(<span class="fl">0.04</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.04</span>) <span class="sc">/</span> <span class="dv">100</span>)) </span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>p_hospital_norm               <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.1</span>, <span class="fu">sqrt</span>(<span class="fl">0.1</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.1</span>) <span class="sc">/</span> <span class="dv">100</span>))          </span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>hosp_case_fatality_ratio_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="fl">0.3</span>, <span class="fu">sqrt</span>(<span class="fl">0.3</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.3</span>) <span class="sc">/</span> <span class="dv">1000</span>)) </span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>force_of_infection_norm       <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.04</span>, <span class="fu">sqrt</span>(<span class="fl">0.04</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.04</span>) <span class="sc">/</span> <span class="dv">100</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>p_hospital_norm               <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.1</span>, <span class="fu">sqrt</span>(<span class="fl">0.1</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.1</span>) <span class="sc">/</span> <span class="dv">100</span>))</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>hosp_case_fatality_ratio_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.3</span>, <span class="fu">sqrt</span>(<span class="fl">0.3</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.3</span>) <span class="sc">/</span> <span class="dv">1000</span>))</span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a></span>
 <span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co"># if mean and se given (and n unknown)</span></span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>life_expectancy_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples,<span class="dv">12</span>,<span class="dv">2</span>) </span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>life_expectancy_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">12</span>, <span class="dv">2</span>)</span>
 <span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a></span>
 <span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co"># if CI given: se = (CI_high - CI_low)/(2*1.96)</span></span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>vaccine_efficacy_norm       <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.6</span>, (<span class="fl">0.7</span> <span class="sc">-</span> <span class="fl">0.5</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> <span class="fl">1.96</span>))            </span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>vaccine_efficacy_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.6</span>, (<span class="fl">0.7</span> <span class="sc">-</span> <span class="fl">0.5</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> <span class="fl">1.96</span>))</span>
 <span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a></span>
 <span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co"># if mean and se given</span></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>adm_cost_norm       <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">50</span>, <span class="dv">4</span>)        </span>
-<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>cost_hosp_norm      <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">2000</span>, <span class="dv">100</span>)</span>
-<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>cost_non_hosp_norm  <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">100</span>, <span class="dv">5</span>)   </span>
-<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>QALYloss_hosp_case_norm      <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.018</span>, <span class="fl">0.0018</span>) </span>
-<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>QALYloss_non_hosp_case_norm  <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.0082</span>, <span class="fl">0.0018</span>)</span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>adm_cost_norm               <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">50</span>, <span class="dv">4</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>cost_hosp_norm              <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">2000</span>, <span class="dv">100</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>cost_non_hosp_norm          <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="dv">100</span>, <span class="dv">5</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>QALYloss_hosp_case_norm     <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.018</span>, <span class="fl">0.0018</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>QALYloss_non_hosp_case_norm <span class="ot">=</span> <span class="fu">rnorm</span>(nsamples, <span class="fl">0.0082</span>, <span class="fl">0.0018</span>)</span></code></pre></div>
 </div>
 <div id="other-distributions" class="section level1">
 <h1>Other distributions</h1>
@@ -552,12 +552,12 @@ mean, se, proportion, samples size or confidence interval:</p>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>}</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>sample_beta_event <span class="ot">=</span> <span class="cf">function</span>(nsamples, events, sample_size){</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">rbeta</span>(nsamples, <span class="at">shape1 =</span> events , <span class="at">shape2 =</span> sample_size <span class="sc">-</span> events))</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">rbeta</span>(nsamples, <span class="at">shape1 =</span> events, <span class="at">shape2 =</span> sample_size <span class="sc">-</span> events))</span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>}</span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a></span>
 <span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>sample_beta_mean <span class="ot">=</span> <span class="cf">function</span>(nsamples, mean, se){</span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  alpha <span class="ot">=</span> mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean) <span class="sc">/</span> se<span class="sc">^</span><span class="dv">2</span> </span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>  beta  <span class="ot">=</span> alpha <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean) <span class="sc">/</span> mean</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  alpha <span class="ot">=</span> mean<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean) <span class="sc">/</span> se<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>  beta <span class="ot">=</span> alpha <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> mean) <span class="sc">/</span> mean</span>
 <span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">rbeta</span>(nsamples, <span class="at">shape1 =</span> alpha, <span class="at">shape2 =</span> beta))</span>
 <span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>}</span></code></pre></div>
 <p>Let’s sample from an adjusted distribution:</p>
@@ -570,16 +570,16 @@ mean, se, proportion, samples size or confidence interval:</p>
 <h1>Explore density plots</h1>
 <p>To check if sample size is sufficiently large to use normal
 distribution:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(force_of_infection_norm), </span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&#39;force of infection&#39;</span>, </span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">25</span>))</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(force_of_infection_beta), </span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(force_of_infection_norm),</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&#39;force of infection&#39;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>))</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(force_of_infection_beta),</span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>      <span class="at">col =</span> <span class="dv">2</span>)</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">mean</span>(force_of_infection_norm),</span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>       <span class="at">lty =</span> <span class="dv">2</span>)</span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">grid</span>()</span>
 <span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&#39;topright&#39;</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">&#39;Norm()&#39;</span>,<span class="st">&#39;Beta()&#39;</span>, <span class="st">&#39;mean&#39;</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">&#39;Norm()&#39;</span>, <span class="st">&#39;Beta()&#39;</span>, <span class="st">&#39;mean&#39;</span>),</span>
 <span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>      <span class="at">col =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
 <span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>      <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
 <span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>      <span class="at">lwd =</span> <span class="dv">1</span>)</span></code></pre></div>

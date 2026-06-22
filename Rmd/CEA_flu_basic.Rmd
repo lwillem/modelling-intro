@@ -8,31 +8,35 @@ toc: FALSE
 </div>
 
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
+
 set.seed(2020)
 options(width = 80)
 
-knitr::opts_chunk$set(fig.cap='', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
+knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
 
 if (!exists("show_results")) show_results = FALSE
+
 ```
 
 This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for illustration and teaching purposes only. Please contact us if you would like to use this model in any public way.
 
 In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note that for most applications, practical use of this model would likely entail having separate, though similarly simple  decision trees to obtain the unit cost estimates (implying that these cells would be intermediary outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the numberof consultations, the unit costs per consultation, medication use, hospital days etc. for cases of pneumonia, and all other relevant disease stages)).
 
-Note that the final output is independent of coverage and target group size if fixed administration costs are set to 0. This is due to the exclusion of herd immunity effects in this model.  
+Note that the final output is independent of coverage and target group size if fixed administration costs are set to 0. This is due to the exclusion of herd immunity effects in this model.
 
-For further information, questions or comments please contact us. 
+For further information, questions or comments please contact us.
 
 # Set working directory
-The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`. 
+The first step when creating a new R file is to specify a working directory. You need to tell the R session where you want it to work. To do this you use the command to "set the working directory" or `setwd()`.
 
 You can label this working directory as 'home', and have other locations stored for plotting or for getting data. This location should be an existing folder on your computer. For example
 
 ```{r results = "hide", eval = FALSE}
+
 home = "~/Documents/Modelling_intro/"     # on OS X
 home = "C:\\Documents\\Modelling_intro\\" # on windows
 setwd(home)
+
 ```
 
 <br>
@@ -63,11 +67,11 @@ cost_hosp_case     = 2000 # euro
 cost_non_hosp_case = 100  # euro
 
 # program details
-uptake_program          = 0.80
-vaccine_efficacy        = 0.60
-vaccine_price_per_dose  = 10   # euro
-admin_cost_per_dose     = 50   # euro
-fixed_program_costs     = 0    # euro
+uptake_program         = 0.80
+vaccine_efficacy       = 0.60
+vaccine_price_per_dose = 10   # euro
+admin_cost_per_dose    = 50   # euro
+fixed_program_costs    = 0    # euro
 
 
 ```
@@ -103,12 +107,14 @@ Here are the tasks you need to complete to run the health technology assessment:
 
 To begin the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, considering the proportion of cases that result in hospitalization:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 
 ```{r, echo = show_results}
+
 vaccine_cost_per_dose     = vaccine_price_per_dose + admin_cost_per_dose
 treatment_cost_per_case   = cost_hosp_case * p_hospital + (1 - p_hospital) * cost_non_hosp_case
 
@@ -116,18 +122,20 @@ treatment_cost_per_case   = cost_hosp_case * p_hospital + (1 - p_hospital) * cos
 
 ```{r, echo = show_results, eval = show_results}
 
-print(c(treatment_cost_per_case = treatment_cost_per_case, 
-        vaccine_cost_per_dose = vaccine_cost_per_dose))
+print(c(treatment_cost_per_case = treatment_cost_per_case,
+        vaccine_cost_per_dose   = vaccine_cost_per_dose))
 
 ```
 
 Calculate the burden of disease for the comparator without the program in place, including only medical costs:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 ```{r, echo = show_results}
+
 # Comparator
 comparator_infections        = targetgroup * force_of_infection
 comparator_hospitalisations  = comparator_infections * p_hospital
@@ -143,15 +151,17 @@ comparator_total_costs       = comparator_treatment_costs + comparator_vaccinati
 Calculate the burden of disease with the program in place, along with the associated medical and program costs:
 
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 ```{r, echo = show_results}
+
 # Program
 population_at_risk        = targetgroup * ((1 - uptake_program) + uptake_program * (1 - vaccine_efficacy))
 
-program_infections        = population_at_risk * force_of_infection 
+program_infections        = population_at_risk * force_of_infection
 program_hospitalisations  = program_infections * p_hospital
 program_deaths            = program_hospitalisations * hosp_case_fatality_ratio
 program_lifeyearslost     = program_deaths * life_expectancy
@@ -164,19 +174,21 @@ program_total_costs       = program_treatment_costs + program_vaccination_costs
 
 ```{r, echo = show_results, eval = show_results}
 
-print(c(comparator_treatment_costs = comparator_treatment_costs, 
-        program_treatment_costs = program_treatment_costs))
+print(c(comparator_treatment_costs = comparator_treatment_costs,
+        program_treatment_costs    = program_treatment_costs))
 
 ```
 
 Calculate the difference between the program and the comparator:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 ```{r, echo = show_results}
-# To calculate the difference between 'program' and 'comparator' 
+
+# To calculate the difference between 'program' and 'comparator'
 infections_averted       = comparator_infections - program_infections
 hospitalisations_averted = comparator_hospitalisations - program_hospitalisations
 deaths_averted           = comparator_deaths - program_deaths
@@ -190,6 +202,7 @@ incr_total_costs         = incr_vaccination_costs - treatment_costs_averted
 
 Calculate the incremental effectiveness ratios for infections, hospitalizations, and deaths averted. Finally, calculate the incremental effectiveness ratios for life years saved:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
@@ -206,19 +219,22 @@ incr_cost_per_lifeyear_gained           = incr_total_costs / lifeyearslost_avert
 
 Show the results:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 ```{r, echo = show_results}
+
 # combine results
 # note: specify column names at once
-ICER_values=c(incr_cost_per_case_prevented  = incr_cost_per_case_prevented,
-               incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
-               incr_cost_per_death_averted   = incr_cost_per_death_averted,
-               incr_cost_per_lifeyear_gained = incr_cost_per_lifeyear_gained)
+ICER_values = c(incr_cost_per_case_prevented            = incr_cost_per_case_prevented,
+                incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
+                incr_cost_per_death_averted             = incr_cost_per_death_averted,
+                incr_cost_per_lifeyear_gained           = incr_cost_per_lifeyear_gained)
 
 round(ICER_values) # print
+
 ```
 
 <br>
@@ -238,8 +254,9 @@ QALYloss_non_hosp_case = 0.0082
 
 ## Solutions II: step-by-step
 
-Calculate the effect per average case and the total burden of disease for the comparator and program. 
+Calculate the effect per average case and the total burden of disease for the comparator and program.
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
@@ -247,29 +264,31 @@ Calculate the effect per average case and the total burden of disease for the co
 ```{r, echo = show_results}
 
 # intermediate results
-QALYloss_per_case    = QALYloss_hosp_case * p_hospital + QALYloss_non_hosp_case * (1 - p_hospital)
+QALYloss_per_case = QALYloss_hosp_case * p_hospital + QALYloss_non_hosp_case * (1 - p_hospital)
 
 # program: effect
-program_QALYloss     = program_infections * QALYloss_per_case + program_lifeyearslost
+program_QALYloss = program_infections * QALYloss_per_case + program_lifeyearslost
 
 # comparator: effect
-comparator_QALYloss  = comparator_infections * QALYloss_per_case + comparator_lifeyearslost
+comparator_QALYloss = comparator_infections * QALYloss_per_case + comparator_lifeyearslost
 
-print(c(QALYloss_per_case = QALYloss_per_case, 
-        program_QALYloss = program_QALYloss, 
+print(c(QALYloss_per_case   = QALYloss_per_case,
+        program_QALYloss    = program_QALYloss,
         comparator_QALYloss = comparator_QALYloss))
 
 ```
 
 Time to calculate the incremental effect, and ICER:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 ```{r, echo = show_results}
+
 # incremental effect
-QALY_gained                = comparator_QALYloss - program_QALYloss
+QALY_gained = comparator_QALYloss - program_QALYloss
 
 # incremental cost-effectiveness ratio
 incr_costs_per_QALY_gained = incr_total_costs / QALY_gained
@@ -280,8 +299,10 @@ ICER_values = c(ICER_values,
 ```
 
 ```{r, echo = show_results, eval = show_results}
+
 # print
 round(ICER_values)
+
 ```
 
 <br>
@@ -297,13 +318,14 @@ data.frame(comparator_treatment_costs = comparator_treatment_costs,
            program_treatment_costs    = program_treatment_costs,
            treatment_costs_averted    = treatment_costs_averted) / 1e6
 
-# investment costs (in million)           
+# investment costs (in million)
 data.frame(incr_vaccination_costs = incr_vaccination_costs) / 1e6
-           
+
 # program vs comparator (in million)
 data.frame(comparator_total_costs = comparator_total_costs,
-           program_total_costs = program_total_costs,
-           incr_total_costs = incr_total_costs) / 1e6
+           program_total_costs    = program_total_costs,
+           incr_total_costs       = incr_total_costs) / 1e6
+
 ```
 
 
@@ -321,10 +343,11 @@ discount_rate = 0.015
 
 
 ```{r}
+
 # Define a discounting function
 discount = function(values, rate, years) {
   # Calculate discounted values
-  discounted_values = values / ((1 + rate) ^ years)
+  discounted_values = values / ((1 + rate)^years)
   return(discounted_values)
 }
 
@@ -340,19 +363,18 @@ discounted_costs = discount(costs, discount_rate, years)
 discounted_qalys = discount(qalys, discount_rate, years)
 
 # Display the results
-discounted_data = data.frame(
-  Year = years,
-  Costs = costs,
-  Discounted_Costs = discounted_costs,
-  QALYs = qalys,
-  Discounted_QALYs = discounted_qalys
-)
+discounted_data = data.frame(Year             = years,
+                             Costs            = costs,
+                             Discounted_Costs = discounted_costs,
+                             QALYs            = qalys,
+                             Discounted_QALYs = discounted_qalys)
 
-# print 
+# print
 print(discounted_data)
 
 # print sum
 print(colSums(discounted_data)[-1])
+
 ```
 
 <br>
@@ -365,13 +387,15 @@ Incorporate time preference into our health technology assessments for flu. Alth
 
 Calculate the discounted life expectancy to include in the effect calculation, and continue to obtain the discounted ICER:
 ```{r, echo = !show_results, eval = FALSE}
+
 ...
 
 ```
 
 ```{r, echo = show_results}
+
 # intermediate results
-life_expectancy_disc = sum(1/((1+discount_rate)^(0:(life_expectancy-1))))
+life_expectancy_disc = sum(1 / ((1 + discount_rate)^(0:(life_expectancy - 1))))
 
 
 # program: effect
@@ -401,8 +425,10 @@ ICER_values = c(ICER_values,
 ```
 
 ```{r, echo = show_results, eval = show_results}
+
 # print
 round(ICER_values)
+
 ```
 
 <br>

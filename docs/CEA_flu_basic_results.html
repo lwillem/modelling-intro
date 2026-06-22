@@ -526,11 +526,11 @@ on the following assumptions and input parameters:</p>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>cost_non_hosp_case <span class="ot">=</span> <span class="dv">100</span>  <span class="co"># euro</span></span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co"># program details</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>uptake_program          <span class="ot">=</span> <span class="fl">0.80</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>vaccine_efficacy        <span class="ot">=</span> <span class="fl">0.60</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose  <span class="ot">=</span> <span class="dv">10</span>   <span class="co"># euro</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose     <span class="ot">=</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs     <span class="ot">=</span> <span class="dv">0</span>    <span class="co"># euro</span></span></code></pre></div>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>uptake_program         <span class="ot">=</span> <span class="fl">0.80</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>vaccine_efficacy       <span class="ot">=</span> <span class="fl">0.60</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose <span class="ot">=</span> <span class="dv">10</span>   <span class="co"># euro</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose    <span class="ot">=</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs    <span class="ot">=</span> <span class="dv">0</span>    <span class="co"># euro</span></span></code></pre></div>
 <p><br></p>
 </div>
 <div id="part-i-costs-and-burden-of-disease" class="section level1">
@@ -581,8 +581,8 @@ cost per dose and the treatment cost per case, considering the
 proportion of cases that result in hospitalization:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>vaccine_cost_per_dose     <span class="ot">=</span> vaccine_price_per_dose <span class="sc">+</span> admin_cost_per_dose</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>treatment_cost_per_case   <span class="ot">=</span> cost_hosp_case <span class="sc">*</span> p_hospital <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> p_hospital) <span class="sc">*</span> cost_non_hosp_case</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">treatment_cost_per_case =</span> treatment_cost_per_case, </span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>        <span class="at">vaccine_cost_per_dose =</span> vaccine_cost_per_dose))</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">treatment_cost_per_case =</span> treatment_cost_per_case,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>        <span class="at">vaccine_cost_per_dose   =</span> vaccine_cost_per_dose))</span></code></pre></div>
 <pre><code>## treatment_cost_per_case   vaccine_cost_per_dose 
 ##                     290                      60</code></pre>
 <p>Calculate the burden of disease for the comparator without the
@@ -601,7 +601,7 @@ the associated medical and program costs:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Program</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>population_at_risk        <span class="ot">=</span> targetgroup <span class="sc">*</span> ((<span class="dv">1</span> <span class="sc">-</span> uptake_program) <span class="sc">+</span> uptake_program <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> vaccine_efficacy))</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>program_infections        <span class="ot">=</span> population_at_risk <span class="sc">*</span> force_of_infection </span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>program_infections        <span class="ot">=</span> population_at_risk <span class="sc">*</span> force_of_infection</span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>program_hospitalisations  <span class="ot">=</span> program_infections <span class="sc">*</span> p_hospital</span>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>program_deaths            <span class="ot">=</span> program_hospitalisations <span class="sc">*</span> hosp_case_fatality_ratio</span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>program_lifeyearslost     <span class="ot">=</span> program_deaths <span class="sc">*</span> life_expectancy</span>
@@ -609,12 +609,12 @@ the associated medical and program costs:</p>
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>program_treatment_costs   <span class="ot">=</span> program_infections <span class="sc">*</span> treatment_cost_per_case</span>
 <span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>program_vaccination_costs <span class="ot">=</span> fixed_program_costs <span class="sc">+</span> targetgroup <span class="sc">*</span> uptake_program <span class="sc">*</span> vaccine_cost_per_dose</span>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>program_total_costs       <span class="ot">=</span> program_treatment_costs <span class="sc">+</span> program_vaccination_costs</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">comparator_treatment_costs =</span> comparator_treatment_costs, </span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>        <span class="at">program_treatment_costs =</span> program_treatment_costs))</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">comparator_treatment_costs =</span> comparator_treatment_costs,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>        <span class="at">program_treatment_costs    =</span> program_treatment_costs))</span></code></pre></div>
 <pre><code>## comparator_treatment_costs    program_treatment_costs 
 ##                   29000000                   15080000</code></pre>
 <p>Calculate the difference between the program and the comparator:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># To calculate the difference between &#39;program&#39; and &#39;comparator&#39; </span></span>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># To calculate the difference between &#39;program&#39; and &#39;comparator&#39;</span></span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>infections_averted       <span class="ot">=</span> comparator_infections <span class="sc">-</span> program_infections</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>hospitalisations_averted <span class="ot">=</span> comparator_hospitalisations <span class="sc">-</span> program_hospitalisations</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>deaths_averted           <span class="ot">=</span> comparator_deaths <span class="sc">-</span> program_deaths</span>
@@ -634,10 +634,10 @@ effectiveness ratios for life years saved:</p>
 <p>Show the results:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># combine results</span></span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co"># note: specify column names at once</span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>ICER_values<span class="ot">=</span><span class="fu">c</span>(<span class="at">incr_cost_per_case_prevented  =</span> incr_cost_per_case_prevented,</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>               <span class="at">incr_cost_per_hospitalisation_prevented =</span> incr_cost_per_hospitalisation_prevented,</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>               <span class="at">incr_cost_per_death_averted   =</span> incr_cost_per_death_averted,</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>               <span class="at">incr_cost_per_lifeyear_gained =</span> incr_cost_per_lifeyear_gained)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>ICER_values <span class="ot">=</span> <span class="fu">c</span>(<span class="at">incr_cost_per_case_prevented            =</span> incr_cost_per_case_prevented,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>                <span class="at">incr_cost_per_hospitalisation_prevented =</span> incr_cost_per_hospitalisation_prevented,</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                <span class="at">incr_cost_per_death_averted             =</span> incr_cost_per_death_averted,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                <span class="at">incr_cost_per_lifeyear_gained           =</span> incr_cost_per_lifeyear_gained)</span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a></span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">round</span>(ICER_values) <span class="co"># print</span></span></code></pre></div>
 <pre><code>##            incr_cost_per_case_prevented incr_cost_per_hospitalisation_prevented 
@@ -660,22 +660,22 @@ following QALY values:</p>
 <p>Calculate the effect per average case and the total burden of disease
 for the comparator and program.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># intermediate results</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>QALYloss_per_case    <span class="ot">=</span> QALYloss_hosp_case <span class="sc">*</span> p_hospital <span class="sc">+</span> QALYloss_non_hosp_case <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hospital)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>QALYloss_per_case <span class="ot">=</span> QALYloss_hosp_case <span class="sc">*</span> p_hospital <span class="sc">+</span> QALYloss_non_hosp_case <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hospital)</span>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a></span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co"># program: effect</span></span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>program_QALYloss     <span class="ot">=</span> program_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> program_lifeyearslost</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>program_QALYloss <span class="ot">=</span> program_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> program_lifeyearslost</span>
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a></span>
 <span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co"># comparator: effect</span></span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>comparator_QALYloss  <span class="ot">=</span> comparator_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> comparator_lifeyearslost</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>comparator_QALYloss <span class="ot">=</span> comparator_infections <span class="sc">*</span> QALYloss_per_case <span class="sc">+</span> comparator_lifeyearslost</span>
 <span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">QALYloss_per_case =</span> QALYloss_per_case, </span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>        <span class="at">program_QALYloss =</span> program_QALYloss, </span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">QALYloss_per_case   =</span> QALYloss_per_case,</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>        <span class="at">program_QALYloss    =</span> program_QALYloss,</span>
 <span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>        <span class="at">comparator_QALYloss =</span> comparator_QALYloss))</span></code></pre></div>
 <pre><code>##   QALYloss_per_case    program_QALYloss comparator_QALYloss 
 ##             0.00918         19197.36000         36918.00000</code></pre>
 <p>Time to calculate the incremental effect, and ICER:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># incremental effect</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>QALY_gained                <span class="ot">=</span> comparator_QALYloss <span class="sc">-</span> program_QALYloss</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>QALY_gained <span class="ot">=</span> comparator_QALYloss <span class="sc">-</span> program_QALYloss</span>
 <span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a></span>
 <span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co"># incremental cost-effectiveness ratio</span></span>
 <span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>incr_costs_per_QALY_gained <span class="ot">=</span> incr_total_costs <span class="sc">/</span> QALY_gained</span>
@@ -705,14 +705,14 @@ investment and revenue of an intervention given the target group.</p>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>           <span class="at">treatment_costs_averted    =</span> treatment_costs_averted) <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div>
 <pre><code>##   comparator_treatment_costs program_treatment_costs treatment_costs_averted
 ## 1                         29                   15.08                   13.92</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># investment costs (in million)           </span></span>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># investment costs (in million)</span></span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">incr_vaccination_costs =</span> incr_vaccination_costs) <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div>
 <pre><code>##   incr_vaccination_costs
 ## 1                    120</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># program vs comparator (in million)</span></span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">comparator_total_costs =</span> comparator_total_costs,</span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>           <span class="at">program_total_costs =</span> program_total_costs,</span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>           <span class="at">incr_total_costs =</span> incr_total_costs) <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>           <span class="at">program_total_costs    =</span> program_total_costs,</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>           <span class="at">incr_total_costs       =</span> incr_total_costs) <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div>
 <pre><code>##   comparator_total_costs program_total_costs incr_total_costs
 ## 1                     29              135.08           106.08</code></pre>
 </div>
@@ -733,7 +733,7 @@ example to illustrate how discounting is applied in HTA:</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># Define a discounting function</span></span>
 <span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>discount <span class="ot">=</span> <span class="cf">function</span>(values, rate, years) {</span>
 <span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>  <span class="co"># Calculate discounted values</span></span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>  discounted_values <span class="ot">=</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate) <span class="sc">^</span> years)</span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>  discounted_values <span class="ot">=</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate)<span class="sc">^</span>years)</span>
 <span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>  <span class="fu">return</span>(discounted_values)</span>
 <span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a>}</span>
 <span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a></span>
@@ -749,16 +749,14 @@ example to illustrate how discounting is applied in HTA:</p>
 <span id="cb27-17"><a href="#cb27-17" tabindex="-1"></a>discounted_qalys <span class="ot">=</span> <span class="fu">discount</span>(qalys, discount_rate, years)</span>
 <span id="cb27-18"><a href="#cb27-18" tabindex="-1"></a></span>
 <span id="cb27-19"><a href="#cb27-19" tabindex="-1"></a><span class="co"># Display the results</span></span>
-<span id="cb27-20"><a href="#cb27-20" tabindex="-1"></a>discounted_data <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
-<span id="cb27-21"><a href="#cb27-21" tabindex="-1"></a>  <span class="at">Year =</span> years,</span>
-<span id="cb27-22"><a href="#cb27-22" tabindex="-1"></a>  <span class="at">Costs =</span> costs,</span>
-<span id="cb27-23"><a href="#cb27-23" tabindex="-1"></a>  <span class="at">Discounted_Costs =</span> discounted_costs,</span>
-<span id="cb27-24"><a href="#cb27-24" tabindex="-1"></a>  <span class="at">QALYs =</span> qalys,</span>
-<span id="cb27-25"><a href="#cb27-25" tabindex="-1"></a>  <span class="at">Discounted_QALYs =</span> discounted_qalys</span>
-<span id="cb27-26"><a href="#cb27-26" tabindex="-1"></a>)</span>
-<span id="cb27-27"><a href="#cb27-27" tabindex="-1"></a></span>
-<span id="cb27-28"><a href="#cb27-28" tabindex="-1"></a><span class="co"># print </span></span>
-<span id="cb27-29"><a href="#cb27-29" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
+<span id="cb27-20"><a href="#cb27-20" tabindex="-1"></a>discounted_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">Year             =</span> years,</span>
+<span id="cb27-21"><a href="#cb27-21" tabindex="-1"></a>                             <span class="at">Costs            =</span> costs,</span>
+<span id="cb27-22"><a href="#cb27-22" tabindex="-1"></a>                             <span class="at">Discounted_Costs =</span> discounted_costs,</span>
+<span id="cb27-23"><a href="#cb27-23" tabindex="-1"></a>                             <span class="at">QALYs            =</span> qalys,</span>
+<span id="cb27-24"><a href="#cb27-24" tabindex="-1"></a>                             <span class="at">Discounted_QALYs =</span> discounted_qalys)</span>
+<span id="cb27-25"><a href="#cb27-25" tabindex="-1"></a></span>
+<span id="cb27-26"><a href="#cb27-26" tabindex="-1"></a><span class="co"># print</span></span>
+<span id="cb27-27"><a href="#cb27-27" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
 <pre><code>##    Year Costs Discounted_Costs QALYs Discounted_QALYs
 ## 1     0  1000        1000.0000     1        1.0000000
 ## 2     1  1000         985.2217     1        0.9852217
@@ -790,7 +788,7 @@ be adjusted using a discount rate.</p>
 <p>Calculate the discounted life expectancy to include in the effect
 calculation, and continue to obtain the discounted ICER:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># intermediate results</span></span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>life_expectancy_disc <span class="ot">=</span> <span class="fu">sum</span>(<span class="dv">1</span><span class="sc">/</span>((<span class="dv">1</span><span class="sc">+</span>discount_rate)<span class="sc">^</span>(<span class="dv">0</span><span class="sc">:</span>(life_expectancy<span class="dv">-1</span>))))</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>life_expectancy_disc <span class="ot">=</span> <span class="fu">sum</span>(<span class="dv">1</span> <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> discount_rate)<span class="sc">^</span>(<span class="dv">0</span><span class="sc">:</span>(life_expectancy <span class="sc">-</span> <span class="dv">1</span>))))</span>
 <span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a></span>
 <span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a></span>
 <span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a><span class="co"># program: effect</span></span>

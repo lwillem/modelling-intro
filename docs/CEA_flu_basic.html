@@ -526,11 +526,11 @@ on the following assumptions and input parameters:</p>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>cost_non_hosp_case <span class="ot">=</span> <span class="dv">100</span>  <span class="co"># euro</span></span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co"># program details</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>uptake_program          <span class="ot">=</span> <span class="fl">0.80</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>vaccine_efficacy        <span class="ot">=</span> <span class="fl">0.60</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose  <span class="ot">=</span> <span class="dv">10</span>   <span class="co"># euro</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose     <span class="ot">=</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs     <span class="ot">=</span> <span class="dv">0</span>    <span class="co"># euro</span></span></code></pre></div>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>uptake_program         <span class="ot">=</span> <span class="fl">0.80</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>vaccine_efficacy       <span class="ot">=</span> <span class="fl">0.60</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose <span class="ot">=</span> <span class="dv">10</span>   <span class="co"># euro</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose    <span class="ot">=</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs    <span class="ot">=</span> <span class="dv">0</span>    <span class="co"># euro</span></span></code></pre></div>
 <p><br></p>
 </div>
 <div id="part-i-costs-and-burden-of-disease" class="section level1">
@@ -632,13 +632,13 @@ investment and revenue of an intervention given the target group.</p>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>           <span class="at">program_treatment_costs    =</span> program_treatment_costs,</span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>           <span class="at">treatment_costs_averted    =</span> treatment_costs_averted) <span class="sc">/</span> <span class="fl">1e6</span></span>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co"># investment costs (in million)           </span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co"># investment costs (in million)</span></span>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">incr_vaccination_costs =</span> incr_vaccination_costs) <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>           </span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
 <span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co"># program vs comparator (in million)</span></span>
 <span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">comparator_total_costs =</span> comparator_total_costs,</span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>           <span class="at">program_total_costs =</span> program_total_costs,</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>           <span class="at">incr_total_costs =</span> incr_total_costs) <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>           <span class="at">program_total_costs    =</span> program_total_costs,</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>           <span class="at">incr_total_costs       =</span> incr_total_costs) <span class="sc">/</span> <span class="fl">1e6</span></span></code></pre></div>
 </div>
 <div id="part-vi-discounting" class="section level1">
 <h1>Part VI: Discounting</h1>
@@ -657,7 +657,7 @@ example to illustrate how discounting is applied in HTA:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Define a discounting function</span></span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>discount <span class="ot">=</span> <span class="cf">function</span>(values, rate, years) {</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="co"># Calculate discounted values</span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  discounted_values <span class="ot">=</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate) <span class="sc">^</span> years)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  discounted_values <span class="ot">=</span> values <span class="sc">/</span> ((<span class="dv">1</span> <span class="sc">+</span> rate)<span class="sc">^</span>years)</span>
 <span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  <span class="fu">return</span>(discounted_values)</span>
 <span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>}</span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a></span>
@@ -673,16 +673,14 @@ example to illustrate how discounting is applied in HTA:</p>
 <span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>discounted_qalys <span class="ot">=</span> <span class="fu">discount</span>(qalys, discount_rate, years)</span>
 <span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a></span>
 <span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co"># Display the results</span></span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>discounted_data <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>  <span class="at">Year =</span> years,</span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>  <span class="at">Costs =</span> costs,</span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a>  <span class="at">Discounted_Costs =</span> discounted_costs,</span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a>  <span class="at">QALYs =</span> qalys,</span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a>  <span class="at">Discounted_QALYs =</span> discounted_qalys</span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a>)</span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a></span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a><span class="co"># print </span></span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>discounted_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">Year             =</span> years,</span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>                             <span class="at">Costs            =</span> costs,</span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>                             <span class="at">Discounted_Costs =</span> discounted_costs,</span>
+<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a>                             <span class="at">QALYs            =</span> qalys,</span>
+<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a>                             <span class="at">Discounted_QALYs =</span> discounted_qalys)</span>
+<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a></span>
+<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a><span class="co"># print</span></span>
+<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="fu">print</span>(discounted_data)</span></code></pre></div>
 <pre><code>##    Year Costs Discounted_Costs QALYs Discounted_QALYs
 ## 1     0  1000        1000.0000     1        1.0000000
 ## 2     1  1000         985.2217     1        0.9852217

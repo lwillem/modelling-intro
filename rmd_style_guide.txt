@@ -1,0 +1,77 @@
+R code style guide for Rmd files in this project
+==================================================
+Version: 2026-06-22 at 11:59
+
+1. Assignment operator
+   - Use = instead of <-
+
+2. Spacing around operators
+   - Space before and after binary operators: + - * /
+   - No space around ^  (keep attached: mean^2)
+   - No space around e in scientific notation (keep attached: 1e-5, 1e4, 12e3)
+   - No space around / inside quoted strings, i.e. file paths (keep attached: "~/Documents/project/")
+   - No space around - inside comment or strings, e.g. cost-effectiveness or individual-based
+   - Space before and after = in function arguments: h = 0, digits = 4
+   - Space before and after == != <= >=
+
+3. Commas
+   - Always one space after a comma, never before
+
+4. Alignment with =
+   - Within a paragraph (group of related assignments), align = to the
+     longest variable name in that group, with one space after the name:
+       force_of_infection = sample_beta_event(...)
+       cost_per_case      = sample_gamma(...)
+   - If a paragraph contains only one assignment, use exactly one space
+     before =, even if nearby single-assignment paragraphs have longer names:
+       # intermediate results
+       QALYloss_per_case = QALYloss_hosp_case * p_hospital + ...
+
+       # program: effect
+       program_QALYloss = program_infections * QALYloss_per_case + ...
+   - Inside data.frame() or c(), place the first element on the same line as
+     the function call, and align all subsequent elements vertically to the
+     first element. Align = to the longest argument name with one space after:
+       data.frame(force_of_infection = force_of_infection,
+                  cost_per_case      = cost_per_case)
+     NOT:
+       data.frame(
+         force_of_infection = force_of_infection,
+         cost_per_case      = cost_per_case
+       )
+
+5. Double spaces after =
+   - Never use double spaces after =: always exactly one space
+   - Exception: alignment spaces BEFORE = are intentional and should be kept
+
+6. No space at the end a line
+
+7. Multi-line expressions
+   - When an expression continues on the next line, break after an operator
+     and indent the continuation to align with the opening expression:
+       interv_total_cost = interv_infections * cost_per_case +
+                            (targetgroup * vaccine_price_per_dose * uptake_program)
+   - IMPORTANT for automated formatting: operator regexes must use (?!\n) to
+     prevent \s* from consuming the newline and collapsing continuation lines.
+     Example (Python): re.sub(r'([\w\)\]])\s*\+\s*(?!\n)', r'\1 + ', code)
+   - IMPORTANT for comma spacing: use [ \t]*,[ \t]* (not \s*,\s*) to avoid
+     consuming newlines and collapsing multi-line function calls.
+   - IMPORTANT: respect rule 2 (no spaces in comments/strings) by applying
+     operator spacing only to the code portion of each line (before the #).
+
+8. Code chunk layout
+   - Every ```{r} block must start and end with a blank line:
+       ```{r}
+
+       # code here
+
+       ```
+
+9. Output width
+   - Set options(width = 80) in the libs chunk to ensure consistent
+     line-wrapping of printed output across machines
+
+10. show_results flag
+   - Do not hard-code show_results in the Rmd; set it via envir in the
+     knit script so the file can also be knitted interactively:
+       if (!exists("show_results")) show_results = FALSE
