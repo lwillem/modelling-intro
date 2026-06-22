@@ -7,15 +7,16 @@ toc: FALSE
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 suppressPackageStartupMessages(library('curl'))
 library('knitr')
 library('EpiDynamics')
 set.seed(2020)
-
-show_results = FALSE
+options(width = 80)
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, warning=FALSE, fig.height = 4, fig.width = 6)
+
+if (!exists("show_results")) show_results = FALSE
 ```
 
 This tutorial has been developed by Joke Bilcke and Lander Willem, for illustration and teaching purposes only. 
@@ -265,7 +266,7 @@ kable(db_out)
 
 Compute the Incremental Net Monetary Benefit for the RSV illustration provided, while adhering to willingness-to-pay thresholds of 20,000 and 40,0000 euro per Quality-Adjusted Life Year (QALY).
 
-```{r, eval=show_results, echo=show_results}
+```{r, eval = show_results, echo = show_results}
 
 # define wtp thresholds
 opt_wtp = c(20e3, 40e3)
