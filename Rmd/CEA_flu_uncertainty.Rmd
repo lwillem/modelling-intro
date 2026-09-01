@@ -3,10 +3,6 @@ title: "Cost-effectiveness analysis for influenza vaccination with uncertainty"
 toc: no
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
 options(width = 80)
@@ -601,7 +597,7 @@ plot(evppi_bcea, col = 1:2, pos = c(1, 1))
 
 <div>
 # Navigate
-Top: [Index](index.html) ---
+[Home page](index.html) ---
 `r if (!show_results) {
     '<a href="CEA_flu_uncertainty_results.html"> Results</a>'
   } else {

@@ -1,22 +1,14 @@
 ---
 title: "Discounting in Health Economics"
-output:
-  html_document:
-    toc: false
 ---
-
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 
 Discounting is a financial technique used to determine the present value of future cash flows or benefits, considering the time value of money. It’s based on the idea that a sum of money today is worth more than the same sum in the future, due to the potential for earning interest or the influence of inflation. By applying a discount rate, we can adjust future values to their present worth, making it easier to compare financial benefits or costs occurring at different times.
 
-### Why Use Discounting?
+### Why use discounting?
 
 Discounting is widely used across various fields, from finance and economics to environmental sciences and public health. It is essential when assessing projects, investments, or policies that have long-term impacts. For example, in evaluating life expectancy, discounting helps to represent the current worth of future life years. This approach allows for better-informed decision-making by giving appropriate weight to benefits or costs occurring over time.
 
-### The Discounting Formula
+### The discounting formula
 
 The basic formula for discounting a future value is as follows:
 
@@ -30,7 +22,7 @@ where:
 \( r \): Discount Rate, and
 \( t \): Time in years, with for the current year \( t=0\).
 
-### Example Calculation
+### Example calculation
 
 Consider a scenario where we want to calculate the present value of a life expectancy of 84 years with a 3% discount rate. By applying the formula iteratively for each year, we sum the discounted values over the life expectancy to find the total present worth of these years.
 
@@ -122,6 +114,3 @@ print(discounted_data)
 ```
 
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>

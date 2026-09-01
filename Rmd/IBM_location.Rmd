@@ -1,10 +1,6 @@
 ---
-title: "Introduction to location-specific IBMs"
+title: "Location-specific IBMs"
 ---
-
-<div style="text-align: right">
-[Home page](index.html)
-</div>
 
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
@@ -125,7 +121,7 @@ run_ibm_location()
 What can you learn from these graphs and output? Can you confirm the population rules based on the graphs above?
 </n>
 
-# Explore some parameters
+# Explore parameters
 
 The "model parameters" from the model printout above can be used as function arguments to modify the default settings. For example, you can change the number of community contacts per day by adjusting `num_contacts_community_day`.
 
@@ -165,7 +161,7 @@ Now, what happens if you...
 
 <div>
 # Navigate
-Top: [Index](index.html) ---
+[Index](index.html) ---
 <a href="IBM_location_results.html"> Results</a>
 </div>
 

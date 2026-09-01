@@ -1,17 +1,10 @@
 ---
 title: "Background literature"
-output:
-  html_document:
-    toc: false  
 ---
 
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 options(width = 80)
 ```
-
-<div style="text-align: right">
-[Home page](index.html)
-</div>
 
 <hr>
 <img src="ext_fig/logo_chermid.png" height="50px"> &nbsp; &nbsp;
@@ -36,6 +29,3 @@ options(width = 80)
 * <a href="http://www.socialcontactdata.org/" target="_blank">http://www.socialcontactdata.org/</a>
 
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>

@@ -2,10 +2,6 @@
 title: "Probabilistic Sensitivity Analysis: methods"
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
 set.seed(2020)
@@ -506,6 +502,6 @@ cbind(opt_wtp, evppi)
 
 <div>
 # Navigate
-Top: [Index](index.html)
+[Home page](index.html)
 </div>
 

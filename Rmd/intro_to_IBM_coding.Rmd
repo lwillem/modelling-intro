@@ -2,10 +2,6 @@
 title: "Introduction to IBMs for infectious diseases"
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
 library('curl')
@@ -527,6 +523,6 @@ If you have time, you can now continue to build more complex versions of the SIR
 
 <div>
 # Navigate
-Top: [Index](index.html) Next: [IBM scenario analyses](IBM_random_walk.html)
+[Home page](index.html) -- Next: [IBM scenario analyses](IBM_random_walk.html)
 </div>
 

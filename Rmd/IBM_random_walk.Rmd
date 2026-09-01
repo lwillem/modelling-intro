@@ -1,10 +1,6 @@
 ---
-title: "Scenario Analyses with a random walk IBM"
+title: "IBM with random walk"
 ---
-
-<div style="text-align: right">
-[Home page](index.html)
-</div>
 
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
@@ -126,20 +122,22 @@ Now, it is time to adapt the model parameters and see what happens to the **tota
 </n>
 
 
-* change the population size to 100 or 2000?
-* decrease the area size?
-* change the velocity to 20?
-* start with 1 or 500 infected individuals?
-* increase the contact range?
-* increase the transmission probability to 0.4?
-* change the average number of contacts per day to 2 or 20?
-* change the time horizon to 100 days?
-* ... etc.
+1. change the population size to 100 or 2000?
+2. decrease the area size?
+3. change the velocity to 20?
+4. start with 1 or 500 infected individuals?
+5. increase the contact range?
+6. increase the transmission probability to 0.4?
+7. change the average number of contacts per day to 2 or 20?
+8. change the time horizon to 100 days?
+
+... etc.
 
 (TIP: the `run_ibm_random_walk` function has an option to `add_baseline = TRUE` to add model results with the default parameters. However, this increases the run time since the model is executed twice.)
 
 <div>
 # Navigate
-Top: [Index](index.html) Next: [IBM household transmission](IBM_location.html)
+[Index](index.html) -- 
+Next: [Location-specific IBMs](IBM_location.html)
 </div>
 

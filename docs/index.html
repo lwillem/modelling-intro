@@ -435,6 +435,86 @@ Hygiene &amp; Tropical Medicine. We fully acknowledge their work and are
 thankful for making them open-source via <a href="https://github.com/sbfnk/modelling">GitHub</a>.</font></p>
 </div>
 
+<script>
+(function () {
+  var toc = document.getElementById("TOC");
+  if (!toc) return;
+
+  // pinned links shown above the auto-generated table of contents.
+  // "Top of page" uses the page's own <title> (set by each Rmd's YAML
+  // title: field), so it always reflects the current script.
+  var pinnedLinks = [
+    { href: "index.html", text: "Home page", gapAfter: false },
+    { href: "#",          text: document.title || "Top of page" }
+  ];
+
+  function restructureToc() {
+    if (toc.querySelector(".toc-pinned-link")) return; // already done
+
+    // everything tocify generated for the page's own sections so far
+    var pageSections = Array.prototype.slice.call(toc.children);
+    if (!pageSections.length) return;
+
+    // group the page's own sections into an indented block, so they
+    // read as belonging to the "current page" entry above them
+    var wrapper = document.createElement("div");
+    wrapper.className = "toc-page-sections";
+    wrapper.style.marginLeft = "15px";
+    pageSections.forEach(function (child) { wrapper.appendChild(child); });
+
+    // build Home page / current page as their own small pinned list, using
+    // the same class combo tocify itself uses on a real TOC entry
+    // (list-group-item), so they render with identical border/padding
+    var pinnedList = document.createElement("ul");
+    pinnedList.className = "tocify-header list-group";
+
+    pinnedLinks.forEach(function (link) {
+      var li = document.createElement("li");
+      li.className = "tocify-item list-group-item";
+      if (link.gapAfter) li.style.marginBottom = "10px";
+
+      var a = document.createElement("a");
+      a.href = link.href;
+      a.textContent = link.text;
+      a.className = "toc-pinned-link";
+      a.style.display = "block"; // leave color/underline to the theme's normal
+                                  // link style, so these read as links
+      // hanging indent: if the label wraps to a 2nd line (e.g. a long page
+      // title), that line starts under the 1st line's text, not flush left
+      a.style.paddingLeft = "14px";
+      a.style.textIndent = "-14px";
+      // stop tocify's own click handling (bound to any <li> in #TOC) from
+      // firing for these plain links, so they behave like normal anchors
+      a.addEventListener("click", function (e) { e.stopPropagation(); });
+
+      li.appendChild(a);
+      pinnedList.appendChild(li);
+
+      // tocify marks the very first TOC item "active" by default on load;
+      // these pinned links aren't real sections, so never let that stick.
+      new MutationObserver(function () {
+        if (li.classList.contains("active")) li.classList.remove("active");
+      }).observe(li, { attributes: true, attributeFilter: ["class"] });
+    });
+
+    toc.appendChild(pinnedList);
+    toc.appendChild(wrapper);
+  }
+
+  var existing = toc.querySelector("ul");
+  if (existing) {
+    restructureToc();
+    return;
+  }
+
+  // the floating TOC (tocify) builds its content asynchronously after the
+  // page loads, so watch #TOC and restructure it once that content appears.
+  var observer = new MutationObserver(function () {
+    if (toc.querySelector("ul")) restructureToc();
+  });
+  observer.observe(toc, { childList: true, subtree: true });
+})();
+</script>
 
 
 

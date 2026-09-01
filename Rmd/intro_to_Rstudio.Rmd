@@ -2,10 +2,6 @@
 title: "Introduction to RStudio"
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 suppressPackageStartupMessages(library('curl'))
 options(width = 80)
@@ -48,6 +44,6 @@ Each computer will have a different specified address for the working directory.
 <div>
 
 # Navigate
-Top: [Index](index.html) Next: [Introduction to R](intro_to_r.html)
+[Home page](index.html) -- Next: [Introduction to R](intro_to_r.html)
 </div>
 

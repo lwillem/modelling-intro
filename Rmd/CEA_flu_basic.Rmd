@@ -3,10 +3,6 @@ title: "Cost-effectiveness analysis for influenza vaccination"
 toc: FALSE
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
 set.seed(2020)
@@ -436,7 +432,7 @@ round(ICER_values)
 
 <div>
 # Navigate
-Top: [Index](index.html) ---
+[Home page](index.html) ---
 `r if (!show_results) {
     '<a href="CEA_flu_basic_results.html"> Results</a>'
   } else {

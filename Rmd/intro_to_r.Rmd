@@ -3,10 +3,6 @@
 title: "Introduction to R"
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 suppressPackageStartupMessages(library('curl'))
 options(width = 80)
@@ -467,6 +463,6 @@ plot(table(wards), xlab = 'ward', ylab = 'days with > 1 infected patient', ylim 
 <div>
 
 # Navigate
-Top: [Index](index.html) Next: [Introduction to infectious disease modelling in R](intro_to_SIR.html)
+[Home page](index.html) -- Next: [Introduction to infectious disease modelling in R](intro_to_SIR.html)
 </div>
 

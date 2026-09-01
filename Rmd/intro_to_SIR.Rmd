@@ -2,10 +2,6 @@
 title: "Introduction to infectious disease modelling in R"
 ---
 
-<div style="text-align: right">
-[Home page](index.html)
-</div>
-
 ```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
 library('curl')
 options(width = 80)
@@ -228,6 +224,6 @@ If you have time, you can now try to build more complex versions of the SIR mode
 
 <div>
 # Navigate
-Top: [Index](index.html) Next: [Individual-Based Models](intro_to_IBM_coding.html)
+[Home page](index.html) -- Next: [Individual-Based Models](intro_to_IBM_coding.html)
 </div>
 

@@ -1,13 +1,5 @@
 ---
 title: "Location-specific IBM tutorials (Results)"
-output:
-  html_document:
-    toc: true
-    toc_float: true
-    theme: spacelab
-    highlight: pygments
-    css: chennai.css
-    self_contained: true
 ---
 
 ```{r setup, include = FALSE}
