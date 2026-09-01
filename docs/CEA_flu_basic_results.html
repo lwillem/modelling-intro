@@ -482,8 +482,8 @@ relevant stage of disease (for instance for the number of consultations,
 the unit costs per consultation, medication use, hospital days etc. for
 cases of pneumonia, and all other relevant disease stages)).</p>
 <p>Note that the final output is independent of coverage and target
-group size if fixed administration costs are set to 0. This is due to
-the exclusion of herd immunity effects in this model.</p>
+group size if fixed delivery costs are set to 0. This is due to the
+exclusion of herd immunity effects in this model.</p>
 <p>For further information, questions or comments please contact us.</p>
 <div id="set-working-directory" class="section level1">
 <h1>Set working directory</h1>
@@ -529,7 +529,7 @@ on the following assumptions and input parameters:</p>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>uptake_program         <span class="ot">=</span> <span class="fl">0.80</span></span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>vaccine_efficacy       <span class="ot">=</span> <span class="fl">0.60</span></span>
 <span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>vaccine_price_per_dose <span class="ot">=</span> <span class="dv">10</span>   <span class="co"># euro</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>admin_cost_per_dose    <span class="ot">=</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>delivery_cost_per_dose <span class="ot">=</span> <span class="dv">50</span>   <span class="co"># euro</span></span>
 <span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>fixed_program_costs    <span class="ot">=</span> <span class="dv">0</span>    <span class="co"># euro</span></span></code></pre></div>
 <p><br></p>
 </div>
@@ -579,7 +579,7 @@ years saved.</li>
 <p>To begin the health technology assessment, we calculate the vaccine
 cost per dose and the treatment cost per case, considering the
 proportion of cases that result in hospitalization:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>vaccine_cost_per_dose     <span class="ot">=</span> vaccine_price_per_dose <span class="sc">+</span> admin_cost_per_dose</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>vaccine_cost_per_dose     <span class="ot">=</span> vaccine_price_per_dose <span class="sc">+</span> delivery_cost_per_dose</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>treatment_cost_per_case   <span class="ot">=</span> cost_hosp_case <span class="sc">*</span> p_hospital <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> p_hospital) <span class="sc">*</span> cost_non_hosp_case</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(<span class="at">treatment_cost_per_case =</span> treatment_cost_per_case,</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>        <span class="at">vaccine_cost_per_dose   =</span> vaccine_cost_per_dose))</span></code></pre></div>

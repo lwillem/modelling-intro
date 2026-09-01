@@ -76,7 +76,7 @@ average_life_expectancy = 9        # years
 # vaccine characteristics
 vaccine_efficacy = 0.60
 cost_per_dose    = 10 # euro
-admin_cost       = 50 # euro
+delivery_cost       = 50 # euro
 
 # program settings
 uptake       = 0.2 # proportion of the population
@@ -88,7 +88,7 @@ time_horizon = 365 # days
 Based on the input above, we can compute the program cost and the proportion of the population that will be effectively protected:
 ```{r}
 
-program_costs         = population_size * uptake * (cost_per_dose + admin_cost)
+program_costs         = population_size * uptake * (cost_per_dose + delivery_cost)
 proportion_protected  = uptake * vaccine_efficacy
 qaly_loss_per_episode = morbidity_per_episode + (proportion_mortality * average_life_expectancy)
 
@@ -312,11 +312,11 @@ kable(db_out_inmb)
 # the static and dynamic approach
 
 run_static_model = function(uptake = 0.2,
-                             admin_cost = 50,
+                             delivery_cost = 50,
                              wtp = 20e3,
                              rsv_incidence = 0.03525){
   # PRE-PROCESSING
-  program_costs        = population_size * uptake * (cost_per_dose + admin_cost)
+  program_costs        = population_size * uptake * (cost_per_dose + delivery_cost)
   proportion_protected = uptake * vaccine_efficacy
 
  # TRANSLATE TO STATIC MODEL SETTING
@@ -340,7 +340,7 @@ run_static_model = function(uptake = 0.2,
   # RETURN RESULTS
   return(c(
            uptake = uptake,
-           round(c(admin_cost           = admin_cost,
+           round(c(delivery_cost        = delivery_cost,
                    wtp                  = wtp,
                    reference_infections = reference_infections,
                    program_infections   = program_infections,
@@ -354,12 +354,12 @@ run_static_model = function(uptake = 0.2,
 run_static_model(uptake = 0.1)
 
 run_dynamic_model = function(uptake = 0.2,
-                             admin_cost = 50,
+                             delivery_cost = 50,
                              wtp = 20e3,
                              initial_R = 0.95099){
 
   # pre-processing
-  program_costs        = population_size * uptake * (cost_per_dose + admin_cost)
+  program_costs        = population_size * uptake * (cost_per_dose + delivery_cost)
   proportion_protected = uptake * vaccine_efficacy
 
   # Reference
@@ -391,7 +391,7 @@ run_dynamic_model = function(uptake = 0.2,
   # RETURN RESULTS
   return(c(
            uptake = uptake,
-           round(c(admin_cost           = admin_cost,
+           round(c(delivery_cost        = delivery_cost,
                    wtp                  = wtp,
                    reference_infections = dynamic_cases_reference,
                    program_infections   = dynamic_cases_program,
@@ -471,22 +471,22 @@ kable(rbind(inmb_example1, inmb_example2, inmb_example3))
 ```
 
 
-3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of administration costs in your analysis.
+3. **Combining Vaccines:** Investigate the consequences of combining RSV and Influenza vaccine uptake on ICERs. Consider the influence of delivery costs in your analysis.
 
 ```{r, eval = show_results, echo = show_results}
 
-static_out = rbind(run_static_model(admin_cost = admin_cost),
-                   run_static_model(admin_cost = admin_cost / 2))
+static_out = rbind(run_static_model(delivery_cost = delivery_cost),
+                   run_static_model(delivery_cost = delivery_cost / 2))
 
-dynamic_out = rbind(run_dynamic_model(admin_cost = admin_cost),
-                    run_dynamic_model(admin_cost = admin_cost / 2))
+dynamic_out = rbind(run_dynamic_model(delivery_cost = delivery_cost),
+                    run_dynamic_model(delivery_cost = delivery_cost / 2))
 
 kable(cbind(model = 'static', static_out))
 
 kable(cbind(model = 'dynamic', dynamic_out))
 
-# Combining the administration of different vaccines, hence reducing the
-# administration cost, is beneficial for the cost-effectiveness.
+# Combining the delivery of different vaccines reduces the
+# delivery cost, which is beneficial for the cost-effectiveness.
 
 ```
 

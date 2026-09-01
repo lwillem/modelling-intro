@@ -21,7 +21,7 @@ This model was developed by Philippe Beutels, Joke Bilcke and Lander Willem for 
 
 In the field of economic evaluation in general, it could be applicable to any intervention with effectiveness realised within one year (like many curative interventions). In the field of infectious disease, it would only be applicable to influenza, and only if vaccination targets a small proportion of the population that does not at the same time form a core transmitter group of the virus (e.g. it is unlikely to be suitable to model childhood influenza vaccination). Note that for most applications, practical use of this model would likely entail having separate, though similarly simple decision trees to obtain the unit cost estimates (implying that these cells would be intermediary outcomes, and that there would be additional input cells for each relevant stage of disease (for instance for the number of consultations, the unit cost per consultation, medication use, hospital days etc. for cases of pneumonia, and all other relevant disease stages)).
 
-Note that the final output is independent of coverage and target group size, if fixed administration costs are set to 0. This is due to the exclusion of herd immunity effects in this model.
+Note that the final output is independent of coverage and target group size, if fixed delivery costs are set to 0. This is due to the exclusion of herd immunity effects in this model.
 
 For further information, questions or comments please contact us.
 
@@ -89,7 +89,7 @@ cost_per_non_hosp_case = sample_gamma(nsamples, 100, 5) # euro
 uptake_program         = 0.80
 vaccine_efficacy       = sample_beta_mean(nsamples, mean = 0.6, se = (0.7 - 0.5) / (2 * 1.96))
 vaccine_price_per_dose = 10 # euro
-admin_cost_per_dose    = sample_gamma(nsamples, 50, 4) # euro
+delivery_cost_per_dose = sample_gamma(nsamples, 50, 4) # euro
 fixed_program_cost     = 0 # euro
 
 # QALY
@@ -103,7 +103,7 @@ QALYloss_non_hosp_case = sample_beta_mean(nsamples, 0.0082, 0.0018)
 Now, propagate the uncertainty from the input parameters of the flu model into the outcome of your flu model. To start the health technology assessment, we calculate the vaccine cost per dose and the treatment cost per case, taking into account the proportion of cases that lead to hospitalization, the QALY lost per case, and the discounted life expectancy:
 ```{r }
 
-vaccine_cost_per_dose   = vaccine_price_per_dose + admin_cost_per_dose
+vaccine_cost_per_dose   = vaccine_price_per_dose + delivery_cost_per_dose
 treatment_cost_per_case = cost_per_hosp_case * p_hosp + (1 - p_hosp) * cost_per_non_hosp_case
 QALYloss_per_case       = QALYloss_hosp_case * p_hosp + QALYloss_non_hosp_case * (1 - p_hosp)
 
@@ -446,7 +446,7 @@ model_param = data.frame(force_of_infection       = force_of_infection,
                          cost_per_hosp_case       = cost_per_hosp_case,
                          cost_per_non_hosp_case   = cost_per_non_hosp_case,
                          vaccine_efficacy         = vaccine_efficacy,
-                         admin_cost_per_dose      = admin_cost_per_dose,
+                         delivery_cost_per_dose   = delivery_cost_per_dose,
                          QALYloss_hosp_case       = QALYloss_hosp_case,
                          QALYloss_non_hosp_case   = QALYloss_non_hosp_case)
 

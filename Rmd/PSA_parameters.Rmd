@@ -14,7 +14,7 @@ options(width = 80)
 
 knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10)
 
-if (!exists("show_results")) show_results = FALSE
+if (!exists("show_results")) show_results = TRUE
 
 ```
 
@@ -30,7 +30,7 @@ Define the uncertainty distributions of the following parameters of our flu mode
 * Hospital case fatality ratio: 30% (n=1000)
 * Life expectancy: 12 + 2 (mean + se)
 * Vaccine efficacy: 60% [50%-70%]
-* Administration costs per dose: 50 + 4 (mean + se)
+* Delivery costs per dose: 50 + 4 (mean + se)
 * Cost per hospitalised case: €2000 + 100 (mean + se)
 * Cost per non-hospitalised case: €100 + 5 (mean + se)
 * QALY loss per hospitalised case: 0.018 + 0.0018 (mean + se)
@@ -176,7 +176,7 @@ abline(v = mean(force_of_infection_norm),
        lty = 2)
 grid()
 legend('topright',
-      c('Norm()', 'Beta()', 'mean'),
+      c('Norm()', 'Beta()*', 'mean'),
       col = c(1, 2, 1),
       lty = c(1, 1, 2),
       lwd = 1)
@@ -194,7 +194,7 @@ abline(v = mean(p_hospital_norm),
        lty = 2)
 grid()
 legend('topright',
-      c('Norm()', 'Beta()', 'mean'),
+      c('Norm()', 'Beta()*', 'mean'),
       col = c(1, 2, 1),
       lty = c(1, 1, 2),
       lwd = 1)
@@ -208,7 +208,7 @@ abline(v = mean(hosp_case_fatality_ratio_norm),
        lty = 2)
 grid()
 legend('topright',
-      c('Norm()', 'Beta()', 'mean'),
+      c('Norm()', 'Beta()*', 'mean'),
       col = c(1, 2, 1),
       lty = c(1, 1, 2),
       lwd = 1)
@@ -222,7 +222,7 @@ abline(v = mean(life_expectancy_norm),
        lty = 2)
 grid()
 legend('topright',
-      c('Norm()', 'Gamma()', 'mean'),
+      c('Norm()', 'Gamma()*', 'mean'),
       col = c(1, 2, 1),
       lty = c(1, 1, 2),
       lwd = 1)
@@ -244,7 +244,7 @@ legend('topright',
       lwd = 1)
 
 plot(density(adm_cost_norm),
-     main = 'administration cost')
+     main = 'delivery cost')
 lines(density(adm_cost_gamma),
       col = 2)
 abline(v = mean(adm_cost_norm),
@@ -303,7 +303,7 @@ abline(v = mean(QALYloss_non_hosp_case_norm),
        lty = 2)
 grid()
 legend('topright',
-      c('Norm()', 'Beta()', 'mean'),
+      c('Norm()', 'Beta()*', 'mean'),
       col = c(1, 2, 1),
       lty = c(1, 1, 2),
       lwd = 1)
@@ -324,9 +324,9 @@ legend('topright',
 # * probability of hospitalisation: sample size rather small for Normal distribution, use Beta
 # * case fatality ratio: sample size rather small for Normal distribution, use Beta
 # 
-# * life expectancy: Normal and Beta distribution OK
+# * life expectancy: Normal and Gamma distribution OK
 # * vaccine effectiveness: Normal, logNormal and Beta distributions OK		
-# * administration cost: Normal and Gamma distributions OK
+# * delivery cost: Normal and Gamma distributions OK
 # * cost per hospital case: Normal and Gamma distributions OK
 # * cost per non-hospital case: Normal and Gamma distribution OK
 # * QALY loss per hospital case: Normal and Beta distribution OK

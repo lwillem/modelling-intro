@@ -538,7 +538,7 @@ Diseases.</p>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co"># vaccine characteristics</span></span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>vaccine_efficacy <span class="ot">=</span> <span class="fl">0.60</span></span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>cost_per_dose    <span class="ot">=</span> <span class="dv">10</span> <span class="co"># euro</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>admin_cost       <span class="ot">=</span> <span class="dv">50</span> <span class="co"># euro</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>delivery_cost       <span class="ot">=</span> <span class="dv">50</span> <span class="co"># euro</span></span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a></span>
 <span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co"># program settings</span></span>
 <span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>uptake       <span class="ot">=</span> <span class="fl">0.2</span> <span class="co"># proportion of the population</span></span>
@@ -548,7 +548,7 @@ Diseases.</p>
 <h1>PRE-PROCESSING</h1>
 <p>Based on the input above, we can compute the program cost and the
 proportion of the population that will be effectively protected:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>program_costs         <span class="ot">=</span> population_size <span class="sc">*</span> uptake <span class="sc">*</span> (cost_per_dose <span class="sc">+</span> admin_cost)</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>program_costs         <span class="ot">=</span> population_size <span class="sc">*</span> uptake <span class="sc">*</span> (cost_per_dose <span class="sc">+</span> delivery_cost)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>proportion_protected  <span class="ot">=</span> uptake <span class="sc">*</span> vaccine_efficacy</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>qaly_loss_per_episode <span class="ot">=</span> morbidity_per_episode <span class="sc">+</span> (proportion_mortality <span class="sc">*</span> average_life_expectancy)</span></code></pre></div>
 </div>
@@ -746,7 +746,7 @@ changes in vaccine uptake lead to similar outcomes in both disease
 models. Provide an explanation for the observed results.</p></li>
 <li><p><strong>Combining Vaccines:</strong> Investigate the consequences
 of combining RSV and Influenza vaccine uptake on ICERs. Consider the
-influence of administration costs in your analysis.</p></li>
+influence of delivery costs in your analysis.</p></li>
 <li><p><strong>Matching Static and Dynamic Models:</strong> Identify the
 parameter settings within the dynamic model that would yield results
 consistent with the static model. Discuss the significance of these
