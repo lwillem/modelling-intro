@@ -140,6 +140,6 @@ Now, it is time to adapt the model parameters and see what happens to the **tota
 
 <div>
 # Navigate
-Top: [Index](index.html) Next: [IBM household transmission](intro_to_IBM_location.html)
+Top: [Index](index.html) Next: [IBM household transmission](IBM_location.html)
 </div>
 
