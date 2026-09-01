@@ -137,7 +137,8 @@ Now, it is time to adapt the model parameters and see what happens to the **tota
 
 <div>
 # Navigate
-[Index](index.html) -- 
+[Index](index.html) ---
+<a href="IBM_random_walk_results.html"> Results</a> ---
 Next: [Location-specific IBMs](IBM_location.html)
 </div>
 
