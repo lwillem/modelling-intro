@@ -1438,6 +1438,31 @@ cursor:pointer;
 font-weight:bold;
 padding:8px 0;
 }
+
+.tocify-header > li.tocify-item:not(.toc-pinned-item){
+padding-left:29px;
+text-indent:-14px;
+}
+.tocify-subheader > li.tocify-item{
+padding-left:39px;
+text-indent:-14px;
+}
+.tocify-subheader .tocify-subheader > li.tocify-item{
+padding-left:49px;
+text-indent:-14px;
+}
+.tocify-subheader .tocify-subheader .tocify-subheader > li.tocify-item{
+padding-left:59px;
+text-indent:-14px;
+}
+.tocify-subheader .tocify-subheader .tocify-subheader .tocify-subheader > li.tocify-item{
+padding-left:69px;
+text-indent:-14px;
+}
+.tocify-subheader .tocify-subheader .tocify-subheader .tocify-subheader .tocify-subheader > li.tocify-item{
+padding-left:79px;
+text-indent:-14px;
+}
 </style>
 
 
@@ -1768,7 +1793,7 @@ distribution:</p>
 
     pinnedLinks.forEach(function (link) {
       var li = document.createElement("li");
-      li.className = "tocify-item list-group-item";
+      li.className = "tocify-item list-group-item toc-pinned-item";
       if (link.gapAfter) li.style.marginBottom = "10px";
 
       var a = document.createElement("a");
