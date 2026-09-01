@@ -794,7 +794,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
           xlab = 'time of infection (day)',
           ylab = 'generation interval (days)',
           main = 'generation interval',
-          ylim = c(0, 10),
+          ylim = c(0, 15),
           xlim = c(0, num_days),
           xaxt = 'n')
   axis(1, seq(0, num_days, 5))
@@ -808,9 +808,9 @@ run_ibm_location = function(pop_size              = 2000,     # population size
   transmission_age_matrix = table(cut(pop_data$infector_age, age_cat, right = F), cut(pop_data$age, age_cat, right = F), dnn = list('age infector', 'age contact'))
 
   # create plot title with some driving parameters
-  plot_title = paste('num_cnt_community', num_contacts_community_day, ' || ',
+  plot_title = paste('num_cnt_community', num_contacts_community_day, ' | ',
                      'p_cnt_household', contact_prob_household, '\n',
-                     'p_cnt_school', contact_prob_school, ' || ',
+                     'p_cnt_school', contact_prob_school, ' | ',
                      'p_cnt_workplace', contact_prob_workplace, '\n',
                      'p_transmission', transmission_prob)
 
@@ -858,7 +858,9 @@ run_ibm_location = function(pop_size              = 2000,     # population size
 #'
 #' @param pop_size  the final population size
 #' @param num_schools the number of schools (which contains one class per age group)
+#' @param target_school_ages the age of children enrolled in school
 #' @param num_workplaces the number of workplaces in the population
+#' @param bool_show_demographics boolean to show the demographic figures
 #'
 #' @keywords external
 #' @export
@@ -866,62 +868,60 @@ run_ibm_location = function(pop_size              = 2000,     # population size
 create_population_matrix = function(pop_size, num_schools, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
 {
   ## demographic parameters
-  ages_adult = 19:60
+  ages_adult = 19:80
   ages_child = 1:18
-  adult_age_tolerance     = 0:5    # age tolerance between adults
+  adult_age_tolerance     = -5:5   # age tolerance between adults
   child_age_tolerance     = 1:4    # age tolerance between children
-  household_age_gap_min   = 22     # min age gap between adults and youngest child
-  household_age_gap_max   = 35     # max age gap age between adults and youngest child
-
-  # create the population
-  pop_data         = NULL  # start from empty matrix
-  current_pop_size = 0     # start from size '0'
-  hh_id            = 1     # a counter variable to track the household id
-
-  # continue as long as 'population size' < 'target population size'
-  while(current_pop_size < pop_size){
-
-    # sample the age of adult 1
-    age_adult1 = sample(ages_adult, 1)
-
-    # sample the age of adult 2, given adult 1
-    age_adult2 = sample(age_adult1 + adult_age_tolerance, 1)
-
-    # get the possible child ages
-    ages_child_option = min(age_adult1, age_adult2) - (household_age_gap_min:household_age_gap_max )
-    ages_child_option[!ages_child_option %in% ages_child] = NA
-    ages_child_option = c(NA, ages_child_option[!is.na(ages_child_option)])
-
-    # sample the age of child 1
-    age_child1 = sample(ages_child_option, 1)
-
-    # sample the age of child 2, given child 1
-    age_child2 = sample(age_child1 + child_age_tolerance, 1)
-
-    # aggregate all ages with the household id
-    hh_data = data.frame(age   = c(age_adult1, age_adult2, age_child1, age_child2),
-                         hh_id = hh_id)
-
-    # remove individuals with age 'NA' or negative ages (unborn)
-    hh_data = hh_data[!is.na(hh_data$age), ]
-    hh_data = hh_data[hh_data$age >= 0, ]
-
-    # add a household member id
-    hh_data$member_id = 1:nrow(hh_data)
-
-    # add hh_data to pop_data
-    pop_data = rbind(pop_data,
-                     hh_data)
-
-    # update statistics and household counter
-    current_pop_size = nrow(pop_data)
-    hh_id            = hh_id + 1
-
-  } # end while-loop
-
-  # select all individuals within the given population size
-  pop_data = pop_data[1:pop_size, ]
-
+  household_age_gap       = 22:35  # age tolerance between oldest adults and oldest child
+  target_workplace_ages   = 19:60 
+    
+  # rough estimation of number of households 
+  num_households <- ceiling(pop_size / 2)
+  
+  adult1 <- data.frame(
+    age = sample(ages_adult, num_households, replace = TRUE),
+    hh_id = seq_len(num_households),
+    hh_role = 1
+  )
+  
+  adult2 <- data.frame(
+    age = adult1$age +
+      sample(adult_age_tolerance,
+             num_households, replace = TRUE),
+    hh_id = seq_len(num_households),
+    hh_role = 2
+  )
+  
+  child1 <- data.frame(
+    age = pmax(adult1$age, adult2$age) -
+      sample(household_age_gap, num_households, replace = TRUE),
+    hh_id = seq_len(num_households),
+    hh_role = 3
+  )
+  
+  child2 <- data.frame(
+    age = child1$age -
+      sample(child_age_tolerance, num_households, replace = TRUE),
+    hh_id = seq_len(num_households),
+    hh_role = 4
+  )
+  
+  children <- rbind(child1, child2)
+  children <- children[children$age > 0 &
+                         children$age < min(ages_adult), ]
+  
+  pop_data <- rbind(adult1, adult2, children)
+  
+  if (nrow(pop_data) > pop_size) {
+    pop_data <- pop_data[sample(seq_len(nrow(pop_data)), pop_size), ]
+  }
+  
+  # set school id's
+  pop_data <- set_schools(pop_data, num_schools, target_school_ages)
+  
+  # set workplace id's
+  pop_data <- set_workplaces(pop_data, num_workplaces, target_workplace_ages)
+  
   # add health state: susceptible
   pop_data = data.frame(pop_data,
                         health              = 'S',           # column to store the health state
@@ -931,21 +931,16 @@ create_population_matrix = function(pop_size, num_schools, target_school_ages, n
                         secondary_cases     = 0,             # column to store the number of secondary cases
                         stringsAsFactors    = FALSE)
 
-  # set school classes by age and number of schools
-  pop_data = set_schools(pop_data, num_schools, target_school_ages)
-
-  # set workplace
-  pop_data = set_workplaces(pop_data, num_workplaces, target_school_ages)
-
   # option to plot demographics
   if(bool_show_demographics){
     # create a figure with 8 subplots
+    age_breaks <- -1:85
     par(mfrow = c(2, 4))
-    hist(pop_data$age, -1:70, main = 'total population', xlab = 'age')
-    hist(pop_data$age[pop_data$member_id == 1], -1:70, main = 'adult 1', xlab = 'age')
-    hist(pop_data$age[pop_data$member_id == 2], -1:70, main = 'adult 2', xlab = 'age')
-    hist(pop_data$age[pop_data$member_id == 3], -1:70, main = 'child 1', xlab = 'age')
-    hist(pop_data$age[pop_data$member_id == 4], -1:70, main = 'child 2', xlab = 'age')
+    hist(pop_data$age, age_breaks, main = 'total population', xlab = 'age')
+    hist(pop_data$age[pop_data$hh_role == 1], age_breaks, main = 'adult 1', xlab = 'age')
+    hist(pop_data$age[pop_data$hh_role == 2], age_breaks, main = 'adult 2', xlab = 'age')
+    hist(pop_data$age[pop_data$hh_role == 3], age_breaks, main = 'child 1', xlab = 'age')
+    hist(pop_data$age[pop_data$hh_role == 4], age_breaks, main = 'child 2', xlab = 'age')
     hist(table(pop_data$hh_id), main = 'household size', xlab = 'household size')
 
     # check class and workplace size
@@ -953,6 +948,8 @@ create_population_matrix = function(pop_size, num_schools, target_school_ages, n
     if(any(!is.na(pop_data$workplace_id))) hist(table(pop_data$workplace_id), xlab = 'Size', main = 'Workplace size')
   }
 
+  # remove household role
+  pop_data$hh_role <- NULL
 
   return(pop_data)
 
@@ -974,14 +971,14 @@ set_schools = function(pop_data, num_schools, target_school_ages){
 }
 
 ## workplaces
-set_workplaces = function(pop_data, num_workplaces, target_school_ages){
+set_workplaces = function(pop_data, num_workplaces, target_workplace_ages){
   if(num_workplaces > 0){
     # sample a workplace for each individual
     pop_data$workplace_id = sample(num_workplaces, nrow(pop_data), replace = TRUE)
 
-    # set 'workplace_id' for children to 'NA' (= no workplace)
-    boolean_workplace_pop = pop_data$age <= max(target_school_ages)
-    pop_data$workplace_id[boolean_workplace_pop] = NA
+    # set 'workplace_id' for people outside `target_workplace_ages` to 'NA' (= no workplace)
+    boolean_workplace_pop = pop_data$age %in% target_workplace_ages
+    pop_data$workplace_id[!boolean_workplace_pop] = NA
   } else {
     pop_data$workplace_id = NA
   }

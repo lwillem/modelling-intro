@@ -13,7 +13,7 @@ set.seed(2020)
 source('lib/ibm_functions.R')
 
 knitr::opts_chunk$set(fig.cap='', fig.align="center", message=FALSE, 
-                      warning=FALSE, fig.height = 6, fig.width = 10)
+                      warning=FALSE, fig.height = 6, fig.width = 7.2)
 
 # set default: echo = false
 #knitr::opts_chunk$set(echo = FALSE)
