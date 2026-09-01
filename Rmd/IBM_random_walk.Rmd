@@ -122,14 +122,14 @@ Now, it is time to adapt the model parameters and see what happens to the **tota
 </n>
 
 
-1. change the population size to 100 or 2000?
-2. decrease the area size?
-3. change the velocity to 20?
-4. start with 1 or 500 infected individuals?
-5. increase the contact range?
-6. increase the transmission probability to 0.4?
-7. change the average number of contacts per day to 2 or 20?
-8. change the time horizon to 100 days?
+1. Change the population size to 200 or 5000?
+2. Decrease the area size?
+3. Change the velocity to 20?
+4. Start with 1 or 500 infected individuals?
+5. Increase the contact range?
+6. Increase the transmission probability to 0.4?
+7. Change the average number of contacts per day to 2 or 20?
+8. Change the time horizon to 100 days?
 
 ... etc.
 

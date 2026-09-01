@@ -33,8 +33,9 @@ knitr::knit_hooks$set(plot = function(x, options) {
 
 ```
 
+This page contains the solutions to the scenarios requested in the <a href="IBM_random_walk.html">random walk IBM tutorial</a>. It starts by presenting the base case, and then changes one (or more) parameter(s) at a time. Results are collapsed by default, but you can expand them to interpret the new dynamics. Good luck!
 
-Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model yourselves.
+To start, please load the IBM functions we prepared on the GitHub repository.
 
 If the `curl` packages is not installed yet, you can do so by:
 ```{r results = "hide", eval = FALSE}
@@ -212,3 +213,10 @@ run_ibm_random_walk(vaccine_coverage = 0.8,
                     add_baseline = T)
 
 ```
+
+
+<div>
+# Navigate
+[Index](index.html) ---
+<a href="IBM_random_walk.html"> Tutorial page</a>
+</div>

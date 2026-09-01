@@ -146,9 +146,9 @@ Now, what happens if you...
 
 1. change the population size to 100?
 2. change the population size to 3000?
-3. start with more infected individuals?
-4. add more schools
-5. decrease the number of workplaces
+3. start with more infected individuals (n = 100)?
+4. add more schools (n = 10)
+5. decrease the number of workplaces (n = 20)
 6. allow only household contacts?
 7. allow only community contacts?
 8. allow only school contacts?

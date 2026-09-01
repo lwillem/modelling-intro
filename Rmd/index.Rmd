@@ -31,7 +31,7 @@ options(width = 80)
 ## Tutorials: Individual-Based Models (IBM)
 
 4. [Introduction to Individual-Based Models (IBMs) using R](intro_to_IBM_coding.html)
-5. [IBM with random walks](IBM_random_walk.html)
+5. [IBM with random walk](IBM_random_walk.html)
 6. [IBM with location-specific mixing](IBM_location.html)
 
 ## Tutorials: Cost-effectiveness Analysis (CEA)
