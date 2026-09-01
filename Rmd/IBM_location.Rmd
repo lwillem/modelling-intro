@@ -165,6 +165,7 @@ Now, what happens if you...
 
 <div>
 # Navigate
-Top: [Index](index.html)
+Top: [Index](index.html) ---
+<a href="IBM_location_results.html"> Results</a>
 </div>
 
