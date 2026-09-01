@@ -6,14 +6,14 @@ title: "Introduction to IBMs for infectious diseases"
 [Home page](index.html)
 </div>
 
-```{r libs, cache=FALSE, echo=FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
 
 library('curl')
 set.seed(2020)
 options(width = 80)
 ```
 
-```{r setup, echo=FALSE}
+```{r setup, echo = FALSE}
 knitr::opts_chunk$set(fig.cap = '', fig.align = "center", message = FALSE, warning = FALSE)
 ```
 
@@ -53,7 +53,7 @@ setwd(home)
 
 # Random numbers in R
 
-In R, you can generate random numbers using for example `sample`, `runif`, `rnorm`,`rbinom`. Please have a look at:
+In R, you can generate random numbers using for example `sample`, `runif`, `rnorm`, `rbinom`. Please have a look at:
 ```{r results = "hide"}
 ?sample
 ?runif
@@ -101,7 +101,7 @@ binom_sample == 1
 
 For this tutorial, we will use a matrix to store the population using one row per individual and one column per person characteristic. We will use a special matrix format, called `data.frame`, in which you can easily access columns using the column names. The following code illustrates the usefulness of the `data.frame` and how to access and modify elements.
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 
 # inspect data.frame
 ?data.frame
@@ -200,7 +200,7 @@ points(x = pop_data$x_coord[1],
 
 # Social contacts (based on proximity)
 
-We assume that susceptible individuals can acquire an infection if they are close to an infected individual. We define proximity here with a maximum distance in terms of `max_contact_distance`. To probability for a social contact, depends on the number people that are within the specified range and the population-based average number of social contacts individuals have per time step (=per day).
+We assume that susceptible individuals can acquire an infection if they are close to an infected individual. We define proximity here with a maximum distance in terms of `max_contact_distance`. To probability for a social contact, depends on the number people that are within the specified range and the population-based average number of social contacts individuals have per time step (= per day).
 
 ```{r}
 
@@ -293,13 +293,13 @@ num_infected_seeds = 10
 pop_data$health[1:num_infected_seeds] = 'I'
 
 ## it is also possible to sample random individuals to change their health state
-#pop_data$health[sample(1:pop_size,size = num_infected_seeds)] <- 'I'
+#pop_data$health[sample(1:pop_size, size = num_infected_seeds)] = 'I'
 
 ```
 <p style="color:darkred">
-Can you visualize the infected individuals like the following plot? (note: using `pch=20` gives you full dots)
+Can you visualize the infected individuals like the following plot? (note: using `pch = 20` gives you full dots)
 </p>
-```{r echo=FALSE}
+```{r echo = FALSE}
 # which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
      y = pop_data$y_coord,
@@ -353,7 +353,7 @@ pop_data$health[binom_infection_vector == 1] = 'I'
 <p style="color:darkred">
 Can you visualize the __newly__ infected individuals? (note: you might have different results since we are working with stochastic processes)
 </p>
-```{r echo=FALSE}
+```{r echo = FALSE}
 
 # which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
@@ -387,10 +387,10 @@ recovery_rate = 1 / num_days_infected
 recovery_probability = 1 - exp(-recovery_rate)
 
 # we identified the infected individuals above
-##boolean_infected <- pop_data$health == 'I'
+##boolean_infected = pop_data$health == 'I'
 
 # get vector with a probability to recover for each individual
-#(if not infected, the Boolean is FALSE (=0), the probability is 0)
+#(if not infected, the Boolean is FALSE (= 0), the probability is 0)
 p_recover_vect = boolean_infected * recovery_probability
 
 # sample individuals that recover
@@ -403,7 +403,7 @@ pop_data$health[binom_recover_vector == 1] = 'R'
 <p style="color:darkred">
 Can you visualize the final health states?
 </p>
-```{r echo=FALSE}
+```{r echo = FALSE}
 
 # which individuals are close enough to our index person?
 plot(x = pop_data$x_coord,
@@ -433,7 +433,7 @@ We coded the population, random movement, social contacts, transmission and reco
 
 
 ```{r eval = FALSE}
-# use iterator 'day_i' to process day 1,2,3 and 4
+# use iterator 'day_i' to process day 1, 2, 3 and 4
 for(day_i in 1:4){
   # print the day index
   print(day_i)

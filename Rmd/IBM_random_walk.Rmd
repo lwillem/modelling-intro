@@ -51,7 +51,7 @@ install.packages(curl) # install the curl library (to import data)
 
 Please load the IBM functions we prepared on the GitHub repository. Using your skills from the previous tutorial(s), you should be able to code this model with random walks and vaccination yourselves.
 
-```{r eval= FALSE}
+```{r eval = FALSE}
 
 # load package 'curl'
 library('curl')

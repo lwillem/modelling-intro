@@ -155,7 +155,7 @@ run_ibm_random_walk = function(pop_size = 1000,  # population size
   recovery_probability = 1 - exp(-recovery_rate)      # convert rate to probability
 
   # create matrix to log health states: one row per individual, one column per time step
-  log_pop_data  = matrix(NA, nrow = pop_size, ncol = num_days)
+  log_pop_data = matrix(NA, nrow = pop_size, ncol = num_days)
 
   # illustrate social contact radius
   if(plot_time_delay > 0)
