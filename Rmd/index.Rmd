@@ -40,8 +40,9 @@ options(width = 80)
 8. [CEA: influenza with uncertainty](CEA_flu_uncertainty.html)
 9. [CEA: RSV](CEA_RSV_dynamic.html)
 
-Extra:
+## Extra:
 
+- [From a rate to a probability](rate_to_probability.html)
 - [Discounting](example_discounting.html)
 - [Parametric sensitity analysis: parameters](PSA_parameters.html)
 - [Parametric sensitity analysis: methods](PSA_methods.html)
