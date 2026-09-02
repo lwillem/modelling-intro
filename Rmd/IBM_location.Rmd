@@ -149,11 +149,14 @@ Now, what happens if you...
 3. start with more infected individuals (n = 100)?
 4. add more schools (n = 10)
 5. decrease the number of workplaces (n = 20)
-6. allow only household contacts?
-7. allow only community contacts?
-8. allow only school contacts?
-9. allow only household and school contacts?
-10. allow only household and workplace contacts?
+6. allow only household contacts? (p_h = 1)
+7. allow only community contacts? (n = 10)
+8. allow only school contacts? (p_s = 1)
+9. allow only workplace contacts? (p_w = 1)
+10. allow only household and community contacts? (p = 1 and n = 5)
+11. allow only household and school contacts? (p_s = 0.5)
+12. allow only household and workplace contacts? (p_w = 0.5)
+
 
 </n>
 

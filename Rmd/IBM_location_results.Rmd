@@ -117,10 +117,10 @@ run_ibm_location(num_contacts_community_day = 0,
 
 ```
 
-# Allow only household and community contacts
-```{r hh_community, eval = TRUE}
-run_ibm_location(num_contacts_community_day = 5,
-                 contact_prob_household = 1,
+# Allow only community contacts (n=10)
+```{r only_community, eval = TRUE}
+run_ibm_location(num_contacts_community_day = 10,
+                 contact_prob_household = 0,
                  contact_prob_school = 0,
                  contact_prob_workplace = 0,
                  rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
@@ -137,9 +137,29 @@ run_ibm_location(num_contacts_community_day = 0,
 
 ```
 
+# Allow only workplace contacts
+```{r only_workplace, eval = TRUE}
+run_ibm_location(num_contacts_community_day = 0,
+                 contact_prob_household = 0,
+                 contact_prob_school = 0,
+                 contact_prob_workplace = 1,
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
+
+```
+
+# Allow only household and community contacts (n=5)
+```{r hh_community, eval = TRUE}
+run_ibm_location(num_contacts_community_day = 5,
+                 contact_prob_household = 1,
+                 contact_prob_school = 0,
+                 contact_prob_workplace = 0,
+                 rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
+
+```
+
 # Allow only household and school contacts
 ```{r hh_school, eval = TRUE}
-run_ibm_location(num_contacts_community_day = 5,
+run_ibm_location(num_contacts_community_day = 0,
                  contact_prob_household = 1,
                  contact_prob_school = 0.5,
                  contact_prob_workplace = 0,
@@ -156,6 +176,9 @@ run_ibm_location(num_contacts_community_day = 0,
                  rng_seed = 20, bool_show_demographics = FALSE, add_baseline = T)
 
 ```
+
+
+
 
 <div>
 # Navigate
