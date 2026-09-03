@@ -127,14 +127,12 @@ population_at_risk = targetgroup * (1 - uptake_program) +
 program_infections         = population_at_risk * force_of_infection
 program_hospitalisations   = program_infections * p_hosp
 program_deaths             = program_hospitalisations * hosp_case_fatality_ratio
-program_lifeyearslost      = program_deaths * life_expectancy
 program_lifeyearslost_disc = program_deaths * life_expectancy_disc
 
 program_treatment_cost     = program_infections * treatment_cost_per_case
 program_vaccination_cost   = fixed_program_cost + targetgroup * uptake_program * vaccine_cost_per_dose
 program_total_cost         = program_treatment_cost + program_vaccination_cost
 
-program_QALYloss           = program_infections * QALYloss_per_case + program_lifeyearslost
 program_QALYloss_disc      = program_infections * QALYloss_per_case + program_lifeyearslost_disc
 
 ```
@@ -152,14 +150,12 @@ Calculate the burden of disease for the comparator without the program in place,
 comparator_infections         = targetgroup * force_of_infection
 comparator_hospitalisations   = comparator_infections * p_hosp
 comparator_deaths             = comparator_hospitalisations * hosp_case_fatality_ratio
-comparator_lifeyearslost      = comparator_deaths * life_expectancy
 comparator_lifeyearslost_disc = comparator_deaths * life_expectancy_disc
 
 comparator_treatment_cost     = comparator_infections * treatment_cost_per_case
 comparator_vaccination_cost   = 0 # for ilustration purpose, no vaccine in the comparator
 comparator_total_cost         = comparator_treatment_cost + comparator_vaccination_cost
 
-comparator_QALYloss           = comparator_infections * QALYloss_per_case + comparator_lifeyearslost
 comparator_QALYloss_disc      = comparator_infections * QALYloss_per_case + comparator_lifeyearslost_disc
 
 ```
@@ -177,10 +173,8 @@ Calculate the difference between the program and the comparator:
 infections_averted         = comparator_infections - program_infections
 hospitalisations_averted   = comparator_hospitalisations - program_hospitalisations
 deaths_averted             = comparator_deaths - program_deaths
-lifeyearslost_averted      = comparator_lifeyearslost - program_lifeyearslost
 lifeyearslost_averted_disc = comparator_lifeyearslost_disc - program_lifeyearslost_disc
 
-QALY_gained                = comparator_QALYloss - program_QALYloss
 QALY_gained_disc           = comparator_QALYloss_disc - program_QALYloss_disc
 
 treatment_cost_averted     = comparator_treatment_cost - program_treatment_cost
@@ -198,9 +192,7 @@ Warning, the expected ICER equals the expected incremental cost/average incremen
 incr_cost_per_case_prevented            = mean(incr_total_cost) / mean(infections_averted)
 incr_cost_per_hospitalisation_prevented = mean(incr_total_cost) / mean(hospitalisations_averted)
 incr_cost_per_death_averted             = mean(incr_total_cost) / mean(deaths_averted)
-incr_cost_per_lifeyear_gained           = mean(incr_total_cost) / mean(lifeyearslost_averted)
 incr_cost_per_lifeyear_gained_disc      = mean(incr_total_cost) / mean(lifeyearslost_averted_disc)
-incr_cost_per_QALY_gained               = mean(incr_total_cost) / mean(QALY_gained)
 incr_cost_per_QALY_gained_disc          = mean(incr_total_cost) / mean(QALY_gained_disc)
 
 ```
@@ -213,9 +205,7 @@ Show the results:
 ICER_values = cbind(incr_cost_per_case_prevented            = incr_cost_per_case_prevented,
                     incr_cost_per_hospitalisation_prevented = incr_cost_per_hospitalisation_prevented,
                     incr_cost_per_death_averted             = incr_cost_per_death_averted,
-                    incr_cost_per_lifeyear_gained           = incr_cost_per_lifeyear_gained,
                     incr_cost_per_lifeyear_gained_disc      = incr_cost_per_lifeyear_gained_disc,
-                    incr_cost_per_QALY_gained               = incr_cost_per_QALY_gained,
                     incr_cost_per_QALY_gained_disc          = incr_cost_per_QALY_gained_disc)
 
 # print rounded results
@@ -305,7 +295,7 @@ for(i in 1:length(opt_wtp)){
   # get the expected INMB
   inmb_wtp_summary$inmb[i] = mean(inmb_sample)
 
-  # inspect the number of samples with a positive INMB
+  # inspect the proportion of samples with a positive INMB
   inmb_wtp_summary$ceac[i] = sum(inmb_sample >= 0) / nsamples
 
   # to calculate INMB with perfect information, set all non-preferred options to zero
@@ -319,8 +309,13 @@ for(i in 1:length(opt_wtp)){
   inmb_wtp_summary$inmb_perfect_info[i] = mean(inmb_sample)
 }
 
-# get preferred strategy by wtp, in this case, when INMB is positive
-inmb_wtp_summary$ceaf[inmb_wtp_summary$inmb > 0] = inmb_wtp_summary$ceac[inmb_wtp_summary$inmb > 0]
+# get preferred strategy by wtp, in this case the intervention when INMB is positive
+bool_inmb_pos                      = inmb_wtp_summary$inmb > 0
+
+# a boolean (false/true) + 1, gives id 1 and 2 
+inmb_wtp_summary$ceaf_intervention               = bool_inmb_pos + 1
+inmb_wtp_summary$ceaf_proportion[bool_inmb_pos]  = inmb_wtp_summary$ceac[bool_inmb_pos]
+inmb_wtp_summary$ceaf_proportion[!bool_inmb_pos] = 1 - inmb_wtp_summary$ceac[!bool_inmb_pos]
 
 # net-loss: difference between INMB under perfect information and expected INMB.
 # This equals the per-patient EVPI: the maximum a decision maker should pay to
@@ -360,11 +355,21 @@ data.frame(ce_threshold = ce_threshold,
 # CEAC
 plot(x = inmb_wtp_summary$wtp,
      y = inmb_wtp_summary$ceac,
-     type = 'b',
+     type = 'l',
+     lwd = 2,
+     col = 2,
      xlab = 'Willingness To Pay (euro)',
      ylab = 'Probability to be cost-effective',
      main = 'Cost-Effectiveness Acceptability Curve',
      ylim = 0:1)
+lines(x = inmb_wtp_summary$wtp,
+      y = 1 - inmb_wtp_summary$ceac,
+      lwd = 2,
+      col = 1)
+legend('right',
+       c('current state','vaccination program'),
+       col = 1:2,
+       lwd = 2)
 
 ```
 
@@ -374,12 +379,19 @@ plot(x = inmb_wtp_summary$wtp,
 ```{r}
 
 plot(x = inmb_wtp_summary$wtp,
-     y = inmb_wtp_summary$ceaf,
-     type = 'b',
+     y = inmb_wtp_summary$ceaf_proportion,
+     col = inmb_wtp_summary$ceaf_intervention,
+     type = 'p',
+     lwd = 2,
      xlab = 'Willingness to pay (euro)',
      ylab = 'Probability to be cost-effective',
      main = 'Cost-Effectiveness Acceptability Frontier',
-     ylim = 0:1)
+     ylim = 0:1,
+     xlim = range(opt_wtp))
+legend('right',
+       c('current state','vaccination program'),
+       col = 1:2,
+       lwd = 2)
 
 ```
 
@@ -390,21 +402,26 @@ Or you can combine the CEAC and CEAF
 # Combination of CEAC & CEAF
 plot(x = inmb_wtp_summary$wtp,
      y = inmb_wtp_summary$ceac,
-     type = 'b',
-     lty = 3,
+     type = 'l',
+     lwd = 2,
+     col = 2,
      xlab = 'Willingness to pay (euro)',
      ylab = 'Probability to be cost-effective',
      main = '',
      ylim = 0:1)
 lines(x = inmb_wtp_summary$wtp,
-      y = inmb_wtp_summary$ceaf,
+      y = 1 - inmb_wtp_summary$ceac,
       type = 'l',
-      lty = 1,
-      lwd = 3)
-legend('topleft',
-       c('CEAC', 'CEAF'),
-       lty = c(3, 1),
-       lwd = c(1, 3))
+      col = 1,
+      lwd = 2)
+points(x = inmb_wtp_summary$wtp,
+       y = inmb_wtp_summary$ceaf_proportion,
+       col = inmb_wtp_summary$ceaf_intervention)
+legend('right',
+       c('current state', 'vaccination program', 'CEAF'),
+       col = c(1, 2, 1),
+       lwd = c(2, 2, NA),
+       pch = c(NA, NA, 1))
 
 ```
 
