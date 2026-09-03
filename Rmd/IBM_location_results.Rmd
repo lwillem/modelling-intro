@@ -42,7 +42,7 @@ If the `curl` packages is not installed yet, you can do so by:
 install.packages(curl) # install the curl library (to import data)
 ```
 
-```{r setup eval = FALSE}
+```{r curl, eval = FALSE}
 # load package 'curl'
 library('curl')
 
