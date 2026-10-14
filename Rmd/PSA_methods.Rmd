@@ -65,7 +65,54 @@ QALYloss_case = 0.082
 
 ```
 
-# Inluding uncertainty: Don't
+# Without uncertainty
+
+Calculate the QALY loss and cost for the comparator and intervention using the mean (= expected) values:
+
+```{r }
+
+# mean force of infection: events / sample_size (mean of the beta distribution)
+foi_expected = foi_mean / foi_sample_size
+
+# comparator
+comp_infections    = foi_expected * targetgroup
+comp_QALY_loss     = comp_infections * QALYloss_case
+comp_total_cost    = comp_infections * cost_mean
+
+# intervention
+interv_infections  = foi_expected * targetgroup * (1 - vaccine_efficacy * uptake_program)
+interv_QALY_loss   = interv_infections * QALYloss_case
+interv_total_cost  = interv_infections * cost_mean +
+                     (targetgroup * vaccine_price_per_dose * uptake_program)
+
+# calculate incremental cost and effect
+incr_QALY_gain = comp_QALY_loss - interv_QALY_loss
+incr_cost      = interv_total_cost - comp_total_cost
+
+# plot CE-plane (single deterministic point)
+plot(x = incr_QALY_gain,
+     y = incr_cost,
+     xlab = 'Incremental effect',
+     ylab = 'Incremental cost',
+     col = 2,
+     pch = 19)
+abline(h = 0, lty = 2)
+abline(v = 0, lty = 2)
+
+# show table
+data_out = data.frame(comp_total_cost   = comp_total_cost,
+                      interv_total_cost = interv_total_cost,
+                      incr_cost         = incr_cost,
+                      comp_QALY_loss    = comp_QALY_loss,
+                      interv_QALY_loss  = interv_QALY_loss,
+                      incr_QALY_gain    = incr_QALY_gain)
+
+# print table
+knitr::kable(round(data_out), caption = "Summary Table of Costs and QALY Values")
+
+```
+
+# Including uncertainty: Don't
 
 Calculate the QALY loss and cost for the comparator and intervention:
 
@@ -148,7 +195,7 @@ knitr::kable(head(round(data_out), 10), caption = "Summary Table of Infections a
 
 
 
-# Inluding uncertainty: Do
+# Including uncertainty: Do
 
 Include uncertainty from the input parameters of the influenza model:
 
