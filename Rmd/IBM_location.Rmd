@@ -110,10 +110,17 @@ set_workplaces
 First, let's run the model with the default parameters:
 </n>
 
-```{r }
+```{r, eval = FALSE}
 
 # you can run the location-specific IBM with default parameters (see console)
 run_ibm_location()
+
+```
+
+```{r, echo = FALSE}
+
+# you can run the location-specific IBM with default parameters (see console)
+run_ibm_location(rng_seed = 2026)
 
 ```
 

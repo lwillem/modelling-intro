@@ -64,10 +64,17 @@ source('ibm_functions.R')
 
 First, let's run the model with the default parameters:
 
-```{r }
+```{r, eval = FALSE }
 
 # you can run the IBM with default parameters (see console)
 run_ibm_random_walk()
+
+```
+
+```{r, echo = FALSE  }
+
+# you can run the IBM with default parameters (fixed rng seed!)
+run_ibm_random_walk(rng_seed = 2026)
 
 ```
 <n style="color:darkred">
@@ -91,9 +98,10 @@ This IBM is able to account for vaccination. Therefore, you have to specify the 
 
 ```{r eval = TRUE}
 
-# set vaccination coverage to 60% with a population that does not move
+# set vaccination coverage to 60% with a population that does not move, and fix random values
 run_ibm_random_walk(max_velocity = 0,
-                    vaccine_coverage = 0.6)
+                    vaccine_coverage = 0.6,
+                    rng_seed = 2026)
 
 ```
 
@@ -108,7 +116,8 @@ What happens if vaccine refusal is geographically clustered and individuals do n
 # is vaccination clustered?
 run_ibm_random_walk(max_velocity = 0,
                     vaccine_coverage = 0.6,
-                    apply_spatial_vaccine_refusal = TRUE)
+                    apply_spatial_vaccine_refusal = TRUE,
+                    rng_seed = 2026)
 
 ```
 

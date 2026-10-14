@@ -58,7 +58,7 @@ source('ibm_functions.R')
 
 ```{r basecase}
 # you can run the location-specific IBM with default parameters (see console)
-run_ibm_location()
+run_ibm_location(rng_seed = 20)
 
 ```
 
