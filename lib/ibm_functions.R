@@ -52,7 +52,7 @@ get_default_parameters = function(){
               contact_prob_school        = 0.5,  # probability for an "effective contact" at school
               contact_prob_workplace     = 0.1,  # probability for an "effective contact" at work
 
-              num_workplaces = 100,
+              target_workplace_size = 10, # expected number of workers per workplace
 
               rng_seed = 2020,
 
@@ -592,8 +592,8 @@ run_ibm_location = function(pop_size              = 2000,     # population size
                              target_class_size      = 10,      # expected number of children per class
                              target_school_ages     = c(3:18), # ages that are eligible to be enrolled in school
 
-                             # workplaces = total number of workplaces
-                             num_workplaces         = 150,
+                             # workplaces: number of workplaces derived from target workplace size
+                             target_workplace_size  = 10,      # expected number of workers per workplace
 
                              # social contact parameters
                              num_contacts_community_day = 4,    # average number of "effective contacts" per day in the general community
@@ -622,7 +622,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
   }
 
   if(any(c(pop_size, num_days, num_infected_seeds, vaccine_coverage, target_class_size,
-           target_school_ages, num_workplaces, num_contacts_community_day,
+           target_school_ages, target_workplace_size, num_contacts_community_day,
            contact_prob_household, contact_prob_school, contact_prob_workplace,
            num_days_infected, transmission_prob) < 0)){
     warning("ERROR: negative values not allowed as function parameter")
@@ -649,7 +649,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
   #   - household_id    the household index of each individual
   #   - member_id       the household member index of each individual
   pop_data              = create_population_matrix(pop_size, target_class_size,
-                                                    target_school_ages, num_workplaces,
+                                                    target_school_ages, target_workplace_size,
                                                     bool_show_demographics)
   # set contact and transmission parameters
   contact_prob_community         = 1 - exp(-num_contacts_community_day / pop_size)  # rate to probability
@@ -833,7 +833,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
   all_param = c('pop_size', 'num_days', 'num_infected_seeds', 'vaccine_coverage',
                 'rng_seed', 'num_days_infected', 'transmission_prob',
                 'num_contacts_community_day', 'contact_prob_household', 'contact_prob_school', 'contact_prob_workplace',
-                'target_class_size', 'target_school_ages', 'num_workplaces', 'bool_show_demographics'
+                'target_class_size', 'target_school_ages', 'target_workplace_size', 'bool_show_demographics'
   )
 
   print('MODEL PARAMETERS')
@@ -861,12 +861,12 @@ run_ibm_location = function(pop_size              = 2000,     # population size
 #' @param pop_size  the final population size
 #' @param target_class_size the expected number of pupils per class (one age group per class)
 #' @param target_school_ages the age of children enrolled in school
-#' @param num_workplaces the number of workplaces in the population
+#' @param target_workplace_size the expected number of workers per workplace
 #' @param bool_show_demographics boolean to show the demographic figures
 #'
 #' @keywords external
 #' @export
-create_population_matrix = function(pop_size, target_class_size, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
+create_population_matrix = function(pop_size, target_class_size, target_school_ages, target_workplace_size, bool_show_demographics = TRUE)
 {
   ## demographic parameters
   ages_adult = 19:80
@@ -921,7 +921,7 @@ create_population_matrix = function(pop_size, target_class_size, target_school_a
   pop_data <- set_schools(pop_data, target_class_size, target_school_ages)
   
   # set workplace id's
-  pop_data <- set_workplaces(pop_data, num_workplaces, target_workplace_ages)
+  pop_data <- set_workplaces(pop_data, target_workplace_size, target_workplace_ages)
   
   # add health state: susceptible
   pop_data = data.frame(pop_data,
@@ -984,7 +984,15 @@ set_schools = function(pop_data, target_class_size, target_school_ages){
 }
 
 ## workplaces
-set_workplaces = function(pop_data, num_workplaces, target_workplace_ages){
+set_workplaces = function(pop_data, target_workplace_size, target_workplace_ages){
+
+  # get the number of workers
+  num_workers = sum(pop_data$age %in% target_workplace_ages)
+
+  # derive number of workplaces from target size
+  # note: using ceiling to have at least 1 workplace
+  num_workplaces = ceiling(num_workers / target_workplace_size)
+
   if(num_workplaces > 0){
     # sample a workplace for each individual
     pop_data$workplace_id = sample(num_workplaces, nrow(pop_data), replace = TRUE)
