@@ -43,7 +43,7 @@ get_default_parameters = function(){
 
               # school settings
               # note: we model (abstract) school contacts in our simulation
-              num_schools            = 2,          # number of classes per age group
+              target_class_size      = 10,       # expected number of pupils per class (= by age) 
               target_school_ages     = c(3:18),
 
               # social contact parameters
@@ -588,9 +588,9 @@ run_ibm_location = function(pop_size              = 2000,     # population size
                              vaccine_coverage      = 0,       # vaccine coverage [0,1]
                              rng_seed              = as.numeric(format(Sys.time(), '%S')), # random number seed = current time (seconds)
 
-                             # schools =  number of classes per age group
-                             num_schools            = 2,
-                             target_school_ages     = c(3:18),
+                             # schools: one class contains one age
+                             target_class_size      = 10,      # expected number of children per class
+                             target_school_ages     = c(3:18), # ages that are eligible to be enrolled in school
 
                              # workplaces = total number of workplaces
                              num_workplaces         = 150,
@@ -621,7 +621,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
     return(NULL)
   }
 
-  if(any(c(pop_size, num_days, num_infected_seeds, vaccine_coverage, num_schools,
+  if(any(c(pop_size, num_days, num_infected_seeds, vaccine_coverage, target_class_size,
            target_school_ages, num_workplaces, num_contacts_community_day,
            contact_prob_household, contact_prob_school, contact_prob_workplace,
            num_days_infected, transmission_prob) < 0)){
@@ -648,7 +648,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
   #   - age             the age of each individual
   #   - household_id    the household index of each individual
   #   - member_id       the household member index of each individual
-  pop_data              = create_population_matrix(pop_size, num_schools,
+  pop_data              = create_population_matrix(pop_size, target_class_size,
                                                     target_school_ages, num_workplaces,
                                                     bool_show_demographics)
   # set contact and transmission parameters
@@ -833,7 +833,7 @@ run_ibm_location = function(pop_size              = 2000,     # population size
   all_param = c('pop_size', 'num_days', 'num_infected_seeds', 'vaccine_coverage',
                 'rng_seed', 'num_days_infected', 'transmission_prob',
                 'num_contacts_community_day', 'contact_prob_household', 'contact_prob_school', 'contact_prob_workplace',
-                'num_schools', 'target_school_ages', 'num_workplaces', 'bool_show_demographics'
+                'target_class_size', 'target_school_ages', 'num_workplaces', 'bool_show_demographics'
   )
 
   print('MODEL PARAMETERS')
@@ -859,15 +859,14 @@ run_ibm_location = function(pop_size              = 2000,     # population size
 #' @description This function creates a population with households
 #'
 #' @param pop_size  the final population size
-#' @param num_schools the number of schools (which contains one class per age group)
+#' @param target_class_size the expected number of pupils per class (one age group per class)
 #' @param target_school_ages the age of children enrolled in school
 #' @param num_workplaces the number of workplaces in the population
 #' @param bool_show_demographics boolean to show the demographic figures
 #'
 #' @keywords external
 #' @export
-#pop_size <- 1e4
-create_population_matrix = function(pop_size, num_schools, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
+create_population_matrix = function(pop_size, target_class_size, target_school_ages, num_workplaces, bool_show_demographics = TRUE)
 {
   ## demographic parameters
   ages_adult = 19:80
@@ -919,7 +918,7 @@ create_population_matrix = function(pop_size, num_schools, target_school_ages, n
   }
   
   # set school id's
-  pop_data <- set_schools(pop_data, num_schools, target_school_ages)
+  pop_data <- set_schools(pop_data, target_class_size, target_school_ages)
   
   # set workplace id's
   pop_data <- set_workplaces(pop_data, num_workplaces, target_workplace_ages)
@@ -957,9 +956,20 @@ create_population_matrix = function(pop_size, num_schools, target_school_ages, n
 
 } # end function
 
-set_schools = function(pop_data, num_schools, target_school_ages){
+set_schools = function(pop_data, target_class_size, target_school_ages){
+  
+  # get the age of all children in school
+  pupils_age = pop_data$age[pop_data$age %in% target_school_ages]
+  
+  # get the average number of pupils by age
+  mean_num_pupils_age = mean(table(pupils_age))
+                         
+  # define the number of schools as the average number of pupils by age defined by the expected class size
+  # note: using ceiling to have at least 1 school
+  num_schools = ceiling(mean_num_pupils_age / target_class_size)
+  
   if(num_schools > 0){
-    # eg. 'class3_1' is the 1th classroom with 3-year olds children
+    # eg. 'class3_1' is the 1th classroom with 3-year-olds children
     pop_data$classroom_id = paste0('class', pop_data$age, '_', sample(num_schools, nrow(pop_data), replace = TRUE))
 
     # set 'classroom_id' for infants and adults outside the target ages to 'NA' (=none)
@@ -968,6 +978,7 @@ set_schools = function(pop_data, num_schools, target_school_ages){
   } else {
     pop_data$classroom_id = NA
   }
+  
   # return the result
   return(pop_data)
 }
