@@ -481,10 +481,10 @@ geo_plot_health_states = function(pop_data, area_size, day_i, num_days, plot_tim
     # setup global variables for one participant 'X' (once!)
     if(day_i == 1 | !exists('participant_id')){
 
-      # select most centered individuals (min distance from the centre)
-       diff_cntr = abs(pop_data$x_coord - (area_size / 2)) +
-                    abs(pop_data$y_coord - (area_size / 2))
-      participant_id <<- which(order(diff_cntr) == 1)
+      # select most centered individual (min distance from the centre)
+      diff_cntr      = abs(pop_data$x_coord - (area_size / 2)) +
+                       abs(pop_data$y_coord - (area_size / 2))
+      participant_id <<- which.min(diff_cntr)
 
       #create matrix to log the x- and y-coordinates
       log_part_coord   <<- matrix(NA, nrow = 2, ncol = num_days)
