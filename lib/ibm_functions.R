@@ -14,12 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright (C) 2025 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
+# Copyright (C) 2019-2026 lwillem, SIMID, UNIVERSITY OF ANTWERP, BELGIUM
 ############################################################################ #
-#
-# FUNCTION TO VISUALISE THE POPULATION IN THE RANDOM WALK TUTORIAL
-#
-############################################################################ #
+
+# include and print some meta-data
+script_version = "1.0"
+message(paste("Load R script with IBM functions, version", script_version))
+message(paste("The file is located in", getwd()))
+message("For more info, see https://lwillem.github.io/modelling-intro")
 
 get_default_parameters = function(){
 
