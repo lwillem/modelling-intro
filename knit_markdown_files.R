@@ -2,8 +2,9 @@
 # clear workspace
 rm(list = ls())
 
-# load package
+# load packages
 require('rmarkdown')
+require('parallel')
 
 # set directories
 project_dir = path.expand(".")
@@ -21,6 +22,7 @@ rmd_files_results = c("CEA_flu_basic",
 
 # define help function
 knit_with_show_results = function(rmd_name, show_results) {
+  require('rmarkdown')
   e = new.env(parent = globalenv())
   e$show_results = show_results
   output_file = if (show_results) paste0(rmd_name, "_results.html") else paste0(rmd_name, ".html")
@@ -32,12 +34,12 @@ knit_with_show_results = function(rmd_name, show_results) {
          envir       = e)
 }
 
-# generate all html files
-for (rmd_name in rmd_files) {
-  knit_with_show_results(rmd_name, show_results = FALSE)
-}
+# set number of cores (leave one free for the OS)
+num_cores = max(1, detectCores() - 1)
+message(paste("Knitting in parallel using", num_cores, "cores"))
 
-# generate specific html files with visible results
-for (rmd_name in rmd_files_results) {
-  knit_with_show_results(rmd_name, show_results = TRUE)
-}
+# generate all html files in parallel
+mclapply(rmd_files, knit_with_show_results, show_results = FALSE, mc.cores = num_cores)
+
+# generate specific html files with visible results in parallel
+mclapply(rmd_files_results, knit_with_show_results, show_results = TRUE, mc.cores = num_cores)
