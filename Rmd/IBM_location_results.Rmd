@@ -2,7 +2,7 @@
 title: "Location-specific IBM tutorials (Results)"
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include = FALSE, , message = FALSE}
 library('curl')
 
 set.seed(2020)
@@ -37,9 +37,9 @@ This page contains the solutions to the scenarios requested in the <a href="IBM_
 
 To start, please load the IBM functions we prepared on the GitHub repository. 
 
-If the `curl` packages is not installed yet, you can do so by:
+If the curl packages is not installed yet, you can do so by:
 ```{r results = "hide", eval = FALSE}
-install.packages(curl) # install the curl library (to import data)
+install.packages('curl') # install the curl library (to import data)
 ```
 
 ```{r curl, eval = FALSE}

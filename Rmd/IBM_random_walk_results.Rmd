@@ -2,7 +2,7 @@
 title: "Random walk IBM tutorials (Results)"
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include = FALSE, warnings = FALSE, message = FALSE}
 library('curl')
 
 set.seed(2020)

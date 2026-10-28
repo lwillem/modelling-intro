@@ -2,7 +2,7 @@
 title: "Location-specific IBMs"
 ---
 
-```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE}
+```{r libs, cache = FALSE, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
 
 suppressPackageStartupMessages(library('curl'))
 set.seed(2020)
@@ -42,10 +42,10 @@ setwd(home)
 
 # Load model code
 
-If the `curl` package is not installed yet, you can do so by
+If the curl package is not installed yet, you can do so by
 ```{r results = "hide", eval = FALSE}
 
-install.packages(curl) # install the curl library (to import data)
+install.packages('curl') # install the curl library (to import data)
 
 ```
 
