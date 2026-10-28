@@ -28,7 +28,7 @@ get_default_parameters = function(){
   attach(list(pop_size = 1000,  # population size
               num_days = 50,    # time horizon
               num_infected_seeds = 3, # initial infections
-              vaccine_coverage = 0.1, # vaccine state
+              vaccine_coverage = 0,   # vaccine coverage [0,1]
               apply_spatial_vaccine_refusal  = TRUE, # are vaccine states randomly distributed
 
               area_size = 20,     # geo-spatial settings
@@ -74,7 +74,7 @@ get_default_parameters = function(){
 run_ibm_random_walk = function(pop_size = 1000,  # population size
                                 num_days = 50,    # time horizon
                                 num_infected_seeds = 3, # initial infections
-                                vaccine_coverage = 0.1, # vaccine state
+                                vaccine_coverage = 0,   # vaccine coverage [0,1]
                                 apply_spatial_vaccine_refusal  = FALSE, # is vaccination geographically clustered?
 
                                 area_size = 20,     # geo-spatial settings
