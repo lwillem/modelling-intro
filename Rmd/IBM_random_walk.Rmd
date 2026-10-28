@@ -94,12 +94,12 @@ run_ibm_random_walk(plot_time_delay = 0.2)
 
 ## Vaccination?
 
-This IBM is able to account for vaccination. Therefore, you have to specify the parameter `vaccine_coverage`. By default, vaccinated individuals are randomly distributed over the area. To make this clear, we suggest to exclude the random movement, and use a static population (with velocity = 0).
+This IBM is able to account for vaccination. Therefore, you have to specify the parameter `vaccine_coverage`. By default, vaccinated individuals are randomly distributed over the area. To make this clear, we suggest to exclude the random movement, and use a static population (with max_step_size = 0).
 
 ```{r eval = TRUE}
 
 # set vaccination coverage to 60% with a population that does not move, and fix random values
-run_ibm_random_walk(max_velocity = 0,
+run_ibm_random_walk(max_step_size = 0,
                     vaccine_coverage = 0.6,
                     rng_seed = 2026)
 
@@ -114,7 +114,7 @@ What happens if vaccine refusal is geographically clustered and individuals do n
 ```{r eval = TRUE}
 
 # is vaccination clustered?
-run_ibm_random_walk(max_velocity = 0,
+run_ibm_random_walk(max_step_size = 0,
                     vaccine_coverage = 0.6,
                     apply_spatial_vaccine_refusal = TRUE,
                     rng_seed = 2026)
@@ -131,14 +131,14 @@ Now, it is time to adapt the model parameters and see what happens to the **tota
 </n>
 
 
-1. Change the population size to 200 or 5000?
-2. Decrease the area size?
-3. Change the velocity to 20?
-4. Start with 1 or 500 infected individuals?
-5. Increase the contact range?
-6. Increase the transmission probability to 0.4?
-7. Change the average number of contacts per day to 2 or 20?
-8. Change the time horizon to 100 days?
+1. Change the population size to 200 or 5000?  ('pop_size')
+2. Decrease the area size? ('area_size')
+3. Change the maximum step size to 20? ('max_step_size')
+4. Start with 1 or 500 infected individuals? ('num_infected_seeds')
+5. Increase the contact range? ('max_contact_distance')
+6. Increase the transmission probability to 0.4? ('transmission_prob')
+7. Change the average number of contacts per day to 2 or 20? ('target_num_contacts_day')
+8. Change the time horizon to 100 days? ('num_days)
 
 ... etc.
 

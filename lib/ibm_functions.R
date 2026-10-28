@@ -32,7 +32,7 @@ get_default_parameters = function(){
               apply_spatial_vaccine_refusal  = TRUE, # are vaccine states randomly distributed
 
               area_size = 20,     # geo-spatial settings
-              max_velocity = 0,
+              max_step_size = 0,
 
               num_days_infected  = 7, # disease parameter
               transmission_prob  = 0.1, # transmission dynamics
@@ -78,7 +78,7 @@ run_ibm_random_walk = function(pop_size = 1000,  # population size
                                 apply_spatial_vaccine_refusal  = FALSE, # is vaccination geographically clustered?
 
                                 area_size = 20,     # geo-spatial settings
-                                max_velocity = 1,
+                                max_step_size = 1,
 
                                 num_days_infected  = 7, # disease parameter
                                 transmission_prob  = 0.1, # transmission probability per contact
@@ -105,7 +105,7 @@ run_ibm_random_walk = function(pop_size = 1000,  # population size
   }
 
   if(any(c(pop_size, num_days, num_infected_seeds, vaccine_coverage,
-           area_size, max_velocity, num_days_infected, transmission_prob,
+           area_size, max_step_size, num_days_infected, transmission_prob,
            target_num_contacts_day, max_contact_distance, plot_time_delay) < 0)){
     warning("ERROR: negative values not allowed as function parameter")
     return(NULL)
@@ -170,8 +170,8 @@ run_ibm_random_walk = function(pop_size = 1000,  # population size
   # LOOP OVER ALL DAYS
   for(day_i in 1:num_days)
   {
-    # step 1a: move at random [-1,1] units along the x and y axis
-    step_vector      = seq(-max_velocity, max_velocity, 0.01)
+    # step 1a: move at random number of units along the x and y axis, bounded by 'max_step_size'
+    step_vector      = seq(-max_step_size, max_step_size, 0.01)
     pop_data$x_coord = pop_data$x_coord + sample(step_vector, pop_size, replace = T)
     pop_data$y_coord = pop_data$y_coord + sample(step_vector, pop_size, replace = T)
 
@@ -293,7 +293,7 @@ run_ibm_random_walk = function(pop_size = 1000,  # population size
   # PRINT PARAMETERS AND RESULTS ----
   # collect possible parameter names
   all_param = c('pop_size', 'num_days', 'num_infected_seeds', 'vaccine_coverage', 'apply_spatial_vaccine_refusal',
-                'rng_seed', 'area_size', 'max_velocity', 'target_num_contacts_day',
+                'rng_seed', 'area_size', 'max_step_size', 'target_num_contacts_day',
                 'max_contact_distance', 'num_days_infected', 'transmission_prob',
                 'plot_time_delay'
   )

@@ -142,17 +142,17 @@ run_ibm_random_walk(max_contact_distance = 4,
 
 ```
 
-# Max velocity 0 (instead of 1)
-```{r velocity_zero, eval = TRUE}
-run_ibm_random_walk(max_velocity = 0,
+# Max step size 0 (instead of 1)
+```{r step_size_zero, eval = TRUE}
+run_ibm_random_walk(max_step_size = 0,
                     rng_seed = 2000,
                     add_baseline = T)
 
 ```
 
-# Max velocity 4 (instead of 1)
-```{r velocity_high, eval = TRUE}
-run_ibm_random_walk(max_velocity = 4,
+# Max step size 4 (instead of 1)
+```{r step_size_high, eval = TRUE}
+run_ibm_random_walk(max_step_size = 4,
                     rng_seed = 2000,
                     add_baseline = T)
 
@@ -178,7 +178,7 @@ run_ibm_random_walk(transmission_prob = 0.4,
 ```{r vaccine_50_uniform, eval = TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.5,
                     apply_spatial_vaccine_refusal = F,
-                    max_velocity = 0,
+                    max_step_size = 0,
                     rng_seed = 2000,
                     add_baseline = T)
 
@@ -188,7 +188,7 @@ run_ibm_random_walk(vaccine_coverage = 0.5,
 ```{r vaccine_50_clustered, eval = TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.5,
                     apply_spatial_vaccine_refusal = T,
-                    max_velocity = 0,
+                    max_step_size = 0,
                     rng_seed = 2000,
                     add_baseline = T)
 
@@ -198,7 +198,7 @@ run_ibm_random_walk(vaccine_coverage = 0.5,
 ```{r vaccine_80_uniform, eval = TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.8,
                     apply_spatial_vaccine_refusal = F,
-                    max_velocity = 0,
+                    max_step_size = 0,
                     rng_seed = 2000,
                     add_baseline = T)
 
@@ -208,7 +208,7 @@ run_ibm_random_walk(vaccine_coverage = 0.8,
 ```{r vaccine_80_clustered, eval = TRUE}
 run_ibm_random_walk(vaccine_coverage = 0.8,
                     apply_spatial_vaccine_refusal = T,
-                    max_velocity = 0,
+                    max_step_size = 0,
                     rng_seed = 2000,
                     add_baseline = T)
 
