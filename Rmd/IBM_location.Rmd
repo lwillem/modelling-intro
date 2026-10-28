@@ -137,8 +137,8 @@ The "model parameters" from the model printout above can be used as function arg
 # increase the number of contacts in the community per day to 6 (= 'num_contacts_community_day')
 run_ibm_location(num_contacts_community_day = 6)
 
-# set num_schools to 5
-run_ibm_location(num_schools = 5)
+# set target_class_size to 5
+run_ibm_location(target_class_size = 5)
 
 # set transmission_prob to 0.15 (and switch off the demographic plots)
 run_ibm_location(transmission_prob = 0.15,

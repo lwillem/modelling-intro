@@ -89,18 +89,18 @@ run_ibm_location(num_infected_seeds = 100,
 
 ```
 
-# Add schools
+# Reduce school class size
 ```{r num_schools, eval = TRUE}
-run_ibm_location(num_schools = 10,
+run_ibm_location(target_class_size = 5,
                  rng_seed = 20,
                  bool_show_demographics = TRUE,
                  add_baseline = T)
 
 ```
 
-# Decrease the number of workplaces
+# Increase the number of colleagues in a workplaces
 ```{r num_workplaces, eval = TRUE}
-run_ibm_location(num_workplaces = 20,
+run_ibm_location(target_workplace_size = 20,
                  rng_seed = 20,
                  bool_show_demographics = TRUE,
                  add_baseline = T)
