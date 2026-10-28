@@ -18,7 +18,7 @@
 ############################################################################ #
 
 # include and print some meta-data
-script_version = "1.0"
+script_version = "1.1"
 message(paste("Load R script with IBM functions, version", script_version))
 message(paste("The file is located in", getwd()))
 message("For more info, see https://lwillem.github.io/modelling-intro")
